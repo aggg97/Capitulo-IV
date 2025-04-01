@@ -608,4 +608,85 @@ st.dataframe(df_petrolifero, use_container_width=True)
 st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Caudal Pico**")
 st.dataframe(df_gasifero, use_container_width=True)
 
+import plotly.graph_objects as go
+
+# Top 10 Gas Wells based on peak gas rate
+top_10_gas_wells = grouped_gasifero_sorted.head(10)
+
+# Define a list of specific colors for gas rate plots
+gas_color_list = ['#FF6347', '#FF4500', '#DC143C', '#FF8C00', '#FF7F50', '#FF1493', '#F08080', '#FFD700', '#B22222', '#B8860B']
+
+# Initialize the figure for Gas wells plot
+gas_rate_fig = go.Figure()
+
+# Loop through the top 10 gas wells
+for i, sigla in enumerate(top_10_gas_wells['sigla']):
+    filtered_well_data = df_merged_VMUT[df_merged_VMUT['sigla'] == sigla]
+    
+    # Filter data to start when 'Qg' is different from zero
+    filtered_well_data = filtered_well_data[filtered_well_data['Qg_peak'] != 0]
+    
+    # Add a counter column to the filtered data for plotting
+    filtered_well_data['counter'] = range(1, len(filtered_well_data) + 1)
+    
+    gas_rate_fig.add_trace(
+        go.Scatter(
+            x=filtered_well_data['counter'],  # Use the counter as x-axis
+            y=filtered_well_data['Qg_peak'],
+            mode='lines+markers',
+            name=f'Gas Rate - {sigla}',
+            line=dict(color=gas_color_list[i % len(gas_color_list)]),  # Use the color list for each line
+        )
+    )
+
+gas_rate_fig.update_layout(
+    title="Historia de Producción de Gas",
+    xaxis_title="Meses",
+    yaxis_title="Caudal de Gas (km³/d)",
+)
+
+# Display the gas rate Plotly figure in the Streamlit app
+st.plotly_chart(gas_rate_fig)
+
+import plotly.graph_objects as go
+
+# Top 10 Gas Wells based on peak gas rate
+top_10_gas_wells = grouped_gasifero_sorted.head(10)
+
+# Define a list of specific colors for gas rate plots
+gas_color_list = ['#FF6347', '#FF4500', '#DC143C', '#FF8C00', '#FF7F50', '#FF1493', '#F08080', '#FFD700', '#B22222', '#B8860B']
+
+# Initialize the figure for Gas wells plot
+gas_rate_fig = go.Figure()
+
+# Loop through the top 10 gas wells
+for i, sigla in enumerate(top_10_gas_wells['sigla']):
+    filtered_well_data = df_merged_VMUT[df_merged_VMUT['sigla'] == sigla]
+    
+    # Filter data to start when 'Qg' is different from zero
+    filtered_well_data = filtered_well_data[filtered_well_data['Qg_peak'] != 0]
+    
+    # Add a counter column to the filtered data for plotting
+    filtered_well_data['counter'] = range(1, len(filtered_well_data) + 1)
+    
+    gas_rate_fig.add_trace(
+        go.Scatter(
+            x=filtered_well_data['counter'],  # Use the counter as x-axis
+            y=filtered_well_data['Qg_peak'],
+            mode='lines+markers',
+            name=f'Gas Rate - {sigla}',
+            line=dict(color=gas_color_list[i % len(gas_color_list)]),  # Use the color list for each line
+        )
+    )
+
+gas_rate_fig.update_layout(
+    title="Historia de Producción de Gas",
+    xaxis_title="Meses",
+    yaxis_title="Caudal de Gas (km³/d)",
+)
+
+# Display the gas rate Plotly figure in the Streamlit app
+st.plotly_chart(gas_rate_fig)
+
+
 
