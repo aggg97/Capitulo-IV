@@ -78,25 +78,12 @@ latest_data = data_filtered[data_filtered['date'] == latest_date]
 top3_gas = latest_data.sort_values(by='gas_rate', ascending=False).head(3)
 top3_oil = latest_data.sort_values(by='oil_rate', ascending=False).head(3)
 
-st.title(f"📊 Producción de Pozos – {latest_date.strftime('%B %Y')}")
 
-# Métricas destacadas – Producción de Gas
+
+
 st.subheader("🔝 Top 3 Producción de Gas")
-cols_gas = st.columns(3)
-for i, row in enumerate(top3_gas.itertuples()):
-    cols_gas[i].metric(
-        label=f"{row.sigla} ({row.empresaNEW})",
-        value=f"{row.gas_rate:,.0f} m³/día"
-    )
 
-# Métricas destacadas – Producción de Petróleo
-st.subheader("🔝 Top 3 Producción de Petróleo")
-cols_oil = st.columns(3)
-for i, row in enumerate(top3_oil.itertuples()):
-    cols_oil[i].metric(
-        label=f"{row.sigla} ({row.empresaNEW})",
-        value=f"{row.oil_rate:,.0f} m³/día"
-    )
+
 
 # Gráfico de Producción de Gas
 fig_gas = px.bar(
@@ -105,7 +92,6 @@ fig_gas = px.bar(
     x='gas_rate',
     color='empresaNEW',
     orientation='h',
-    title='Top 3 Pozos por Producción de Gas',
     labels={'gas_rate': 'Producción de Gas (m³/día)', 'sigla': 'Pozo', 'empresaNEW': 'Empresa'},
     text='gas_rate'
 )
@@ -114,6 +100,9 @@ fig_gas.update_layout(yaxis=dict(categoryorder='total ascending'))
 
 st.plotly_chart(fig_gas, use_container_width=True)
 
+
+st.subheader("🔝 Top 3 Producción de Petróleo")
+
 # Gráfico de Producción de Petróleo
 fig_oil = px.bar(
     top3_oil.sort_values(by='oil_rate'),
@@ -121,7 +110,6 @@ fig_oil = px.bar(
     x='oil_rate',
     color='empresaNEW',
     orientation='h',
-    title='Top 3 Pozos por Producción de Petróleo',
     labels={'oil_rate': 'Producción de Petróleo (m³/día)', 'sigla': 'Pozo', 'empresaNEW': 'Empresa'},
     text='oil_rate'
 )
