@@ -48,7 +48,7 @@ replacement_dict = {
 data_sorted['empresaNEW'] = data_sorted['empresa'].replace(replacement_dict)
 
 # Sidebar filters
-st.header(f":blue[Reporte de Producción No Convencional]")
+st.header(f":blue[Watchlist Nuevos Pozos VM]")
 image = Image.open('Vaca Muerta rig.png')
 st.sidebar.image(image)
 
@@ -80,8 +80,7 @@ top3_oil = latest_data.sort_values(by='oil_rate', ascending=False).head(3)
 
 
 
-
-st.subheader("🔝 Top 3 Producción de Gas")
+st.subheader("🔝 3 Producción de Gas")
 
 
 
@@ -101,7 +100,7 @@ fig_gas.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_gas, use_container_width=True)
 
 
-st.subheader("🔝 Top 3 Producción de Petróleo")
+st.subheader("🔝 3 Producción de Petróleo")
 
 # Gráfico de Producción de Petróleo
 fig_oil = px.bar(
