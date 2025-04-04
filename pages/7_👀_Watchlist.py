@@ -52,69 +52,101 @@ st.header(f":blue[Watchlist Nuevos Pozos VM]")
 image = Image.open('Vaca Muerta rig.png')
 st.sidebar.image(image)
 
-# Filter out rows where TEF is zero for calculating metrics
-data_filtered = data_sorted[(data_sorted['tef'] > 0)]
+# Create a multiselect list for 'sigla'
+selected_sigla = st.sidebar.multiselect("Seleccionar siglas de los pozos a comparar", data_sorted['sigla'].unique())
 
-# Find the latest date in the dataset
-latest_date = data_filtered['date'].max()
+# Filter data for matching 'sigla'
+filtered_data = data_sorted[
+    (data_sorted['sigla'].isin(selected_sigla))
+]
 
-st.write("Fecha de Alocación en Progreso: ", latest_date.date())
+# Find highest gas and oil rates in the entire dataset
+max_gas_rate = data_sorted['gas_rate'].max()
+max_oil_rate = data_sorted['oil_rate'].max()
 
-#------------------------------------------- RESULTADOS CON ULTIMOS DATOS 
+# Plot gas rate using Plotly
+gas_rate_fig = go.Figure()
 
-import streamlit as st
-import plotly.express as px
+# Define colors for the plots
+gas_gp_palette = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
 
-# Filtrar datos válidos
-data_filtered = data_sorted[data_sorted['tef'] > 0]
+for i, sigla in enumerate(selected_sigla):
+    filtered_well_data = filtered_data[filtered_data['sigla'] == sigla]
+    
+    # Filter data to start when 'Gp' is different from zero
+    filtered_well_data = filtered_well_data[filtered_well_data['Gp'] != 0]
+    
+    # Add a counter column to the filtered data
+    filtered_well_data['counter'] = range(1, len(filtered_well_data) + 1)
+    
+    gas_rate_fig.add_trace(
+        go.Scatter(
+            x=filtered_well_data['counter'],  # Use the counter as x-axis
+            y=filtered_well_data['gas_rate'],
+            mode='lines+markers',
+            name=f'Gas Rate - {sigla}',
+            line=dict(color=gas_gp_palette[i % len(gas_gp_palette)]),  # Use the Gas Rate and Gp palette
+        )
+    )
 
-# Fecha más reciente
-latest_date = data_filtered['date'].max()
-
-# Datos de esa fecha
-latest_data = data_filtered[data_filtered['date'] == latest_date]
-
-# Top 5 pozos por gas y por petróleo
-top_gas = latest_data.sort_values(by='gas_rate', ascending=False).head(5)
-top_oil = latest_data.sort_values(by='oil_rate', ascending=False).head(5)
-
-
-
-st.subheader("🔝 5 Producción de Gas")
-
-
-
-# Gráfico de Producción de Gas
-fig_gas = px.bar(
-    top_gas.sort_values(by='gas_rate'),
-    y='sigla',
-    x='gas_rate',
-    color='empresaNEW',
-    orientation='h',
-    labels={'gas_rate': 'Producción de Gas (m³/día)', 'sigla': 'Pozo', 'empresaNEW': 'Empresa'},
-    text='gas_rate'
+# Add a horizontal line for the highest gas rate
+gas_rate_fig.add_trace(
+    go.Scatter(
+        x=[0, len(filtered_data)],  # X values for horizontal line
+        y=[max_gas_rate, max_gas_rate],  # Y values for the highest gas rate
+        mode='lines',
+        name='Highest Gas Rate',
+        line=dict(color='red', dash='dash')
+    )
 )
-fig_gas.update_traces(texttemplate='%{text:.2f}', textposition='inside')
-fig_gas.update_layout(yaxis=dict(categoryorder='total ascending'))
 
-st.plotly_chart(fig_gas, use_container_width=True)
-
-
-st.subheader("🔝 5 Producción de Petróleo")
-
-# Gráfico de Producción de Petróleo
-fig_oil = px.bar(
-    top_oil.sort_values(by='oil_rate'),
-    y='sigla',
-    x='oil_rate',
-    color='empresaNEW',
-    orientation='h',
-    labels={'oil_rate': 'Producción de Petróleo (m³/día)', 'sigla': 'Pozo', 'empresaNEW': 'Empresa'},
-    text='oil_rate'
+gas_rate_fig.update_layout(
+    title="Historia de Producción de Gas",
+    xaxis_title="Meses",
+    yaxis_title="Caudal de Gas (m³/día)",
 )
-fig_oil.update_traces(texttemplate='%{text:.2f}', textposition='inside')
-fig_oil.update_layout(yaxis=dict(categoryorder='total ascending'))
 
-st.plotly_chart(fig_oil, use_container_width=True)
+# Display the gas rate Plotly figure in the Streamlit app
+st.plotly_chart(gas_rate_fig)
 
-#-------------------------------------------
+# Plot oil rate using Plotly
+oil_rate_fig = go.Figure()
+
+for i, sigla in enumerate(selected_sigla):
+    filtered_well_data = filtered_data[filtered_data['sigla'] == sigla]
+    
+    # Filter data to start when 'Np' is different from zero
+    filtered_well_data = filtered_well_data[filtered_well_data['Np'] != 0]
+    
+    # Add a counter column to the filtered data
+    filtered_well_data['counter'] = range(1, len(filtered_well_data) + 1)
+    
+    oil_rate_fig.add_trace(
+        go.Scatter(
+            x=filtered_well_data['counter'],  # Use the counter as x-axis
+            y=filtered_well_data['oil_rate'],
+            mode='lines+markers',
+            name=f'Oil Rate - {sigla}',
+            line=dict(color=gas_gp_palette[i % len(gas_gp_palette)]),  # Use the same palette
+        )
+    )
+
+# Add a horizontal line for the highest oil rate
+oil_rate_fig.add_trace(
+    go.Scatter(
+        x=[0, len(filtered_data)],  # X values for horizontal line
+        y=[max_oil_rate, max_oil_rate],  # Y values for the highest oil rate
+        mode='lines',
+        name='Highest Oil Rate',
+        line=dict(color='blue', dash='dash')
+    )
+)
+
+oil_rate_fig.update_layout(
+    title="Historia de Producción de Petróleo",
+    xaxis_title="Meses",
+    yaxis_title="Caudal de Petróleo (m³/día)",
+)
+
+# Display the oil rate Plotly figure in the Streamlit app
+st.plotly_chart(oil_rate_fig)
