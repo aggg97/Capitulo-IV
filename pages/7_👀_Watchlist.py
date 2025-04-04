@@ -85,7 +85,7 @@ for i, row in enumerate(top3_gas.itertuples()):
     cols_gas[i].metric(
         label=f"{row.sigla}",
         value=f"{row.gas_rate:,.0f} km³/día",
-        label=f"({row.empresaNEW})"
+        label2=f"({row.empresaNEW})"
     )
 
 # Métricas destacadas – Producción de Petróleo
@@ -95,7 +95,7 @@ for i, row in enumerate(top3_oil.itertuples()):
     cols_oil[i].metric(
        label=f"{row.sigla}",
         value=f"{row.oil_rate:,.0f} m³/día",
-        label=f"({row.empresaNEW})"
+        label2=f"({row.empresaNEW})"
     )
 
 
