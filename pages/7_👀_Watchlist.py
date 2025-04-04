@@ -85,8 +85,7 @@ st.subheader("🔝 Top 3 Producción de Gas")
 cols_gas = st.columns(3)
 for i, row in enumerate(top3_gas.itertuples()):
     cols_gas[i].metric(
-        label=f"{row.sigla}",
-        label=f"{row.empresaNEW})",
+        label=f"{row.sigla} ({row.empresaNEW})",
         value=f"{row.gas_rate:,.0f} km³/día"
     )
 
