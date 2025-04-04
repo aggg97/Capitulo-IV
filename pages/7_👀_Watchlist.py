@@ -68,17 +68,14 @@ import plotly.express as px
 # Filtrar datos válidos
 data_filtered = data_sorted[data_sorted['tef'] > 0]
 
-# Fecha más reciente
-latest_date = data_filtered['date'].max()
-
-# Datos de esa fecha
+# Filter data for the latest date
 latest_data = data_filtered[data_filtered['date'] == latest_date]
 
-# Top 3 pozos por gas y por petróleo
+# Top 3 wells by gas and oil production rates
 top3_gas = latest_data.sort_values(by='gas_rate', ascending=False).head(3)
 top3_oil = latest_data.sort_values(by='oil_rate', ascending=False).head(3)
 
-# Métricas destacadas – Producción de Gas
+# Display top 3 gas wells
 st.subheader(f":red[Últimos 🔝 3 Pozos de Gas]")
 cols_gas = st.columns(3)
 for i, row in enumerate(top3_gas.itertuples()):
@@ -88,16 +85,12 @@ for i, row in enumerate(top3_gas.itertuples()):
         label2=f"({row.empresaNEW})"
     )
 
-# Métricas destacadas – Producción de Petróleo
+# Display top 3 oil wells
 st.subheader(f":green[Últimos 🔝 3 Pozos de Petróleo]")
 cols_oil = st.columns(3)
 for i, row in enumerate(top3_oil.itertuples()):
     cols_oil[i].metric(
-       label=f"{row.sigla}",
+        label=f"{row.sigla}",
         value=f"{row.oil_rate:,.0f} m³/día",
         label2=f"({row.empresaNEW})"
     )
-
-
-
-#-------------------------------------------
