@@ -133,4 +133,4 @@ oil_rate_fig.update_layout(
 )
 
 # Display the oil rate Plotly figure in the Streamlit app
-st.plotly_chart(oil_rate_fig)
+st.plotly_chart(oil_rate_fig) 
