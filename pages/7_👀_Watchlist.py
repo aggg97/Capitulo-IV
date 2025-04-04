@@ -81,8 +81,7 @@ cols_gas = st.columns(3)
 for i, row in enumerate(top3_gas.itertuples()):
     cols_gas[i].metric(
         label=f"{row.sigla}",
-        value=f"{row.gas_rate:,.0f} km³/día",
-        label2=f"({row.empresaNEW})"
+        value=f"{row.gas_rate:,.0f} km³/día"
     )
 
 # Display top 3 oil wells
@@ -91,6 +90,5 @@ cols_oil = st.columns(3)
 for i, row in enumerate(top3_oil.itertuples()):
     cols_oil[i].metric(
         label=f"{row.sigla}",
-        value=f"{row.oil_rate:,.0f} m³/día",
-        label2=f"({row.empresaNEW})"
+        value=f"{row.oil_rate:,.0f} m³/día"
     )
