@@ -56,9 +56,6 @@ filtered_data = data_sorted[
     (data_sorted['sigla'] == max_gas_rate_well['sigla']) | (data_sorted['sigla'] == max_oil_rate_well['sigla'])
 ]
 
-# Find highest gas and oil rates in the entire dataset
-max_gas_rate = data_sorted['gas_rate'].max()
-max_oil_rate = data_sorted['oil_rate'].max()
 
 # Plot gas rate using Plotly
 gas_rate_fig = go.Figure()
