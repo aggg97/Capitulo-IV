@@ -82,7 +82,7 @@ st.header(f"📊 Watchlist – {latest_date.strftime('%B %Y')}")
 
 # Métricas destacadas – Producción de Gas
 st.subheader("🔝 Caudal de Gas")
-cols_gas = st.columns(1)
+cols_gas = st.columns(2)
 for i, row in enumerate(top3_gas.itertuples()):
     cols_gas[i].metric(
         label=f"{row.sigla} ({row.empresaNEW})",
@@ -91,7 +91,7 @@ for i, row in enumerate(top3_gas.itertuples()):
 
 # Métricas destacadas – Producción de Petróleo
 st.subheader("🔝 Caudal de Petróleo")
-cols_oil = st.columns(1)
+cols_oil = st.columns(2)
 for i, row in enumerate(top3_oil.itertuples()):
     cols_oil[i].metric(
         label=f"{row.sigla} ({row.empresaNEW})",
