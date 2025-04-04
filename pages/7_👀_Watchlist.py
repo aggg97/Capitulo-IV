@@ -79,21 +79,23 @@ top3_gas = latest_data.sort_values(by='gas_rate', ascending=False).head(3)
 top3_oil = latest_data.sort_values(by='oil_rate', ascending=False).head(3)
 
 # Métricas destacadas – Producción de Gas
-st.subheader(f":blue[Últimos 🔝 3 Pozos de Gas]")
+st.subheader(f":red[Últimos 🔝 3 Pozos de Gas]")
 cols_gas = st.columns(3)
 for i, row in enumerate(top3_gas.itertuples()):
     cols_gas[i].metric(
-        label=f"{row.sigla} ({row.empresaNEW})",
-        value=f"{row.gas_rate:,.0f} km³/día"
+        label=f"{row.sigla}",
+        value=f"{row.gas_rate:,.0f} km³/día",
+        label=f"({row.empresaNEW})",
     )
 
 # Métricas destacadas – Producción de Petróleo
-st.subheader(f":blue[Últimos 🔝 3 Pozos de Petróleo]")
+st.subheader(f":green[Últimos 🔝 3 Pozos de Petróleo]")
 cols_oil = st.columns(3)
 for i, row in enumerate(top3_oil.itertuples()):
     cols_oil[i].metric(
-        label=f"{row.sigla} ({row.empresaNEW})",
+       label=f"{row.sigla}",
         value=f"{row.oil_rate:,.0f} m³/día"
+        label=f"({row.empresaNEW})",
     )
 
 
