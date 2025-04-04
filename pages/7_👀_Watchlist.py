@@ -78,7 +78,7 @@ latest_data = data_filtered[data_filtered['date'] == latest_date]
 top3_gas = latest_data.sort_values(by='gas_rate', ascending=False).head(3)
 top3_oil = latest_data.sort_values(by='oil_rate', ascending=False).head(3)
 
-st.subtitle(f"📊 Watchlist – {latest_date.strftime('%B %Y')}")
+st.header(f"📊 Watchlist – {latest_date.strftime('%B %Y')}")
 
 # Métricas destacadas – Producción de Gas
 st.subheader("🔝 Caudal de Gas")
