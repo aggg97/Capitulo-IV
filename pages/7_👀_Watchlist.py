@@ -81,7 +81,7 @@ top3_oil = latest_data.sort_values(by='oil_rate', ascending=False).head(3)
 st.title(f"📊 Producción de Pozos – {latest_date.strftime('%B %Y')}")
 
 # Métricas destacadas – Producción de Gas
-st.subheader("🔝 3 Pozos de Gas – {latest_date.strftime('%B %Y')}")
+st.write("🔝 3 Pozos de Gas: ", latest_date.date())
 cols_gas = st.columns(3)
 for i, row in enumerate(top3_gas.itertuples()):
     cols_gas[i].metric(
@@ -90,7 +90,7 @@ for i, row in enumerate(top3_gas.itertuples()):
     )
 
 # Métricas destacadas – Producción de Petróleo
-st.subheader("🔝 3 Pozos Petróleo – {latest_date.strftime('%B %Y')}")
+st.write("🔝 3 Pozos de Petróleo: ", latest_date.date())
 cols_oil = st.columns(3)
 for i, row in enumerate(top3_oil.itertuples()):
     cols_oil[i].metric(
