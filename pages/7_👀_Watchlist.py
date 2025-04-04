@@ -74,19 +74,19 @@ latest_date = data_filtered['date'].max()
 # Datos de esa fecha
 latest_data = data_filtered[data_filtered['date'] == latest_date]
 
-# Top 3 pozos por gas y por petróleo
-top3_gas = latest_data.sort_values(by='gas_rate', ascending=False).head(3)
-top3_oil = latest_data.sort_values(by='oil_rate', ascending=False).head(3)
+# Top 5 pozos por gas y por petróleo
+top_gas = latest_data.sort_values(by='gas_rate', ascending=False).head(5)
+top_oil = latest_data.sort_values(by='oil_rate', ascending=False).head(5)
 
 
 
-st.subheader("🔝 3 Producción de Gas")
+st.subheader("🔝 5 Producción de Gas")
 
 
 
 # Gráfico de Producción de Gas
 fig_gas = px.bar(
-    top3_gas.sort_values(by='gas_rate'),
+    top_gas.sort_values(by='gas_rate'),
     y='sigla',
     x='gas_rate',
     color='empresaNEW',
@@ -100,11 +100,11 @@ fig_gas.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_gas, use_container_width=True)
 
 
-st.subheader("🔝 3 Producción de Petróleo")
+st.subheader("🔝 5 Producción de Petróleo")
 
 # Gráfico de Producción de Petróleo
 fig_oil = px.bar(
-    top3_oil.sort_values(by='oil_rate'),
+    top_oil.sort_values(by='oil_rate'),
     y='sigla',
     x='oil_rate',
     color='empresaNEW',
