@@ -94,7 +94,7 @@ fig_gas = px.bar(
     labels={'gas_rate': 'Producción de Gas (m³/día)', 'sigla': 'Pozo', 'empresaNEW': 'Empresa'},
     text='gas_rate'
 )
-fig_gas.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+fig_gas.update_traces(texttemplate='%{text:.2f}', textposition='inside')
 fig_gas.update_layout(yaxis=dict(categoryorder='total ascending'))
 
 st.plotly_chart(fig_gas, use_container_width=True)
@@ -112,7 +112,7 @@ fig_oil = px.bar(
     labels={'oil_rate': 'Producción de Petróleo (m³/día)', 'sigla': 'Pozo', 'empresaNEW': 'Empresa'},
     text='oil_rate'
 )
-fig_oil.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+fig_oil.update_traces(texttemplate='%{text:.2f}', textposition='inside')
 fig_oil.update_layout(yaxis=dict(categoryorder='total ascending'))
 
 st.plotly_chart(fig_oil, use_container_width=True)
