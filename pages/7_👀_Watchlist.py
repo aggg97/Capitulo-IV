@@ -47,17 +47,13 @@ replacement_dict = {
 }
 data_sorted['empresaNEW'] = data_sorted['empresa'].replace(replacement_dict)
 
-# Sidebar filters
-st.header(f":blue[Watchlist Nuevos Pozos VM]")
-image = Image.open('Vaca Muerta rig.png')
-st.sidebar.image(image)
+# Find the well with the highest gas rate and oil rate
+max_gas_rate_well = data_sorted.loc[data_sorted['gas_rate'].idxmax()]
+max_oil_rate_well = data_sorted.loc[data_sorted['oil_rate'].idxmax()]
 
-# Create a multiselect list for 'sigla'
-selected_sigla = st.sidebar.multiselect("Seleccionar siglas de los pozos a comparar", data_sorted['sigla'].unique())
-
-# Filter data for matching 'sigla'
+# Filter data for the well with the highest gas and oil rate
 filtered_data = data_sorted[
-    (data_sorted['sigla'].isin(selected_sigla))
+    (data_sorted['sigla'] == max_gas_rate_well['sigla']) | (data_sorted['sigla'] == max_oil_rate_well['sigla'])
 ]
 
 # Find highest gas and oil rates in the entire dataset
@@ -70,24 +66,18 @@ gas_rate_fig = go.Figure()
 # Define colors for the plots
 gas_gp_palette = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
 
-for i, sigla in enumerate(selected_sigla):
-    filtered_well_data = filtered_data[filtered_data['sigla'] == sigla]
-    
-    # Filter data to start when 'Gp' is different from zero
-    filtered_well_data = filtered_well_data[filtered_well_data['Gp'] != 0]
-    
-    # Add a counter column to the filtered data
-    filtered_well_data['counter'] = range(1, len(filtered_well_data) + 1)
-    
-    gas_rate_fig.add_trace(
-        go.Scatter(
-            x=filtered_well_data['counter'],  # Use the counter as x-axis
-            y=filtered_well_data['gas_rate'],
-            mode='lines+markers',
-            name=f'Gas Rate - {sigla}',
-            line=dict(color=gas_gp_palette[i % len(gas_gp_palette)]),  # Use the Gas Rate and Gp palette
-        )
+# Plot for the well with the highest gas rate
+filtered_gas_well_data = filtered_data[filtered_data['sigla'] == max_gas_rate_well['sigla']]
+filtered_gas_well_data['counter'] = range(1, len(filtered_gas_well_data) + 1)
+gas_rate_fig.add_trace(
+    go.Scatter(
+        x=filtered_gas_well_data['counter'],  # Use the counter as x-axis
+        y=filtered_gas_well_data['gas_rate'],
+        mode='lines+markers',
+        name=f'Gas Rate - {max_gas_rate_well["sigla"]}',
+        line=dict(color='red'),  # Use red for the gas well
     )
+)
 
 # Add a horizontal line for the highest gas rate
 gas_rate_fig.add_trace(
@@ -112,24 +102,18 @@ st.plotly_chart(gas_rate_fig)
 # Plot oil rate using Plotly
 oil_rate_fig = go.Figure()
 
-for i, sigla in enumerate(selected_sigla):
-    filtered_well_data = filtered_data[filtered_data['sigla'] == sigla]
-    
-    # Filter data to start when 'Np' is different from zero
-    filtered_well_data = filtered_well_data[filtered_well_data['Np'] != 0]
-    
-    # Add a counter column to the filtered data
-    filtered_well_data['counter'] = range(1, len(filtered_well_data) + 1)
-    
-    oil_rate_fig.add_trace(
-        go.Scatter(
-            x=filtered_well_data['counter'],  # Use the counter as x-axis
-            y=filtered_well_data['oil_rate'],
-            mode='lines+markers',
-            name=f'Oil Rate - {sigla}',
-            line=dict(color=gas_gp_palette[i % len(gas_gp_palette)]),  # Use the same palette
-        )
+# Plot for the well with the highest oil rate
+filtered_oil_well_data = filtered_data[filtered_data['sigla'] == max_oil_rate_well['sigla']]
+filtered_oil_well_data['counter'] = range(1, len(filtered_oil_well_data) + 1)
+oil_rate_fig.add_trace(
+    go.Scatter(
+        x=filtered_oil_well_data['counter'],  # Use the counter as x-axis
+        y=filtered_oil_well_data['oil_rate'],
+        mode='lines+markers',
+        name=f'Oil Rate - {max_oil_rate_well["sigla"]}',
+        line=dict(color='blue'),  # Use blue for the oil well
     )
+)
 
 # Add a horizontal line for the highest oil rate
 oil_rate_fig.add_trace(
