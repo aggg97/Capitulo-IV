@@ -93,8 +93,9 @@ fig_gas = px.bar(
     x='gas_rate',
     color='empresaNEW',
     orientation='h',
-    labels={'gas_rate': 'Producción de Gas (m³/día)', 'sigla': 'Pozo', 'empresaNEW': 'Empresa'},
+    labels={'gas_rate': 'Producción de Gas (m³/día)', 'sigla': 'Pozo', 'empresaNEW': 'Empresa','areayacimiento':'Bloque'},
     text='gas_rate'
+    hover_data=['empresaNEW', 'areayacimiento'],
 )
 fig_gas.update_traces(texttemplate='%{text:.2f}', textposition='inside')
 fig_gas.update_layout(yaxis=dict(categoryorder='total ascending'))
@@ -111,8 +112,9 @@ fig_oil = px.bar(
     x='oil_rate',
     color='empresaNEW',
     orientation='h',
-    labels={'oil_rate': 'Producción de Petróleo (m³/día)', 'sigla': 'Pozo', 'empresaNEW': 'Empresa'},
+    labels={'oil_rate': 'Producción de Petróleo (m³/día)', 'sigla': 'Pozo', 'empresaNEW': 'Empresa','areayacimiento':'Bloque'},
     text='oil_rate'
+    hover_data=['empresaNEW', 'areayacimiento'],
 )
 fig_oil.update_traces(texttemplate='%{text:.2f}', textposition='inside')
 fig_oil.update_layout(yaxis=dict(categoryorder='total ascending'))
