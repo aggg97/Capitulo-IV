@@ -43,7 +43,9 @@ replacement_dict = {
     'Vista Oil & Gas Argentina SA': 'VISTA',
     'VISTA OIL & GAS ARGENTINA SAU': 'VISTA',
     'WINTERSHALL DE ARGENTINA S.A.': 'WINTERSHALL',
-    'WINTERSHALL ENERGÍA S.A.': 'WINTERSHALL'
+    'WINTERSHALL ENERGÍA S.A.': 'WINTERSHALL',
+    'PLUSPETROL S.A.': 'PLUSPETROL',
+    'PLUSPETROL CUENCA NEUQUINA S.R.L.': 'PLUSPETROL'
 }
 data_sorted['empresaNEW'] = data_sorted['empresa'].replace(replacement_dict)
 
