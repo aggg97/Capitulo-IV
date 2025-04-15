@@ -82,7 +82,7 @@ top_oil = latest_data.sort_values(by='oil_rate', ascending=False).head(5)
 
 
 
-st.subheader("🔥 Top 5 Pozos de Gas de la Cuenca Actualmente")
+st.subheader("🔥 Ranking actual de los 5 pozos de gas más productivos de la Cuenca")
 
 
 
@@ -103,7 +103,7 @@ fig_gas.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_gas, use_container_width=True)
 
 
-st.subheader("🔥 Top 5 Pozos de Petróleo de la Cuenca Actualmente")
+st.subheader("🔥 Ranking actual de los 5 pozos de petróleo más productivos de la Cuenca")
 
 # Gráfico de Producción de Petróleo
 fig_oil = px.bar(
