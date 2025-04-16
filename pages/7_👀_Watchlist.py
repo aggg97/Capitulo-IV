@@ -122,3 +122,12 @@ fig_oil.update_layout(yaxis=dict(categoryorder='total ascending'))
 st.plotly_chart(fig_oil, use_container_width=True)
 
 #-------------------------------------------
+
+st.markdown('''
+**Nota:** Al evaluar la productividad en Vaca Muerta, es importante tener precaución con los pozos considerados "más productivos".
+
+El caudal máximo registrado suele estar influenciado por el (*choke management*), asi tambien como la interferencia de pozos en un mismo PAD. Este fenómeno está relacionado con el concepto del SRV (*Stimulated Reservoir Volume*).
+
+Por lo tanto, una evaluación más representativa de la productividad debe realizarse a nivel de PAD y no de manera individual por pozo.
+''')
+
