@@ -98,7 +98,7 @@ fig_gas = px.bar(
     hover_data=['empresaNEW', 'areayacimiento'],
 )
 fig_gas.update_traces(texttemplate='%{text:.2f}', textposition='inside')
-fig_gas.update_layout(yaxis=dict(categoryorder='total ascending'))
+fig_gas.update_layout(yaxis=dict(categoryorder='total ascending'),yaxis_title=None )
 
 st.plotly_chart(fig_gas, use_container_width=True)
 
@@ -117,7 +117,7 @@ fig_oil = px.bar(
     hover_data=['empresaNEW', 'areayacimiento'],
 )
 fig_oil.update_traces(texttemplate='%{text:.2f}', textposition='inside')
-fig_oil.update_layout(yaxis=dict(categoryorder='total ascending'))
+fig_oil.update_layout(yaxis=dict(categoryorder='total ascending'),yaxis_title=None )
 
 st.plotly_chart(fig_oil, use_container_width=True)
 
