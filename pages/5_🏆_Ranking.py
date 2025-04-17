@@ -653,6 +653,49 @@ st.dataframe(df_petrolifero_display, use_container_width=True)
 st.write("Top 3 Empresas con Mayores Caudales Pico de Gas")
 st.dataframe(df_gasifero_display, use_container_width=True)
 
+# ----------------------------------------
+
+# Step 1: Process Data for Top 3 Sigla with Maximum Arena Bombeada
+grouped_sigla = df_merged_VMUT.groupby(
+    ['start_year', 'sigla']
+).agg({
+    'arena_total_tn': 'max',  # Use maximum arena bombeada
+}).reset_index()
+
+# Sort and ensure no repeated siglas per year
+grouped_sigla_sorted = grouped_sigla.sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
+top_sigla = grouped_sigla_sorted.groupby('start_year').head(3)
+
+# Step 2: Process Data for Top 3 Empresas with Maximum Average Arena Bombeada
+grouped_empresa = df_merged_VMUT.groupby(
+    ['start_year', 'empresaNEW']
+).agg({
+    'arena_total_tn': 'median',  # Use average arena bombeada
+}).reset_index()
+
+# Sort and ensure no repeated companies per year
+grouped_empresa_sorted = grouped_empresa.sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
+top_empresa = grouped_empresa_sorted.groupby('start_year').head(3)
+
+import streamlit as st
+import pandas as pd
+
+# Step 3: Convert List of Dicts to DataFrames
+df_sigla_display = pd.DataFrame(data_sigla_table)
+df_empresa_display = pd.DataFrame(data_empresa_table)
+
+# Optional: Rename columns for better presentation
+df_sigla_display.columns = ["Campaña", "Sigla", "Máxima Arena Bombeada (tn)"]
+df_empresa_display.columns = ["Campaña", "Empresa", "Prom. Arena Bombeada (tn)"]
+
+# Step 4: Display using Streamlit
+st.subheader("Top 3 Siglas con la Mayor Cantidad de Arena Bombeada por Año")
+st.dataframe(df_sigla_display, use_container_width=True)
+
+st.subheader("Top 3 Empresas con el Mayor Promedio de Arena Bombeada por Año")
+st.dataframe(df_empresa_display, use_container_width=True)
+
+
 
 
 
