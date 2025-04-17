@@ -608,7 +608,6 @@ st.dataframe(df_petrolifero, use_container_width=True)
 st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Caudal Pico**")
 st.dataframe(df_gasifero, use_container_width=True)
 
-st.text("hola")
 #------------------------------------
 
 # Step 1: Process Data for Petrolífero
@@ -648,10 +647,10 @@ df_petrolifero_display.columns = ["Campaña", "Empresa", "Prom. Caudal Pico Petr
 df_gasifero_display.columns = ["Campaña", "Empresa", "Prom. Caudal Pico Gas", "Etapas Promedio"]
 
 # Step 4: Display Tables in Streamlit
-st.subheader("Top 3 Empresas con Mayores Caudales Pico de Petróleo")
+st.write("Top 3 Empresas con Mayores Caudales Pico de Petróleo")
 st.dataframe(df_petrolifero_display, use_container_width=True)
 
-st.subheader("Top 3 Empresas con Mayores Caudales Pico de Gas")
+st.write("Top 3 Empresas con Mayores Caudales Pico de Gas")
 st.dataframe(df_gasifero_display, use_container_width=True)
 
 
