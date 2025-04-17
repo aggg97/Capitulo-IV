@@ -608,6 +608,7 @@ st.dataframe(df_petrolifero, use_container_width=True)
 st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Caudal Pico**")
 st.dataframe(df_gasifero, use_container_width=True)
 
+st.markdown("hola")
 #------------------------------------
 
 # Step 1: Process Data for Petrolífero
