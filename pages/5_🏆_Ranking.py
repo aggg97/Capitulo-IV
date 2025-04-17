@@ -638,71 +638,21 @@ grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].
 grouped_gasifero_sorted = grouped_gasifero.sort_values(['start_year', 'Qg_peak'], ascending=[True, False])
 top_gasifero = grouped_gasifero_sorted.groupby('start_year').head(3)
 
-# Step 3: Prepare Data for Tables with " " for Repeated Years
-# Petrolífero Table Data
-data_petrolifero_table = []
-last_year = None
-for _, row in top_petrolifero.iterrows():
-    data_petrolifero_table.append({
-        'start_year': row['start_year'] if row['start_year'] != last_year else "",  # Avoid repetition
-        'empresaNEW': row['empresaNEW'],
-        'Qo_peak': int(round(row['Qo_peak'])),  # Round to integer
-        'cantidad_fracturas': int(round(row['cantidad_fracturas']))  # Round to integer
-    })
-    last_year = row['start_year']
+# Step 3: Convert List of Dicts to DataFrame
+df_petrolifero_display = pd.DataFrame(data_petrolifero_table)
+df_gasifero_display = pd.DataFrame(data_gasifero_table)
 
-# Gasífero Table Data
-data_gasifero_table = []
-last_year = None
-for _, row in top_gasifero.iterrows():
-    data_gasifero_table.append({
-        'start_year': row['start_year'] if row['start_year'] != last_year else "",  # Avoid repetition
-        'empresaNEW': row['empresaNEW'],
-        'Qg_peak': int(round(row['Qg_peak'])),  # Round to integer
-        'cantidad_fracturas': int(round(row['cantidad_fracturas']))  # Round to integer
-    })
-    last_year = row['start_year']
+# Optional: Rename columns for nicer display
+df_petrolifero_display.columns = ["Campaña", "Empresa", "Prom. Caudal Pico Petróleo", "Etapas Promedio"]
+df_gasifero_display.columns = ["Campaña", "Empresa", "Prom. Caudal Pico Gas", "Etapas Promedio"]
 
-# Step 4: Create Plotly Tables
-# Petrolífero Table
-fig_petrolifero = go.Figure(data=[go.Table(
-    header=dict(values=["Campaña", "Empresa", "Promedio de Caudal Pico de Petróleo", "Cantidad de Etapas Promedio"]),
-    cells=dict(
-        values=[
-            [row['start_year'] for row in data_petrolifero_table],
-            [row['empresaNEW'] for row in data_petrolifero_table],
-            [row['Qo_peak'] for row in data_petrolifero_table],
-            [row['cantidad_fracturas'] for row in data_petrolifero_table]
-        ],
-    )
-)])
+# Step 4: Display Tables in Streamlit
+st.subheader("Top 3 Empresas con Mayores Caudales Pico de Petróleo")
+st.dataframe(df_petrolifero_display, use_container_width=True)
 
-fig_petrolifero.update_layout(
-    title="Top 3 Empresas con Mayores Caudales Pico de Petróleo",
-    template="plotly_white"
-)
+st.subheader("Top 3 Empresas con Mayores Caudales Pico de Gas")
+st.dataframe(df_gasifero_display, use_container_width=True)
 
-fig_petrolifero.show()
-
-# Gasífero Table
-fig_gasifero = go.Figure(data=[go.Table(
-    header=dict(values=["Campaña", "Empresa", "Promedio de Caudal Pico de Gas", "Cantidad de Etapas Promedio"]),
-    cells=dict(
-        values=[
-            [row['start_year'] for row in data_gasifero_table],
-            [row['empresaNEW'] for row in data_gasifero_table],
-            [row['Qg_peak'] for row in data_gasifero_table],
-            [row['cantidad_fracturas'] for row in data_gasifero_table]
-        ],
-    )
-)])
-
-fig_gasifero.update_layout(
-    title="Top 3 Empresas con Mayores Caudales Pico de Gas",
-    template="plotly_white"
-)
-
-fig_gasifero.show()
 
 
 
