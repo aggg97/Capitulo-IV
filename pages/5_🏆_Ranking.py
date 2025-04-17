@@ -654,6 +654,7 @@ st.write("Top 3 Empresas con Mayores Caudales Pico de Gas")
 st.dataframe(df_gasifero_display, use_container_width=True)
 
 # ----------------------------------------
+st.subheader("Ranking según Arena Bombeada", divider="blue")
 
 # Step 1: Process Data for Top 3 Sigla with Maximum Arena Bombeada
 grouped_sigla = df_merged_VMUT.groupby(
@@ -677,8 +678,6 @@ grouped_empresa = df_merged_VMUT.groupby(
 grouped_empresa_sorted = grouped_empresa.sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
 top_empresa = grouped_empresa_sorted.groupby('start_year').head(3)
 
-import streamlit as st
-import pandas as pd
 
 # Step 3: Convert List of Dicts to DataFrames
 df_sigla_display = pd.DataFrame(data_sigla_table)
