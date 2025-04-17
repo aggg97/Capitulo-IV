@@ -502,9 +502,12 @@ st.dataframe(df_avg_lenght, use_container_width=True)
 
 #------------------------------------
 
+import streamlit as st
+import pandas as pd
+
 st.subheader("Ranking según Caudales Pico", divider="blue")
 
-# Process Data for Petrolífero
+# -------------------- Petrolífero Pozos --------------------
 grouped_petrolifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
     ['start_year', 'sigla', 'empresaNEW']
 ).agg({
@@ -520,27 +523,30 @@ grouped_petrolifero['agente_etapa'] = (
     grouped_petrolifero['arena_bombeada_nacional_tn'] + grouped_petrolifero['arena_bombeada_importada_tn']
 ) / grouped_petrolifero['cantidad_fracturas']
 
-grouped_petrolifero = grouped_petrolifero.drop_duplicates(subset=['start_year', 'sigla'], keep='first')
 grouped_petrolifero_sorted = grouped_petrolifero.sort_values(['start_year', 'Qo_peak'], ascending=[True, False])
 top_petrolifero = grouped_petrolifero_sorted.groupby('start_year').head(3)
 
-# Handle repeated years in Petrolífero table
+# Format Table
 data_petrolifero_table = []
 previous_year = None
 for _, row in top_petrolifero.iterrows():
     year_value = int(row['start_year']) if row['start_year'] != previous_year else " "
     data_petrolifero_table.append({
-        'start_year': year_value,
-        'sigla': row['sigla'],
-        'empresaNEW': row['empresaNEW'],
-        'Qo_peak': int(row['Qo_peak']),
-        'cantidad_fracturas': int(row['cantidad_fracturas']),
-        'fracspacing': int(row['fracspacing']),
-        'agente_etapa': int(row['agente_etapa'])
+        'Campaña': year_value,
+        'Sigla': row['sigla'],
+        'Empresa': row['empresaNEW'],
+        'Caudal Pico de Petróleo (m3/d)': int(row['Qo_peak']),
+        'Cantidad de Fracturas': int(row['cantidad_fracturas']),
+        'Fracspacing (m/fractura)': int(row['fracspacing']),
+        'Agente de Sosten por Etapa (tn/fractura)': int(row['agente_etapa']),
     })
     previous_year = row['start_year']
 
-# Process Data for Gasífero
+df_petrolifero_final = pd.DataFrame(data_petrolifero_table)
+st.write("**Tipo Petrolífero: Top 3 Pozos con Mayor Caudal Pico**")
+st.dataframe(df_petrolifero_final, use_container_width=True)
+
+# -------------------- Gasífero Pozos --------------------
 grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
     ['start_year', 'sigla', 'empresaNEW']
 ).agg({
@@ -556,144 +562,84 @@ grouped_gasifero['agente_etapa'] = (
     grouped_gasifero['arena_bombeada_nacional_tn'] + grouped_gasifero['arena_bombeada_importada_tn']
 ) / grouped_gasifero['cantidad_fracturas']
 
-grouped_gasifero = grouped_gasifero.drop_duplicates(subset=['start_year', 'sigla'], keep='first')
 grouped_gasifero_sorted = grouped_gasifero.sort_values(['start_year', 'Qg_peak'], ascending=[True, False])
 top_gasifero = grouped_gasifero_sorted.groupby('start_year').head(3)
 
-# Handle repeated years in Gasífero table
+# Format Table
 data_gasifero_table = []
 previous_year = None
 for _, row in top_gasifero.iterrows():
     year_value = int(row['start_year']) if row['start_year'] != previous_year else " "
     data_gasifero_table.append({
-        'start_year': year_value,
-        'sigla': row['sigla'],
-        'empresaNEW': row['empresaNEW'],
-        'Qg_peak': int(row['Qg_peak']),
-        'cantidad_fracturas': int(row['cantidad_fracturas']),
-        'fracspacing': int(row['fracspacing']),
-        'agente_etapa': int(row['agente_etapa'])
+        'Campaña': year_value,
+        'Sigla': row['sigla'],
+        'Empresa': row['empresaNEW'],
+        'Caudal Pico de Gas (km3/d)': int(row['Qg_peak']),
+        'Cantidad de Fracturas': int(row['cantidad_fracturas']),
+        'Fracspacing (m/etapa)': int(row['fracspacing']),
+        'Agente de Sosten por Etapa (tn/etapa)': int(row['agente_etapa']),
     })
     previous_year = row['start_year']
 
-# Convert to DataFrame for Petrolífero and Gasífero tables
-df_petrolifero = pd.DataFrame(data_petrolifero_table)
-df_gasifero = pd.DataFrame(data_gasifero_table)
-
-# Rename columns for both DataFrames
-df_petrolifero.rename(columns={
-    'start_year': 'Campaña',
-    'sigla': 'Sigla',
-    'empresaNEW': 'Empresa',
-    'Qo_peak': 'Caudal Pico de Petróleo (m3/d)',
-    'cantidad_fracturas': 'Cantidad de Fracturas',
-    'fracspacing': 'Fracspacing (m/fractura)',
-    'agente_etapa': 'Agente de Sosten por Etapa (tn/fractura)'
-}, inplace=True)
-
-df_gasifero.rename(columns={
-    'start_year': 'Campaña',
-    'sigla': 'Sigla',
-    'empresaNEW': 'Empresa',
-    'Qg_peak': 'Caudal Pico de Gas (km3/d)',
-    'cantidad_fracturas': 'Cantidad de Fracturas',
-    'fracspacing': 'Fracspacing (m/etapa)',
-    'agente_etapa': 'Agente de Sosten por Etapa (tn/etapa)'
-}, inplace=True)
-
-
-# Display tables using st.dataframe
-st.write("**Tipo Petrolífero: Top 3 Pozos con Mayor Caudal Pico**")
-st.dataframe(df_petrolifero, use_container_width=True)
+df_gasifero_final = pd.DataFrame(data_gasifero_table)
 st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Caudal Pico**")
-st.dataframe(df_gasifero, use_container_width=True)
+st.dataframe(df_gasifero_final, use_container_width=True)
 
-#------------------------------------
-
-# Step 1: Process Data for Petrolífero
-grouped_petrolifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
+# -------------------- Empresas: Promedios --------------------
+# Petrolífero
+grouped_petrolifero_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
     ['start_year', 'empresaNEW']
 ).agg({
-    'Qo_peak': 'median',  # Use average oil rate
-    'cantidad_fracturas': 'median',
-  
+    'Qo_peak': 'median',
+    'cantidad_fracturas': 'median'
 }).reset_index()
 
+top_petrolifero_emp = grouped_petrolifero_emp.sort_values(['start_year', 'Qo_peak'], ascending=[True, False])
+top_petrolifero_emp = top_petrolifero_emp.groupby('start_year').head(3)
+top_petrolifero_emp['Campaña'] = top_petrolifero_emp['start_year'].astype(int)
+df_petrolifero_emp_final = top_petrolifero_emp[['Campaña', 'empresaNEW', 'Qo_peak', 'cantidad_fracturas']].rename(columns={
+    'empresaNEW': 'Empresa',
+    'Qo_peak': 'Prom. Caudal Pico Petróleo',
+    'cantidad_fracturas': 'Etapas Promedio'
+})
 
-# Sort and ensure no repeated companies per year
-grouped_petrolifero_sorted = grouped_petrolifero.sort_values(['start_year', 'Qo_peak'], ascending=[True, False])
-top_petrolifero = grouped_petrolifero_sorted.groupby('start_year').head(3)
-
-# Step 2: Process Data for Gasífero
-grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
-    ['start_year', 'empresaNEW']
-).agg({
-    'Qg_peak': 'median',  # Use average gas rate
-    'cantidad_fracturas': 'median',
-   
-}).reset_index()
-
-
-# Sort and ensure no repeated companies per year
-grouped_gasifero_sorted = grouped_gasifero.sort_values(['start_year', 'Qg_peak'], ascending=[True, False])
-top_gasifero = grouped_gasifero_sorted.groupby('start_year').head(3)
-
-# Step 3: Convert List of Dicts to DataFrame
-df_petrolifero_display = pd.DataFrame(data_petrolifero_table)
-df_gasifero_display = pd.DataFrame(data_gasifero_table)
-
-# Optional: Rename columns for nicer display
-df_petrolifero_display.columns = ["Campaña", "Empresa", "Prom. Caudal Pico Petróleo", "Etapas Promedio"]
-df_gasifero_display.columns = ["Campaña", "Empresa", "Prom. Caudal Pico Gas", "Etapas Promedio"]
-
-# Step 4: Display Tables in Streamlit
 st.write("Top 3 Empresas con Mayores Caudales Pico de Petróleo")
-st.dataframe(df_petrolifero_display, use_container_width=True)
+st.dataframe(df_petrolifero_emp_final, use_container_width=True)
+
+# Gasífero
+grouped_gasifero_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
+    ['start_year', 'empresaNEW']
+).agg({
+    'Qg_peak': 'median',
+    'cantidad_fracturas': 'median'
+}).reset_index()
+
+top_gasifero_emp = grouped_gasifero_emp.sort_values(['start_year', 'Qg_peak'], ascending=[True, False])
+top_gasifero_emp = top_gasifero_emp.groupby('start_year').head(3)
+top_gasifero_emp['Campaña'] = top_gasifero_emp['start_year'].astype(int)
+df_gasifero_emp_final = top_gasifero_emp[['Campaña', 'empresaNEW', 'Qg_peak', 'cantidad_fracturas']].rename(columns={
+    'empresaNEW': 'Empresa',
+    'Qg_peak': 'Prom. Caudal Pico Gas',
+    'cantidad_fracturas': 'Etapas Promedio'
+})
 
 st.write("Top 3 Empresas con Mayores Caudales Pico de Gas")
-st.dataframe(df_gasifero_display, use_container_width=True)
+st.dataframe(df_gasifero_emp_final, use_container_width=True)
 
-# ----------------------------------------
+# -------------------- Arena Bombeada --------------------
 st.subheader("Ranking según Arena Bombeada", divider="blue")
 
-# Step 1: Process Data for Top 3 Sigla with Maximum Arena Bombeada
-grouped_sigla = df_merged_VMUT.groupby(
-    ['start_year', 'sigla']
-).agg({
-    'arena_total_tn': 'max',  # Use maximum arena bombeada
-}).reset_index()
-
-# Sort and ensure no repeated siglas per year
-grouped_sigla_sorted = grouped_sigla.sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
-top_sigla = grouped_sigla_sorted.groupby('start_year').head(3)
-
-# Step 2: Process Data for Top 3 Empresas with Maximum Average Arena Bombeada
-grouped_empresa = df_merged_VMUT.groupby(
-    ['start_year', 'empresaNEW']
-).agg({
-    'arena_total_tn': 'median',  # Use average arena bombeada
-}).reset_index()
-
-# Sort and ensure no repeated companies per year
-grouped_empresa_sorted = grouped_empresa.sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
-top_empresa = grouped_empresa_sorted.groupby('start_year').head(3)
-
-
-# Step 3: Convert List of Dicts to DataFrames
+# Siglas
 df_sigla_display = pd.DataFrame(data_sigla_table)
-df_empresa_display = pd.DataFrame(data_empresa_table)
-
-# Optional: Rename columns for better presentation
 df_sigla_display.columns = ["Campaña", "Sigla", "Máxima Arena Bombeada (tn)"]
-df_empresa_display.columns = ["Campaña", "Empresa", "Prom. Arena Bombeada (tn)"]
-
-# Step 4: Display using Streamlit
 st.subheader("Top 3 Siglas con la Mayor Cantidad de Arena Bombeada por Año")
 st.dataframe(df_sigla_display, use_container_width=True)
 
+# Empresas
+df_empresa_display = pd.DataFrame(data_empresa_table)
+df_empresa_display.columns = ["Campaña", "Empresa", "Prom. Arena Bombeada (tn)"]
 st.subheader("Top 3 Empresas con el Mayor Promedio de Arena Bombeada por Año")
 st.dataframe(df_empresa_display, use_container_width=True)
-
 
 
 
