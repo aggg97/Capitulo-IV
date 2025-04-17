@@ -376,7 +376,7 @@ with tab1:
     pivot_table_arena['perc_arena_importada'] = (pivot_table_arena['arena_bombeada_importada_tn'] / pivot_table_arena['arena_total_tn']) * 100
     
     # Calculate average arena bombeada (average of national and imported)
-    pivot_table_arena['avg_arena_bombeada'] = pivot_table_arena[['arena_total_tn']].mean(axis=1)
+    pivot_table_arena['avg_arena_bombeada'] = pivot_table_arena[['arena_total_tn']].median(axis=1)
     
     pivot_table_arena['start_year'] = pivot_table_arena['start_year'].astype(int).astype(str)
     
@@ -451,7 +451,7 @@ with tab2:
     # Aggregate data to calculate min, median, max, avg, and standard deviation by year and type of well (tipopozoNEW)
     statistics = df_merged_VMUT_filtered.groupby(['start_year']).agg(
         min_lenght=('longitud_rama_horizontal_m', 'min'),
-        avg_lenght=('longitud_rama_horizontal_m', 'mean'),
+        avg_lenght=('longitud_rama_horizontal_m', 'median'),
         max_lenght=('longitud_rama_horizontal_m', 'max'),
         std_lenght=('longitud_rama_horizontal_m', 'std'),
     ).reset_index()
@@ -534,7 +534,7 @@ with tab2:
     # Aggregate data to calculate max and avg by year
     statistics = df_merged_VMUT_filtered.groupby(['start_year']).agg(
         max_etapas=('cantidad_fracturas', 'max'),
-        avg_etapas=('cantidad_fracturas', 'mean')
+        avg_etapas=('cantidad_fracturas', 'median')
     ).reset_index()
     
     # Create the Plotly figure
