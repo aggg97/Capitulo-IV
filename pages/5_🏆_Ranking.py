@@ -390,7 +390,7 @@ st.dataframe(df_max_lenght,use_container_width=True)
 
 # Aggregate the data to calculate avg length for each empresaNEW and start_year
 company_statistics_avg = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW']).agg(
-    avg_lenght=('longitud_rama_horizontal_m', 'mean')
+    avg_lenght=('longitud_rama_horizontal_m', 'median')
 ).reset_index()
 
 # Round the avg_lenght to 0 decimal places
@@ -472,7 +472,7 @@ import plotly.graph_objects as go
 
 # Aggregate the data to calculate avg length for each empresaNEW and start_year
 company_statistics_avg = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW']).agg(
-    avg_lenght=('longitud_rama_horizontal_m', 'mean')
+    avg_lenght=('longitud_rama_horizontal_m', 'median')
 ).reset_index()
 
 # Round the avg_lenght to 2 decimal places
@@ -509,8 +509,8 @@ grouped_petrolifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolíf
     ['start_year', 'sigla', 'empresaNEW']
 ).agg({
     'Qo_peak': 'max',
-    'longitud_rama_horizontal_m': 'mean',
-    'cantidad_fracturas': 'mean',
+    'longitud_rama_horizontal_m': 'median',
+    'cantidad_fracturas': 'median',
     'arena_bombeada_nacional_tn': 'sum',
     'arena_bombeada_importada_tn': 'sum'
 }).reset_index()
@@ -545,8 +545,8 @@ grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].
     ['start_year', 'sigla', 'empresaNEW']
 ).agg({
     'Qg_peak': 'max',
-    'longitud_rama_horizontal_m': 'mean',
-    'cantidad_fracturas': 'mean',
+    'longitud_rama_horizontal_m': 'median',
+    'cantidad_fracturas': 'median',
     'arena_bombeada_nacional_tn': 'sum',
     'arena_bombeada_importada_tn': 'sum'
 }).reset_index()
