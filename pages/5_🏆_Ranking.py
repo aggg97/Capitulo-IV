@@ -633,7 +633,11 @@ for _, row in top3_petro_emp.iterrows():
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
         'Mediana Pico (m3/d)': round(row['Qo_peak'], 0),
-        'Etapas (Mediana)': int(row['cantidad_fracturas'])
+        'Etapas (Mediana)': (
+            int(row['cantidad_fracturas']) 
+            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
+            else None
+            )
     })
     last_year = current_year
 
@@ -665,7 +669,11 @@ for _, row in top3_gas_emp.iterrows():
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
         'Mediana Pico (km3/d)': round(row['Qg_peak'], 0),
-        'Etapas (Mediana)': int(row['cantidad_fracturas'])
+        'Etapas (Mediana)': (
+            int(row['cantidad_fracturas']) 
+            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
+            else None
+            )
     })
     last_year = current_year
 
