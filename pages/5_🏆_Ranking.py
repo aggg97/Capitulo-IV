@@ -534,9 +534,21 @@ for _, row in top_petrolifero.iterrows():
         'Sigla': row['sigla'],
         'Empresa': row['empresaNEW'],
         'Caudal Pico de Petróleo (m3/d)': int(row['Qo_peak']),
-        'Cantidad de Fracturas': int(row['cantidad_fracturas']),
-        'Fracspacing (m/fractura)': int(row['fracspacing']),
-        'Agente de Sosten por Etapa (tn/fractura)': int(row['agente_etapa']),
+        'Cantidad de Fracturas': (
+            int(row['cantidad_fracturas']) 
+            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
+            else None
+            ),
+        'Fracspacing (m/etapa)': (
+            int(row['fracspacing']) 
+            if pd.notna(row['fracspacing']) and row['fracspacing'] > 0 
+            else None
+            ),
+        'Agente de Sosten por Etapa (tn/etapa)': (
+            int(row['agente_etapa']) 
+            if pd.notna(row['agente_etapa']) and row['agente_etapa'] > 0 
+            else None
+            )
     })
     previous_year = row['start_year']
 
@@ -573,9 +585,21 @@ for _, row in top_gasifero.iterrows():
         'Sigla': row['sigla'],
         'Empresa': row['empresaNEW'],
         'Caudal Pico de Gas (km3/d)': int(row['Qg_peak']),
-        'Cantidad de Fracturas': int(row['cantidad_fracturas']),
-        'Fracspacing (m/etapa)': int(row['fracspacing']),
-        'Agente de Sosten por Etapa (tn/etapa)': int(row['agente_etapa']),
+        'Cantidad de Fracturas': (
+            int(row['cantidad_fracturas']) 
+            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
+            else None
+            ),
+        'Fracspacing (m/etapa)': (
+            int(row['fracspacing']) 
+            if pd.notna(row['fracspacing']) and row['fracspacing'] > 0 
+            else None
+            ),
+        'Agente de Sosten por Etapa (tn/etapa)': (
+            int(row['agente_etapa']) 
+            if pd.notna(row['agente_etapa']) and row['agente_etapa'] > 0 
+            else None
+            )
     })
     previous_year = row['start_year']
 
@@ -584,7 +608,6 @@ st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Caudal Pico**")
 st.dataframe(df_gasifero_final, use_container_width=True)
 
 # -------------------- Empresas: Promedios --------------------
-# -------------------- Empresas: Promedios (Top 3 con Año No Repetido) --------------------
 
 # --- Petrolífero ---
 grouped_petro_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
