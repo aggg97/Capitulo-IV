@@ -271,7 +271,51 @@ df_merged_VMUT = df_merged_final[
 ]
 
 # ------------------------------------------------
+# ==============================
+# 📈 Ranking Data Management por Impacto de Datos Faltantes
+# ==============================
+st.subheader("Ranking Data Management: Impacto por Producción sin Datos de Fractura")
 
+# Copiar df_merged_final para no alterar el original
+df_dm = df_merged_final.copy()
+
+# Producción total (Np + Gp)
+df_dm['prod_total'] = df_dm['Np'].fillna(0) + df_dm['Gp'].fillna(0)
+
+# Flag: sin datos de fractura
+df_dm['sin_datos_frac'] = df_dm['id_base_fractura_adjiv'].isna()
+
+# Ranking por empresa
+ranking_dm = (
+    df_dm.groupby('empresaNEW')
+    .agg(
+        prod_total=('prod_total', 'sum'),
+        prod_sin_frac=('prod_total', lambda x: x[df_dm.loc[x.index, 'sin_datos_frac']].sum())
+    )
+    .reset_index()
+)
+
+# % incompleto
+ranking_dm['pct_incompleto'] = (ranking_dm['prod_sin_frac'] / ranking_dm['prod_total']) * 100
+
+# Ordenar por impacto absoluto
+ranking_dm = ranking_dm.sort_values('prod_sin_frac', ascending=False)
+
+# Mostrar tabla en Streamlit
+st.dataframe(ranking_dm.head(10), use_container_width=True)
+
+# Gráfico opcional: barra de producción sin datos
+fig_dm = px.bar(
+    ranking_dm.head(10),
+    x='empresaNEW',
+    y='prod_sin_frac',
+    text=ranking_dm['prod_sin_frac'].round(0),
+    title="Top 10 Empresas con Producción sin Datos de Fractura",
+    labels={'prod_sin_frac': 'Producción sin datos', 'empresaNEW': 'Empresa'}
+)
+fig_dm.update_traces(textposition='outside')
+fig_dm.update_layout(template='plotly_white')
+st.plotly_chart(fig_dm, use_container_width=True)
 # ==============================
 # 🔍 ANÁLISIS POR EMPRESA
 # ==============================
