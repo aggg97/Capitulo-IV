@@ -586,85 +586,70 @@ st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Caudal Pico**")
 st.dataframe(df_gasifero_final, use_container_width=True)
 
 # -------------------- Empresas: Promedios --------------------
+# -------------------- Empresas: Promedios (Top 3 con Año No Repetido) --------------------
 
-
-# Petrolífero
-
-grouped_petrolifero_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
-
+# --- Petrolífero ---
+grouped_petro_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
     ['start_year', 'empresaNEW']
-
 ).agg({
-
     'Qo_peak': 'median',
-
     'cantidad_fracturas': 'median'
-
 }).reset_index()
 
+# Ordenar y sacar Top 3 por año
+top3_petro_emp = grouped_petro_emp.sort_values(['start_year', 'Qo_peak'], ascending=[True, False]).groupby('start_year').head(3)
+
+# Lógica para no repetir el año en la visualización
+data_petro_final = []
+last_year = None
+
+for _, row in top3_petro_emp.iterrows():
+    current_year = str(int(row['start_year']))
+    # Si el año es el mismo que el anterior, lo dejamos en blanco
+    display_year = current_year if current_year != last_year else ""
+    
+    data_petro_final.append({
+        'Campaña': display_year,
+        'Empresa': row['empresaNEW'],
+        'Mediana Pico (m3/d)': round(row['Qo_peak'], 1),
+        'Etapas (Mediana)': int(row['cantidad_fracturas'])
+    })
+    last_year = current_year
+
+st.write("**Top 3 Empresas con Mayores Caudales Pico de Petróleo**")
+st.dataframe(pd.DataFrame(data_petro_final), use_container_width=True, hide_index=True)
 
 
-top_petrolifero_emp = grouped_petrolifero_emp.sort_values(['start_year', 'Qo_peak'], ascending=[True, False])
-
-top_petrolifero_emp = top_petrolifero_emp.groupby('start_year').head(3)
-
-top_petrolifero_emp['Campaña'] = top_petrolifero_emp['start_year'].astype(int)
-
-df_petrolifero_emp_final = top_petrolifero_emp[['Campaña', 'empresaNEW', 'Qo_peak', 'cantidad_fracturas']].rename(columns={
-
-    'empresaNEW': 'Empresa',
-
-    'Qo_peak': 'Prom. Caudal Pico Petróleo',
-
-    'cantidad_fracturas': 'Etapas Promedio'
-
-})
-
-
-
-st.write("Top 3 Empresas con Mayores Caudales Pico de Petróleo")
-
-st.dataframe(df_petrolifero_emp_final, use_container_width=True)
-
-
-
-# Gasífero
-
-grouped_gasifero_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
-
+# --- Gasífero ---
+grouped_gas_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
     ['start_year', 'empresaNEW']
-
 ).agg({
-
     'Qg_peak': 'median',
-
     'cantidad_fracturas': 'median'
-
 }).reset_index()
 
+# Ordenar y sacar Top 3 por año
+top3_gas_emp = grouped_gas_emp.sort_values(['start_year', 'Qg_peak'], ascending=[True, False]).groupby('start_year').head(3)
 
+# Lógica para no repetir el año en la visualización
+data_gas_final = []
+last_year = None
 
-top_gasifero_emp = grouped_gasifero_emp.sort_values(['start_year', 'Qg_peak'], ascending=[True, False])
+for _, row in top3_gas_emp.iterrows():
+    current_year = str(int(row['start_year']))
+    # Si el año es el mismo que el anterior, lo dejamos en blanco
+    display_year = current_year if current_year != last_year else ""
+    
+    data_gas_final.append({
+        'Campaña': display_year,
+        'Empresa': row['empresaNEW'],
+        'Mediana Pico (km3/d)': round(row['Qg_peak'], 1),
+        'Etapas (Mediana)': int(row['cantidad_fracturas'])
+    })
+    last_year = current_year
 
-top_gasifero_emp = top_gasifero_emp.groupby('start_year').head(3)
-
-top_gasifero_emp['Campaña'] = top_gasifero_emp['start_year'].astype(int)
-
-df_gasifero_emp_final = top_gasifero_emp[['Campaña', 'empresaNEW', 'Qg_peak', 'cantidad_fracturas']].rename(columns={
-
-    'empresaNEW': 'Empresa',
-
-    'Qg_peak': 'Prom. Caudal Pico Gas',
-
-    'cantidad_fracturas': 'Etapas Promedio'
-
-})
-
-
-
-st.write("Top 3 Empresas con Mayores Caudales Pico de Gas")
-
-st.dataframe(df_gasifero_emp_final, use_container_width=True)
+st.write("**Top 3 Empresas con Mayores Caudales Pico de Gas**")
+st.dataframe(pd.DataFrame(data_gas_final), use_container_width=True, hide_index=True)
 
 
 
