@@ -148,7 +148,9 @@ cum_df = cum_df.merge(tipopozo_unique, on='sigla', how='left')
 
 # Step 5: Create the 'tipopozoNEW' column based on the 'tipopozo' and 'Fluido McCain'
 cum_df['tipopozoNEW'] = cum_df.apply(
-    lambda row: row['Fluido McCain'] if row['tipopozo'] == 'Otro tipo' else row['tipopozo'],
+    lambda row: row['Fluido McCain'] 
+    if pd.isna(row['tipopozo']) or str(row['tipopozo']).strip().lower().startswith('otro')
+    else row['tipopozo'],
     axis=1
 )
 
