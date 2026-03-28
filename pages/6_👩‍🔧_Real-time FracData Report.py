@@ -365,12 +365,16 @@ with tab1:
     import pandas as pd
     import plotly.graph_objects as go
     
-    # Group by 'start_year' and aggregate the data
-    pivot_table_arena = df_merged_VMUT.groupby('start_year').agg({
+    # Filtrar solo pozos que tienen datos de fractura
+    df_con_frac = df_merged_VMUT[df_merged_VMUT['id_base_fractura_adjiv'].notna()].copy()
+    
+    # Luego agrupás por año o empresa como quieras
+    pivot_table_arena = df_con_frac.groupby('start_year').agg({
         'arena_bombeada_nacional_tn': 'sum',
         'arena_bombeada_importada_tn': 'sum',
         'arena_total_tn': 'sum',
     }).reset_index()
+
     
     # Calculate %Arena Importada
     pivot_table_arena['perc_arena_importada'] = (pivot_table_arena['arena_bombeada_importada_tn'] / pivot_table_arena['arena_total_tn']) * 100
