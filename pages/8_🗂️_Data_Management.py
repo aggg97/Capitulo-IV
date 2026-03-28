@@ -271,55 +271,6 @@ df_merged_VMUT = df_merged_final[
 ]
 
 # ------------------------------------------------
-# ==============================
-# 📈 Ranking Data Management por Impacto de Datos Faltantes
-# ==============================
-st.subheader("Ranking Data Management: Impacto por Producción sin Datos de Fractura")
-
-# Copiar df_merged_final para no alterar el original
-df_dm = df_merged_final.copy()
-
-# Producción total (Np + Gp)
-df_dm['prod_total'] = df_dm['Np'].fillna(0) + df_dm['Gp'].fillna(0)
-
-# Flag: sin datos de fractura
-df_dm['sin_datos_frac'] = df_dm['id_base_fractura_adjiv'].isna()
-
-# Ranking por empresa
-ranking_dm = (
-    df_dm.groupby('empresaNEW')
-    .agg(
-        prod_total=('prod_total', 'sum'),
-        prod_sin_frac=('prod_total', lambda x: x[df_dm.loc[x.index, 'sin_datos_frac']].sum())
-    )
-    .reset_index()
-)
-
-# % incompleto
-ranking_dm['pct_incompleto'] = (ranking_dm['prod_sin_frac'] / ranking_dm['prod_total']) * 100
-
-# Ordenar por impacto absoluto
-ranking_dm = ranking_dm.sort_values('prod_sin_frac', ascending=False)
-
-# Mostrar tabla en Streamlit
-st.dataframe(ranking_dm.head(10), use_container_width=True)
-
-# Gráfico opcional: barra de producción sin datos
-fig_dm = px.bar(
-    ranking_dm.head(10),
-    x='empresaNEW',
-    y='prod_sin_frac',
-    text=ranking_dm['prod_sin_frac'].round(0),
-    title="Top 10 Empresas con Producción sin Datos de Fractura",
-    labels={'prod_sin_frac': 'Producción sin datos', 'empresaNEW': 'Empresa'}
-)
-fig_dm.update_traces(textposition='outside')
-fig_dm.update_layout(template='plotly_white')
-st.plotly_chart(fig_dm, use_container_width=True)
-# ==============================
-# 🔍 ANÁLISIS POR EMPRESA
-# ==============================
-
 st.subheader("Diagnóstico de Calidad de Datos por Empresa", divider="blue")
 
 st.info("""
@@ -329,6 +280,64 @@ de Vaca Muerta.
 El foco está en producción, no en cantidad de pozos, para evidenciar qué empresas 
 tienen información crítica incompleta que puede afectar análisis y rankings.
 """)
+# ==============================
+# 📈 Ranking Data Management por Impacto de Datos Faltantes
+# ==============================
+st.subheader("Ranking Data Management: Impacto por Producción sin Datos de Fractura")
+
+df_dm = df_merged_final.copy()
+
+# Producción total (Np + Gp)
+df_dm['prod_total'] = df_dm['Np'].fillna(0) + df_dm['Gp'].fillna(0)
+
+# Flag: sin datos de fractura
+df_dm['sin_datos_frac'] = df_dm['id_base_fractura_adjiv'].isna()
+
+# Ranking por empresa usando suma segura
+ranking_dm = df_dm.groupby('empresaNEW').agg(
+    prod_total=('prod_total', 'sum'),
+    prod_sin_frac=('prod_total', lambda x: df_dm.loc[x.index, 'prod_total'][df_dm.loc[x.index, 'sin_datos_frac']].sum())
+).reset_index()
+
+# % incompleto
+ranking_dm['pct_incompleto'] = (ranking_dm['prod_sin_frac'] / ranking_dm['prod_total']) * 100
+
+# Ordenar por impacto absoluto
+ranking_dm = ranking_dm.sort_values('prod_sin_frac', ascending=False)
+
+# Formatear números con separadores de miles
+ranking_dm['prod_total_fmt'] = ranking_dm['prod_total'].map('{:,.0f}'.format)
+ranking_dm['prod_sin_frac_fmt'] = ranking_dm['prod_sin_frac'].map('{:,.0f}'.format)
+ranking_dm['pct_incompleto_fmt'] = ranking_dm['pct_incompleto'].map('{:.1f}%'.format)
+
+# Mostrar tabla limpia en Streamlit
+st.dataframe(
+    ranking_dm[['empresaNEW', 'prod_total_fmt', 'prod_sin_frac_fmt', 'pct_incompleto_fmt']],
+    use_container_width=True
+)
+
+# Gráfico de barras mejorado
+fig_dm = px.bar(
+    ranking_dm.head(10),
+    x='empresaNEW',
+    y='prod_sin_frac',
+    text=ranking_dm['prod_sin_frac'].map('{:,.0f}'.format),
+    title="Top 10 Empresas con Producción sin Datos de Fractura",
+    labels={'prod_sin_frac': 'Producción sin datos (bbl/m3)', 'empresaNEW': 'Empresa'}
+)
+fig_dm.update_traces(textposition='outside')
+fig_dm.update_layout(
+    template='plotly_white',
+    yaxis_tickformat=',',  # separadores de miles
+    xaxis_title='Empresa',
+    yaxis_title='Producción sin datos'
+)
+st.plotly_chart(fig_dm, use_container_width=True)
+# ==============================
+# 🔍 ANÁLISIS POR EMPRESA
+# ==============================
+
+
 
 empresa_objetivo = st.selectbox(
     "Seleccionar Empresa",
