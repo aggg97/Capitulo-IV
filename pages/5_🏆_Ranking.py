@@ -586,7 +586,9 @@ st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Caudal Pico**")
 st.dataframe(df_gasifero_final, use_container_width=True)
 
 # -------------------- Empresas: Promedios --------------------
-# Petrolífero
+# -------------------- Empresas: Promedios (Top 3 por Año) --------------------
+
+# --- Petrolífero ---
 grouped_petrolifero_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
     ['start_year', 'empresaNEW']
 ).agg({
@@ -594,19 +596,28 @@ grouped_petrolifero_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petro
     'cantidad_fracturas': 'median'
 }).reset_index()
 
+# Ordenar por año (asc) y por caudal pico (desc)
 top_petrolifero_emp = grouped_petrolifero_emp.sort_values(['start_year', 'Qo_peak'], ascending=[True, False])
-top_petrolifero_emp = top_petrolifero_emp.groupby('start_year').head(3)
-top_petrolifero_emp['Campaña'] = top_petrolifero_emp['start_year'].astype(int)
+
+# Tomar las 3 mejores empresas de CADA año
+top_petrolifero_emp = top_petrolifero_emp.groupby('start_year').head(3).copy()
+
+# Formatear: Año como string (evita la coma) y redondear métricas
+top_petrolifero_emp['Campaña'] = top_petrolifero_emp['start_year'].astype(int).astype(str)
+top_petrolifero_emp['Qo_peak'] = top_petrolifero_emp['Qo_peak'].round(1)
+top_petrolifero_emp['cantidad_fracturas'] = top_petrolifero_emp['cantidad_fracturas'].round(0)
+
 df_petrolifero_emp_final = top_petrolifero_emp[['Campaña', 'empresaNEW', 'Qo_peak', 'cantidad_fracturas']].rename(columns={
     'empresaNEW': 'Empresa',
-    'Qo_peak': 'Prom. Caudal Pico Petróleo',
-    'cantidad_fracturas': 'Etapas Promedio'
+    'Qo_peak': 'Mediana Caudal Pico (m3/d)',
+    'cantidad_fracturas': 'Etapas (Mediana)'
 })
 
-st.write("Top 3 Empresas con Mayores Caudales Pico de Petróleo")
-st.dataframe(df_petrolifero_emp_final, use_container_width=True)
+st.write("**Top 3 Empresas con Mayores Caudales Pico de Petróleo (Mediana)**")
+st.dataframe(df_petrolifero_emp_final, use_container_width=True, hide_index=True)
 
-# Gasífero
+
+# --- Gasífero ---
 grouped_gasifero_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
     ['start_year', 'empresaNEW']
 ).agg({
@@ -614,17 +625,25 @@ grouped_gasifero_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífer
     'cantidad_fracturas': 'median'
 }).reset_index()
 
+# Ordenar por año (asc) y por caudal pico gas (desc)
 top_gasifero_emp = grouped_gasifero_emp.sort_values(['start_year', 'Qg_peak'], ascending=[True, False])
-top_gasifero_emp = top_gasifero_emp.groupby('start_year').head(3)
-top_gasifero_emp['Campaña'] = top_gasifero_emp['start_year'].astype(int)
+
+# Tomar las 3 mejores empresas de CADA año
+top_gasifero_emp = top_gasifero_emp.groupby('start_year').head(3).copy()
+
+# Formatear: Año como string y redondear métricas
+top_gasifero_emp['Campaña'] = top_gasifero_emp['start_year'].astype(int).astype(str)
+top_gasifero_emp['Qg_peak'] = top_gasifero_emp['Qg_peak'].round(1)
+top_gasifero_emp['cantidad_fracturas'] = top_gasifero_emp['cantidad_fracturas'].round(0)
+
 df_gasifero_emp_final = top_gasifero_emp[['Campaña', 'empresaNEW', 'Qg_peak', 'cantidad_fracturas']].rename(columns={
     'empresaNEW': 'Empresa',
-    'Qg_peak': 'Prom. Caudal Pico Gas',
-    'cantidad_fracturas': 'Etapas Promedio'
+    'Qg_peak': 'Mediana Caudal Pico (km3/d)',
+    'cantidad_fracturas': 'Etapas (Mediana)'
 })
 
-st.write("Top 3 Empresas con Mayores Caudales Pico de Gas")
-st.dataframe(df_gasifero_emp_final, use_container_width=True)
+st.write("**Top 3 Empresas con Mayores Caudales Pico de Gas (Mediana)**")
+st.dataframe(df_gasifero_emp_final, use_container_width=True, hide_index=True)
 
 # -------------------- Arena Bombeada --------------------
 st.subheader("Ranking según Arena Bombeada", divider="blue")
