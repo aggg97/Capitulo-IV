@@ -316,14 +316,16 @@ st.dataframe(
     use_container_width=True
 )
 
-# Gráfico de barras mejorado
+# Crear columna formateada para mostrar en el gráfico
+ranking_dm['prod_sin_frac_text'] = ranking_dm['prod_sin_frac'].map('{:,.0f}'.format)
+
 fig_dm = px.bar(
     ranking_dm.head(10),
     x='empresaNEW',
     y='prod_sin_frac',
-    text=ranking_dm['prod_sin_frac'].map('{:,.0f}'.format),
+    text='prod_sin_frac_text',  # usar columna del DataFrame
     title="Top 10 Empresas con Producción sin Datos de Fractura",
-    labels={'prod_sin_frac': 'Producción sin datos (bbl/m3)', 'empresaNEW': 'Empresa'}
+    labels={'prod_sin_frac': 'Producción sin datos', 'empresaNEW': 'Empresa'}
 )
 fig_dm.update_traces(textposition='outside')
 fig_dm.update_layout(
@@ -333,6 +335,8 @@ fig_dm.update_layout(
     yaxis_title='Producción sin datos'
 )
 st.plotly_chart(fig_dm, use_container_width=True)
+
+
 # ==============================
 # 🔍 ANÁLISIS POR EMPRESA
 # ==============================
