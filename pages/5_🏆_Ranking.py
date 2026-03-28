@@ -255,7 +255,7 @@ df_merged_final = pd.merge(
 ).drop_duplicates()
 
 # Filter out rows where 'id_base_fractura_adjiv' is null
-df_merged_final = df_merged_final[df_merged_final['id_base_fractura_adjiv'].notna()] 
+#df_merged_final = df_merged_final[df_merged_final['id_base_fractura_adjiv'].notna()] 
 
 # Check the dataframe info and columns
 print(df_merged_final.info())
