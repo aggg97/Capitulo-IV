@@ -278,6 +278,14 @@ df_merged_VMUT = df_merged_final[
 
 st.subheader("Diagnóstico de Calidad de Datos por Empresa", divider="blue")
 
+st.info("""
+Esta sección muestra dónde faltan datos de fractura en los pozos más relevantes 
+de Vaca Muerta.
+
+El foco está en producción, no en cantidad de pozos, para evidenciar qué empresas 
+tienen información crítica incompleta que puede afectar análisis y rankings.
+""")
+
 empresa_objetivo = st.selectbox(
     "Seleccionar Empresa",
     sorted(df_merged_final['empresaNEW'].dropna().unique())
