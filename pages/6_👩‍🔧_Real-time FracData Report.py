@@ -781,8 +781,6 @@ with tab2:
     st.markdown("Fracspacing = $\\frac{longitud\\_rama\\_horizontal\\_m}{cantidad\\_fracturas}$")
 
 #-----------
-    
-    st.subheader("Evolución de Agua Inyectada (Fm. Vaca Muerta)", divider="blue")
 
     
     # -------------------- Data --------------------
@@ -820,7 +818,7 @@ with tab2:
     
     # Layout
     fig_agua_plot.update_layout(
-        title="P50 Agua Inyectada por Año",
+        title="Evolúción del P50 de Agua Inyectada por Año (Fm. Vaca Muerta)",
         xaxis_title="Campaña",
         yaxis_title="Agua Inyectada (km3)",
         template="plotly_white",
