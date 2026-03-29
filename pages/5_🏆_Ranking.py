@@ -868,7 +868,7 @@ for _, row in top_gasifero.iterrows():
         'Campaña': year_value,
         'Sigla': row['sigla'],
         'Empresa': row['empresaNEW'],
-        'Fracspacing Mínimo (m/etapa)': int(row['fracspacing'])
+        'Fracspacing Mínimo (m)': int(row['fracspacing'])
     })
     previous_year = row['start_year']
 
