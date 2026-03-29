@@ -358,14 +358,14 @@ st.subheader("Ranking según Cantidad de Etapas", divider="blue")
 
 # Aggregate the data to calculate max length for each sigla, empresaNEW, and start_year
 company_statistics = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW', 'sigla']).agg(
-    max_lenght=('longitud_rama_horizontal_m', 'max')
+    max_lenght=('cantidad_fracturas, 'max')
 ).reset_index()
 
 # Round the max_lenght to 0 decimal places
-company_statistics['max_lenght'] = company_statistics['max_lenght'].round(0)
+company_statistics['max_etapas'] = company_statistics['max_etapas'].round(0)
 
 # Sort by start_year and max_lenght to get the top 3 sigla per year
-company_statistics_sorted = company_statistics.sort_values(['start_year', 'max_lenght'], ascending=[True, False])
+company_statistics_sorted = company_statistics.sort_values(['start_year', 'max_etapas'], ascending=[True, False])
 
 # Select the top 3 sigla for each year based on max_lenght
 top_max_lenght = company_statistics_sorted.groupby('start_year').head(3)
@@ -375,27 +375,27 @@ data_for_max_lenght_table = []
 previous_year = None
 for _, row in top_max_lenght.iterrows():
     year_value = int(row['start_year']) if row['start_year'] != previous_year else " "  # Use blank for repeated years
-    data_for_max_lenght_table.append([year_value, row['sigla'], row['empresaNEW'], row['max_lenght']])
+    data_for_max_lenght_table.append([year_value, row['sigla'], row['empresaNEW'], row['max_etapas']])
     previous_year = row['start_year']
 
 # Convert to a dataframe
-df_max_lenght = pd.DataFrame(data_for_max_lenght_table, columns=["Campaña", "Sigla", "Empresa", "Longitud de Rama Maxima (metros)"])
+df_max_etapas = pd.DataFrame(data_for_max_lenght_table, columns=["Campaña", "Sigla", "Empresa", "Máxima Cantidad de Etapas"])
 
 # Display the DataFrame in Streamlit
 st.write("**Top 3 Pozos con Máxima Cantidad de Etapas**")
 # Display the dataframe in Streamlit
-st.dataframe(df_max_lenght,use_container_width=True)
+st.dataframe(df_max_etapas,use_container_width=True)
 
 # Aggregate the data to calculate avg length for each empresaNEW and start_year
 company_statistics_avg = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW']).agg(
-    avg_lenght=('longitud_rama_horizontal_m', 'median')
+    avg_lenght=('cantidad_etapas', 'median')
 ).reset_index()
 
 # Round the avg_lenght to 0 decimal places
-company_statistics_avg['avg_lenght'] = company_statistics_avg['avg_lenght'].round(0)
+company_statistics_avg['avg_etapas'] = company_statistics_avg['avg_etapas'].round(0)
 
 # Sort by start_year and avg_lenght to get the top 3 empresasNEW per year
-company_statistics_sorted_avg = company_statistics_avg.sort_values(['start_year', 'avg_lenght'], ascending=[True, False])
+company_statistics_sorted_avg = company_statistics_avg.sort_values(['start_year', 'avg_etapas'], ascending=[True, False])
 
 # Select the top 3 empresasNEW for each year based on avg_lenght
 top_avg_lenght = company_statistics_sorted_avg.groupby('start_year').head(3)
@@ -405,14 +405,14 @@ data_for_avg_lenght_table = []
 previous_year = None
 for _, row in top_avg_lenght.iterrows():
     year_value = int(row['start_year']) if row['start_year'] != previous_year else " "  # Use blank for repeated years
-    data_for_avg_lenght_table.append([year_value, row['empresaNEW'], row['avg_lenght']])
+    data_for_avg_lenght_table.append([year_value, row['empresaNEW'], row['avg_etapas']])
     previous_year = row['start_year']
 
 # Convert to a dataframe
-df_avg_lenght = pd.DataFrame(data_for_avg_lenght_table, columns=["Campaña", "Empresa", "Longitud de Rama Promedio (metros)"])
+df_avg_lenght = pd.DataFrame(data_for_avg_lenght_table, columns=["Campaña", "Empresa", "P50 Cantidad de Etapas"])
 
 # Display the DataFrame in Streamlit
-st.write("**Top 3 Empresa con Máxima Cantidad Promedio de Etapas**")
+st.write("**Top 3 Empresas con Máxima Cantidad de Etapas por Pozo**")
 # Display the dataframe in Streamlit
 st.dataframe(df_avg_lenght,use_container_width=True)
 
@@ -459,7 +459,7 @@ fig_max_lenght.update_layout(
 
 
 # Convert to a dataframe
-df_max_lenght = pd.DataFrame(data_for_max_lenght_table, columns=["Campaña", "Sigla", "Empresa", "Longitud de Rama Máxima (metros)"])
+df_max_lenght = pd.DataFrame(data_for_max_lenght_table, columns=["Campaña", "Sigla", "Empresa", "Máxima Longitud de Rama (metros)"])
 
 st.write("**Top 3 Pozos con Mayor Longitud de Rama**")
 st.dataframe(df_max_lenght, use_container_width=True)
@@ -491,9 +491,9 @@ for _, row in top_avg_lenght.iterrows():
     previous_year = row['start_year']
 
 # Convert to a dataframe
-df_avg_lenght = pd.DataFrame(data_for_avg_lenght_table, columns=["Campaña", "Empresa", "Longitud de Rama Promedio (metros)"])
+df_avg_lenght = pd.DataFrame(data_for_avg_lenght_table, columns=["Campaña", "Empresa", "P50 Longitud de Rama (metros)"])
 
-st.write("**Top 3 Empresa con Mayor Longitud de Rama Promedio**")
+st.write("**Top 3 Empresa con Máxima Longitud de Rama por Pozo**")
 st.dataframe(df_avg_lenght, use_container_width=True)
 
 
@@ -695,11 +695,6 @@ grouped_arena = df_clean.groupby(
     'longitud_rama_horizontal_m': 'median'
 }).reset_index()
 
-# Métricas derivadas
-grouped_arena['fracspacing'] = (
-    grouped_arena['longitud_rama_horizontal_m'] / grouped_arena['cantidad_fracturas']
-)
-
 grouped_arena_sorted = grouped_arena.sort_values(
     ['start_year', 'arena_total_tn'], ascending=[True, False]
 )
@@ -728,7 +723,7 @@ for _, row in top_arena.iterrows():
 
 df_arena_final = pd.DataFrame(data_arena_table)
 
-st.write("**Top 3 Pozos con Mayor Arena Bombeada**")
+st.write("**Top 3 Pozos con Máxima Arena Bombeada**")
 st.dataframe(df_arena_final, use_container_width=True)
 
 # -------------------- Empresas: Arena Promedio --------------------
@@ -758,7 +753,7 @@ for _, row in top_emp_arena.iterrows():
     data_emp_arena.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'Máxima Arena Promedio Bombeada (tn)': (
+        'P50 Arena Promedio Bombeada (tn)': (
             int(row['arena_total_tn']) 
             if pd.notna(row['arena_total_tn']) and row['arena_total_tn'] > 0 
             else None
@@ -767,5 +762,5 @@ for _, row in top_emp_arena.iterrows():
 
     last_year = current_year
 
-st.write("**Top 3 Empresas con Mayor Arena Promedio Bombeada**")
+st.write("**Top 3 Empresas con Máxima Arena Bombeada por Pozo**")
 st.dataframe(pd.DataFrame(data_emp_arena), use_container_width=True, hide_index=True)
