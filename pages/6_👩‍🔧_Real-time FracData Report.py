@@ -740,10 +740,9 @@ with tab2:
         template="plotly_white"
     )
     
-    fig_lines.show()
     
     # Mostrar en Streamlit
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig_lines, use_container_width=True)
 
 
 # --- Tab 3: Productividad ---
