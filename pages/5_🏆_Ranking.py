@@ -21,19 +21,18 @@ from PIL import Image
 #data_sorted = load_and_sort_data(dataset_url)
 
 
-#Verificamos si los datos ya fueron cargados en la Main Page
+# Verificamos si los datos ya fueron cargados en la Main Page
 if 'df' in st.session_state:
     # Recuperamos los datos de la memoria sin esperar un segundo
     data_sorted = st.session_state['df']
-    data_sorted['date'] = pd.to_datetime(data_sorted['anio'].astype(str) + '-' + data_sorted['mes'].astype(str) + '-1')
-    data_sorted['gas_rate'] = data_sorted['prod_gas'] / data_sorted['tef']
-    data_sorted['oil_rate'] = data_sorted['prod_pet'] / data_sorted['tef']
-    data_sorted = data_sorted.sort_values(by=['sigla', 'date'], ascending=True)
     
     st.info("Utilizando datos recuperados de la memoria.")
     
 else:
     st.warning("⚠️ No se han cargado los datos. Por favor, vuelve a la Página Principal.")
+    
+    # El link para regresar
+    st.page_link("main.py", label="Ir a la Página Principal para cargar datos", icon="🏠")
 
 
 # Replace company names in production data
@@ -353,120 +352,151 @@ df_merged_VMUT_filtered = df_merged_VMUT[df_merged_VMUT['longitud_rama_horizonta
 # -----------------------------
 
 # ── Helper reutilizable ──────────────────────────────────────────────────────
-def display_ranking_table(df, year_col="Campaña"):
-    df = df.copy()
-    df[year_col] = df[year_col].astype(int)
+def style_ranking_table(df, year_col="Campaña"):
+    """
+    Recibe un DataFrame con el año real en cada fila (int).
+    Devuelve un Styler donde el año se muestra en gris claro cuando
+    es igual al de la fila anterior, simulando el efecto 'sin repetir'
+    pero sin romper el ordenamiento interactivo de Streamlit.
+    """
+    def dim_repeated_years(col):
+        styles = []
+        prev = None
+        for val in col:
+            if val == prev:
+                styles.append("color: #cccccc")   # gris claro = "vacío visual"
+            else:
+                styles.append("color: inherit; font-weight: bold")
+            prev = val
+        return styles
 
-    row_styles = []
-    prev_year = None
-    for val in df[year_col]:
-        if val == prev_year:
-            row_styles.append({year_col: "color: #bbbbbb; font-style: italic"})
-        else:
-            row_styles.append({year_col: "color: inherit; font-weight: bold"})
-        prev_year = val
-
-    def apply_row_style(row):
-        style_dict = row_styles[row.name]
-        return [style_dict.get(col, "") for col in df.columns]
-
-    styled = (
+    return (
         df.style
-        .apply(apply_row_style, axis=1)
-        .format({year_col: lambda x: str(x)})
+        .apply(dim_repeated_years, subset=[year_col])
+        .format({year_col: "{:.0f}"})           # sin decimales en el año
     )
-    st.dataframe(styled, use_container_width=True, hide_index=True)
+# ────────────────────────────────────────────────────────────────────────────
+
 
 # ══════════════════════════════════════════════════════════════════════════════
-# -----------------------------
-# Remove rows where longitud_rama_horizontal_m is zero and drop duplicates based on 'sigla'
+# A partir de acá reemplazás toda la lógica de construcción de tablas.
+# El cambio clave: year_value SIEMPRE es el año real (int), nunca " ".
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── Filtro base ──────────────────────────────────────────────────────────────
 df_merged_VMUT_filtered = df_merged_VMUT[
     df_merged_VMUT['longitud_rama_horizontal_m'] > 0
 ].drop_duplicates(subset='sigla')
-# -----------------------------
-
-def safe_int(val):
-    return int(val) if pd.notna(val) and val > 0 else None
 
 
 # ════════════════════════════════════════════════════════════════════════════
 st.subheader("Ranking según Cantidad de Etapas", divider="blue")
 
 # ── Pozos ────────────────────────────────────────────────────────────────────
-top_max_etapas = (
+company_statistics = (
     df_merged_VMUT_filtered
     .groupby(['start_year', 'empresaNEW', 'sigla'])
     .agg(max_etapas=('cantidad_fracturas', 'max'))
     .reset_index()
-    .assign(max_etapas=lambda x: x['max_etapas'].round(0).astype(int))
+)
+company_statistics['max_etapas'] = company_statistics['max_etapas'].round(0).astype(int)
+
+top_max_etapas = (
+    company_statistics
     .sort_values(['start_year', 'max_etapas'], ascending=[True, False])
     .groupby('start_year').head(3)
     .reset_index(drop=True)
-    .rename(columns={
-        'start_year': 'Campaña', 'sigla': 'Sigla',
-        'empresaNEW': 'Empresa', 'max_etapas': 'Máxima Cantidad de Etapas'
-    })[['Campaña', 'Sigla', 'Empresa', 'Máxima Cantidad de Etapas']]
 )
+
+df_max_etapas = top_max_etapas.rename(columns={
+    'start_year': 'Campaña',
+    'sigla': 'Sigla',
+    'empresaNEW': 'Empresa',
+    'max_etapas': 'Máxima Cantidad de Etapas'
+})[['Campaña', 'Sigla', 'Empresa', 'Máxima Cantidad de Etapas']]
+
 st.write("**Top 3 Pozos con Máxima Cantidad de Etapas**")
-st.dataframe(top_max_etapas, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_max_etapas), use_container_width=True, hide_index=True)
 
 # ── Empresas (P50) ───────────────────────────────────────────────────────────
-top_p50_etapas = (
+company_p50_etapas = (
     df_merged_VMUT_filtered
     .groupby(['start_year', 'empresaNEW'])
     .agg(p50_etapas=('cantidad_fracturas', 'median'))
     .reset_index()
-    .assign(p50_etapas=lambda x: x['p50_etapas'].round(0).astype(int))
+)
+company_p50_etapas['p50_etapas'] = company_p50_etapas['p50_etapas'].round(0).astype(int)
+
+top_p50_etapas = (
+    company_p50_etapas
     .sort_values(['start_year', 'p50_etapas'], ascending=[True, False])
     .groupby('start_year').head(3)
     .reset_index(drop=True)
-    .rename(columns={
-        'start_year': 'Campaña', 'empresaNEW': 'Empresa',
-        'p50_etapas': 'P50 Cantidad de Etapas'
-    })[['Campaña', 'Empresa', 'P50 Cantidad de Etapas']]
 )
+
+df_p50_etapas = top_p50_etapas.rename(columns={
+    'start_year': 'Campaña',
+    'empresaNEW': 'Empresa',
+    'p50_etapas': 'P50 Cantidad de Etapas'
+})[['Campaña', 'Empresa', 'P50 Cantidad de Etapas']]
+
 st.write("**Top 3 Empresas con Mayor P50 de Cantidad de Etapas**")
-st.dataframe(top_p50_etapas, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_p50_etapas), use_container_width=True, hide_index=True)
 
 
 # ════════════════════════════════════════════════════════════════════════════
 st.subheader("Ranking según Longitud de Rama", divider="blue")
 
 # ── Pozos ────────────────────────────────────────────────────────────────────
-top_max_lenght = (
+company_statistics = (
     df_merged_VMUT_filtered
     .groupby(['start_year', 'empresaNEW', 'sigla'])
     .agg(max_lenght=('longitud_rama_horizontal_m', 'max'))
     .reset_index()
-    .assign(max_lenght=lambda x: x['max_lenght'].round(0).astype(int))
+)
+company_statistics['max_lenght'] = company_statistics['max_lenght'].round(0).astype(int)
+
+top_max_lenght = (
+    company_statistics
     .sort_values(['start_year', 'max_lenght'], ascending=[True, False])
     .groupby('start_year').head(3)
     .reset_index(drop=True)
-    .rename(columns={
-        'start_year': 'Campaña', 'sigla': 'Sigla',
-        'empresaNEW': 'Empresa', 'max_lenght': 'Máxima Longitud de Rama (m)'
-    })[['Campaña', 'Sigla', 'Empresa', 'Máxima Longitud de Rama (m)']]
 )
+
+df_max_lenght = top_max_lenght.rename(columns={
+    'start_year': 'Campaña',
+    'sigla': 'Sigla',
+    'empresaNEW': 'Empresa',
+    'max_lenght': 'Máxima Longitud de Rama (m)'
+})[['Campaña', 'Sigla', 'Empresa', 'Máxima Longitud de Rama (m)']]
+
 st.write("**Top 3 Pozos con Mayor Longitud de Rama**")
-st.dataframe(top_max_lenght, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_max_lenght), use_container_width=True, hide_index=True)
 
 # ── Empresas (P50) ───────────────────────────────────────────────────────────
-top_p50_lenght = (
+company_p50_lenght = (
     df_merged_VMUT_filtered
     .groupby(['start_year', 'empresaNEW'])
     .agg(p50_lenght=('longitud_rama_horizontal_m', 'median'))
     .reset_index()
-    .assign(p50_lenght=lambda x: x['p50_lenght'].round(0).astype(int))
+)
+company_p50_lenght['p50_lenght'] = company_p50_lenght['p50_lenght'].round(0).astype(int)
+
+top_p50_lenght = (
+    company_p50_lenght
     .sort_values(['start_year', 'p50_lenght'], ascending=[True, False])
     .groupby('start_year').head(3)
     .reset_index(drop=True)
-    .rename(columns={
-        'start_year': 'Campaña', 'empresaNEW': 'Empresa',
-        'p50_lenght': 'P50 Longitud de Rama (m)'
-    })[['Campaña', 'Empresa', 'P50 Longitud de Rama (m)']]
 )
+
+df_p50_lenght = top_p50_lenght.rename(columns={
+    'start_year': 'Campaña',
+    'empresaNEW': 'Empresa',
+    'p50_lenght': 'P50 Longitud de Rama (m)'
+})[['Campaña', 'Empresa', 'P50 Longitud de Rama (m)']]
+
 st.write("**Top 3 Empresas con Mayor P50 de Longitud de Rama**")
-st.dataframe(top_p50_lenght, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_p50_lenght), use_container_width=True, hide_index=True)
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -482,7 +512,8 @@ grouped_petrolifero = (
         'cantidad_fracturas': 'median',
         'arena_bombeada_nacional_tn': 'sum',
         'arena_bombeada_importada_tn': 'sum'
-    }).reset_index()
+    })
+    .reset_index()
 )
 grouped_petrolifero['fracspacing'] = (
     grouped_petrolifero['longitud_rama_horizontal_m'] / grouped_petrolifero['cantidad_fracturas']
@@ -497,18 +528,22 @@ top_petrolifero = (
     .groupby('start_year').head(3)
     .reset_index(drop=True)
 )
+
+def safe_int(val):
+    return int(val) if pd.notna(val) and val > 0 else None
+
 df_petrolifero_final = pd.DataFrame([{
-    'Campaña':                               int(row['start_year']),
-    'Sigla':                                 row['sigla'],
-    'Empresa':                               row['empresaNEW'],
-    'Caudal Pico (m3/d)':                   safe_int(row['Qo_peak']),
-    'Fracturas':                             safe_int(row['cantidad_fracturas']),
-    'Fracspacing (m)':                       safe_int(row['fracspacing']),
-    'Agente/Etapa (tn)':                     safe_int(row['agente_etapa']),
+    'Campaña':                            int(row['start_year']),
+    'Sigla':                              row['sigla'],
+    'Empresa':                            row['empresaNEW'],
+    'Caudal Pico de Petróleo (m3/d)':    safe_int(row['Qo_peak']),
+    'Cantidad de Fracturas':              safe_int(row['cantidad_fracturas']),
+    'Fracspacing (m/etapa)':              safe_int(row['fracspacing']),
+    'Agente de Sosten por Etapa (tn/etapa)': safe_int(row['agente_etapa']),
 } for _, row in top_petrolifero.iterrows()])
 
 st.write("**Tipo Petrolífero: Top 3 Pozos con Mayor Caudal Pico**")
-st.dataframe(df_petrolifero_final, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_petrolifero_final), use_container_width=True, hide_index=True)
 
 # ── Gasífero Pozos ───────────────────────────────────────────────────────────
 grouped_gasifero = (
@@ -520,7 +555,8 @@ grouped_gasifero = (
         'cantidad_fracturas': 'median',
         'arena_bombeada_nacional_tn': 'sum',
         'arena_bombeada_importada_tn': 'sum'
-    }).reset_index()
+    })
+    .reset_index()
 )
 grouped_gasifero['fracspacing'] = (
     grouped_gasifero['longitud_rama_horizontal_m'] / grouped_gasifero['cantidad_fracturas']
@@ -535,53 +571,62 @@ top_gasifero = (
     .groupby('start_year').head(3)
     .reset_index(drop=True)
 )
+
 df_gasifero_final = pd.DataFrame([{
     'Campaña':                               int(row['start_year']),
     'Sigla':                                 row['sigla'],
     'Empresa':                               row['empresaNEW'],
-    'Caudal Pico (km3/d)':                  safe_int(row['Qg_peak']),
-    'Fracturas':                             safe_int(row['cantidad_fracturas']),
-    'Fracspacing (m)':                       safe_int(row['fracspacing']),
-    'Agente/Etapa (tn)':                     safe_int(row['agente_etapa']),
+    'Caudal Pico de Gas (km3/d)':           safe_int(row['Qg_peak']),
+    'Cantidad de Fracturas':                 safe_int(row['cantidad_fracturas']),
+    'Fracspacing (m/etapa)':                 safe_int(row['fracspacing']),
+    'Agente de Sosten por Etapa (tn/etapa)': safe_int(row['agente_etapa']),
 } for _, row in top_gasifero.iterrows()])
 
 st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Caudal Pico**")
-st.dataframe(df_gasifero_final, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_gasifero_final), use_container_width=True, hide_index=True)
 
 # ── Empresas P50 Caudales ────────────────────────────────────────────────────
-top3_petro_emp = (
+p50_petro_emp = (
     df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero']
     .groupby(['start_year', 'empresaNEW'])
     .agg(p50_Qo=('Qo_peak', 'median'))
     .reset_index()
+)
+top3_petro_emp = (
+    p50_petro_emp
     .sort_values(['start_year', 'p50_Qo'], ascending=[True, False])
     .groupby('start_year').head(3)
     .reset_index(drop=True)
 )
-top3_petro_emp['p50_Qo'] = top3_petro_emp['p50_Qo'].round(0).astype(int)
-top3_petro_emp = top3_petro_emp.rename(columns={
+df_petro_emp = top3_petro_emp.rename(columns={
     'start_year': 'Campaña', 'empresaNEW': 'Empresa', 'p50_Qo': 'P50 Caudal Pico (m3/d)'
-})[['Campaña', 'Empresa', 'P50 Caudal Pico (m3/d)']]
+})
+df_petro_emp['P50 Caudal Pico (m3/d)'] = df_petro_emp['P50 Caudal Pico (m3/d)'].round(0).astype(int)
 
 st.write("**Top 3 Empresas con Mayor P50 de Caudal Pico de Petróleo**")
-st.dataframe(top3_petro_emp, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_petro_emp[['Campaña', 'Empresa', 'P50 Caudal Pico (m3/d)']]),
+             use_container_width=True, hide_index=True)
 
-top3_gas_emp = (
+p50_gas_emp = (
     df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero']
     .groupby(['start_year', 'empresaNEW'])
     .agg(p50_Qg=('Qg_peak', 'median'))
     .reset_index()
+)
+top3_gas_emp = (
+    p50_gas_emp
     .sort_values(['start_year', 'p50_Qg'], ascending=[True, False])
     .groupby('start_year').head(3)
     .reset_index(drop=True)
 )
-top3_gas_emp['p50_Qg'] = top3_gas_emp['p50_Qg'].round(0).astype(int)
-top3_gas_emp = top3_gas_emp.rename(columns={
+df_gas_emp = top3_gas_emp.rename(columns={
     'start_year': 'Campaña', 'empresaNEW': 'Empresa', 'p50_Qg': 'P50 Caudal Pico (km3/d)'
-})[['Campaña', 'Empresa', 'P50 Caudal Pico (km3/d)']]
+})
+df_gas_emp['P50 Caudal Pico (km3/d)'] = df_gas_emp['P50 Caudal Pico (km3/d)'].round(0).astype(int)
 
 st.write("**Top 3 Empresas con Mayor P50 de Caudal Pico de Gas**")
-st.dataframe(top3_gas_emp, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_gas_emp[['Campaña', 'Empresa', 'P50 Caudal Pico (km3/d)']]),
+             use_container_width=True, hide_index=True)
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -594,41 +639,49 @@ df_clean = df_merged_VMUT[
 ].copy()
 
 # ── Pozos ────────────────────────────────────────────────────────────────────
-top_arena = (
+grouped_arena = (
     df_clean
     .groupby(['start_year', 'sigla', 'empresaNEW'])
     .agg(arena_total_tn=('arena_total_tn', 'max'))
     .reset_index()
+)
+top_arena = (
+    grouped_arena
     .sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
     .groupby('start_year').head(3)
     .reset_index(drop=True)
 )
-top_arena['arena_total_tn'] = top_arena['arena_total_tn'].round(0).astype(int)
-top_arena = top_arena.rename(columns={
+df_arena_final = top_arena.rename(columns={
     'start_year': 'Campaña', 'sigla': 'Sigla',
     'empresaNEW': 'Empresa', 'arena_total_tn': 'Máxima Arena Bombeada (tn)'
-})[['Campaña', 'Sigla', 'Empresa', 'Máxima Arena Bombeada (tn)']]
+})
+df_arena_final['Máxima Arena Bombeada (tn)'] = df_arena_final['Máxima Arena Bombeada (tn)'].round(0).astype(int)
 
 st.write("**Top 3 Pozos con Máxima Arena Bombeada**")
-st.dataframe(top_arena, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_arena_final[['Campaña', 'Sigla', 'Empresa', 'Máxima Arena Bombeada (tn)']]),
+             use_container_width=True, hide_index=True)
 
 # ── Empresas (P50) ───────────────────────────────────────────────────────────
-top_emp_arena = (
+p50_emp_arena = (
     df_clean
     .groupby(['start_year', 'empresaNEW'])
     .agg(p50_arena=('arena_total_tn', 'median'))
     .reset_index()
+)
+top_emp_arena = (
+    p50_emp_arena
     .sort_values(['start_year', 'p50_arena'], ascending=[True, False])
     .groupby('start_year').head(3)
     .reset_index(drop=True)
 )
-top_emp_arena['p50_arena'] = top_emp_arena['p50_arena'].round(0).astype(int)
-top_emp_arena = top_emp_arena.rename(columns={
+df_emp_arena = top_emp_arena.rename(columns={
     'start_year': 'Campaña', 'empresaNEW': 'Empresa', 'p50_arena': 'P50 Arena Bombeada (tn)'
-})[['Campaña', 'Empresa', 'P50 Arena Bombeada (tn)']]
+})
+df_emp_arena['P50 Arena Bombeada (tn)'] = df_emp_arena['P50 Arena Bombeada (tn)'].round(0).astype(int)
 
 st.write("**Top 3 Empresas con Mayor P50 de Arena Bombeada**")
-st.dataframe(top_emp_arena, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_emp_arena[['Campaña', 'Empresa', 'P50 Arena Bombeada (tn)']]),
+             use_container_width=True, hide_index=True)
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -656,17 +709,18 @@ top_petro_frac = (
     .groupby('start_year').head(3)
     .reset_index(drop=True)
 )
-top_petro_frac['fracspacing'] = top_petro_frac['fracspacing'].round(0).astype(int)
-top_petro_frac = top_petro_frac.rename(columns={
+df_petro_frac_final = top_petro_frac.rename(columns={
     'start_year': 'Campaña', 'sigla': 'Sigla',
     'empresaNEW': 'Empresa', 'fracspacing': 'Mínimo Fracspacing (m)'
-})[['Campaña', 'Sigla', 'Empresa', 'Mínimo Fracspacing (m)']]
+})
+df_petro_frac_final['Mínimo Fracspacing (m)'] = df_petro_frac_final['Mínimo Fracspacing (m)'].round(0).astype(int)
 
 st.write("**Tipo Petrolífero: Top 3 Pozos con Fracspacing más Agresivo**")
-st.dataframe(top_petro_frac, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_petro_frac_final[['Campaña', 'Sigla', 'Empresa', 'Mínimo Fracspacing (m)']]),
+             use_container_width=True, hide_index=True)
 
 # ── Petrolífero Empresas (P50) ───────────────────────────────────────────────
-top_petro_frac_emp = (
+top3_petro_frac_emp = (
     df_petro_frac
     .groupby(['start_year', 'empresaNEW'])
     .agg(p50_fracspacing=('fracspacing', 'median'))
@@ -675,13 +729,14 @@ top_petro_frac_emp = (
     .groupby('start_year').head(3)
     .reset_index(drop=True)
 )
-top_petro_frac_emp['p50_fracspacing'] = top_petro_frac_emp['p50_fracspacing'].round(0).astype(int)
-top_petro_frac_emp = top_petro_frac_emp.rename(columns={
+df_petro_frac_emp = top3_petro_frac_emp.rename(columns={
     'start_year': 'Campaña', 'empresaNEW': 'Empresa', 'p50_fracspacing': 'P50 Fracspacing (m)'
-})[['Campaña', 'Empresa', 'P50 Fracspacing (m)']]
+})
+df_petro_frac_emp['P50 Fracspacing (m)'] = df_petro_frac_emp['P50 Fracspacing (m)'].round(0).astype(int)
 
 st.write("**Top 3 Empresas con Fracspacing más Agresivo - Petrolífero**")
-st.dataframe(top_petro_frac_emp, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_petro_frac_emp[['Campaña', 'Empresa', 'P50 Fracspacing (m)']]),
+             use_container_width=True, hide_index=True)
 
 # ── Gasífero Pozos ───────────────────────────────────────────────────────────
 df_gas_frac = df_fracspacing_base[df_fracspacing_base['tipopozoNEW'] == 'Gasífero']
@@ -695,17 +750,18 @@ top_gas_frac = (
     .groupby('start_year').head(3)
     .reset_index(drop=True)
 )
-top_gas_frac['fracspacing'] = top_gas_frac['fracspacing'].round(0).astype(int)
-top_gas_frac = top_gas_frac.rename(columns={
+df_gas_frac_final = top_gas_frac.rename(columns={
     'start_year': 'Campaña', 'sigla': 'Sigla',
     'empresaNEW': 'Empresa', 'fracspacing': 'Mínimo Fracspacing (m)'
-})[['Campaña', 'Sigla', 'Empresa', 'Mínimo Fracspacing (m)']]
+})
+df_gas_frac_final['Mínimo Fracspacing (m)'] = df_gas_frac_final['Mínimo Fracspacing (m)'].round(0).astype(int)
 
 st.write("**Tipo Gasífero: Top 3 Pozos con Fracspacing más Agresivo**")
-st.dataframe(top_gas_frac, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_gas_frac_final[['Campaña', 'Sigla', 'Empresa', 'Mínimo Fracspacing (m)']]),
+             use_container_width=True, hide_index=True)
 
 # ── Gasífero Empresas (P50) ──────────────────────────────────────────────────
-top_gas_frac_emp = (
+top3_gas_frac_emp = (
     df_gas_frac
     .groupby(['start_year', 'empresaNEW'])
     .agg(p50_fracspacing=('fracspacing', 'median'))
@@ -714,10 +770,11 @@ top_gas_frac_emp = (
     .groupby('start_year').head(3)
     .reset_index(drop=True)
 )
-top_gas_frac_emp['p50_fracspacing'] = top_gas_frac_emp['p50_fracspacing'].round(0).astype(int)
-top_gas_frac_emp = top_gas_frac_emp.rename(columns={
+df_gas_frac_emp = top3_gas_frac_emp.rename(columns={
     'start_year': 'Campaña', 'empresaNEW': 'Empresa', 'p50_fracspacing': 'P50 Fracspacing (m)'
-})[['Campaña', 'Empresa', 'P50 Fracspacing (m)']]
+})
+df_gas_frac_emp['P50 Fracspacing (m)'] = df_gas_frac_emp['P50 Fracspacing (m)'].round(0).astype(int)
 
 st.write("**Top 3 Empresas con Fracspacing más Agresivo - Gasífero**")
-st.dataframe(top_gas_frac_emp, use_container_width=True, hide_index=True)
+st.dataframe(style_ranking_table(df_gas_frac_emp[['Campaña', 'Empresa', 'P50 Fracspacing (m)']]),
+             use_container_width=True, hide_index=True)
