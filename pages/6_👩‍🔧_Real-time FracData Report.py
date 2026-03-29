@@ -475,7 +475,7 @@ with tab2:
         x=statistics['start_year'],
         y=statistics['max_lenght'],
         mode='lines+markers',
-        name='Longitud Máxima',
+        name='Max',
         line=dict(color='blue', dash='dash'),
         marker=dict(size=8),
     ))
@@ -486,7 +486,7 @@ with tab2:
         x=statistics['start_year'],
         y=statistics['avg_lenght'],
         mode='lines+markers',
-        name='Longitud Promedio',
+        name='P50',
         line=dict(color='magenta'),
         marker=dict(size=8),
     ))
@@ -549,7 +549,7 @@ with tab2:
         x=statistics['start_year'],
         y=statistics['max_etapas'],
         mode='lines+markers',
-        name='Máximo de Cantidad de Etapas',
+        name='Max',
         line=dict(color='blue', dash='dash'),
         marker=dict(size=8),
     ))
@@ -559,7 +559,7 @@ with tab2:
         x=statistics['start_year'],
         y=statistics['avg_etapas'],
         mode='lines+markers',
-        name='Promedio de Cantidad de Etapas',
+        name='P50',
         line=dict(color='orange'),
         marker=dict(size=8),
     ))
@@ -603,6 +603,103 @@ with tab2:
     
     # Show the plot
     #fig.show()
+    st.plotly_chart(fig, use_container_width=True)
+
+    #----------------
+    st.subheader("Evolución de Arena Bombeada por Pozo", divider="blue")
+    
+    # -----------------------------
+    # 1. Limpiar datos
+    # -----------------------------
+    df_arena = df_merged_VMUT_filtered[
+        (df_merged_VMUT_filtered['arena_total_tn'].notna()) &
+        (df_merged_VMUT_filtered['arena_total_tn'] > 0)
+    ].copy()
+    
+    # -----------------------------
+    # 2. Agregar estadísticas
+    # -----------------------------
+    statistics_arena = df_arena.groupby(['start_year']).agg(
+        max_arena=('arena_total_tn', 'max'),
+        avg_arena=('arena_total_tn', 'median')
+    ).reset_index()
+    
+    # -----------------------------
+    # 3. Plot
+    # -----------------------------
+    fig = go.Figure()
+
+    
+    # Max Arena
+    fig.add_trace(go.Scatter(
+        x=statistics_arena['start_year'],
+        y=statistics_arena['max_arena'],
+        mode='lines+markers',
+        name='Max',
+        line=dict(color='blue', dash='dash'),
+        marker=dict(size=8),
+    ))
+    
+    # P50 Arena
+    fig.add_trace(go.Scatter(
+        x=statistics_arena['start_year'],
+        y=statistics_arena['avg_arena'],
+        mode='lines+markers',
+        name='P50',
+        line=dict(color='green', dash='dash'),
+        marker=dict(size=8),
+    ))
+    
+    # -----------------------------
+    # 4. Annotations (más limpias)
+    # -----------------------------
+    for _, row in statistics_arena.iterrows():
+        fig.add_annotation(
+            x=row['start_year'],
+            y=row['max_arena'],
+            text=f"{row['max_arena']:.0f}",
+            showarrow=False,
+            yshift=12,
+            font=dict(color=color_max, size=10)
+        )
+    
+    for _, row in statistics_arena.iterrows():
+        fig.add_annotation(
+            x=row['start_year'],
+            y=row['avg_arena'],
+            text=f"{row['avg_arena']:.0f}",
+            showarrow=False,
+            yshift=-15,  # abajo para no superponer
+            font=dict(color=color_avg, size=10)
+        )
+    
+    # -----------------------------
+    # 5. Layout PRO
+    # -----------------------------
+    fig.update_layout(
+        template="plotly_white",
+        height=500,
+        margin=dict(l=20, r=20, t=60, b=20),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        xaxis=dict(
+            title="Campaña",
+            showgrid=False
+        ),
+        yaxis=dict(
+            title="Arena Bombeada (tn)",
+            gridcolor="rgba(0,0,0,0.05)"
+        )
+    )
+    
+    # -----------------------------
+    # 6. Mostrar en Streamlit
+    # -----------------------------
     st.plotly_chart(fig, use_container_width=True)
 
 
