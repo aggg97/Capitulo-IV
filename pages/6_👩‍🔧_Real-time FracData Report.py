@@ -651,56 +651,13 @@ with tab2:
     ))
     
     # -----------------------------
-    # 4. Annotations (más limpias)
-    # -----------------------------
-    for _, row in statistics_arena.iterrows():
-        fig.add_annotation(
-            x=row['start_year'],
-            y=row['max_arena'],
-            text=f"{row['max_arena']:.0f}",
-            showarrow=False,
-            yshift=12,
-            font=dict(color=color_max, size=10)
-        )
-    
-    for _, row in statistics_arena.iterrows():
-        fig.add_annotation(
-            x=row['start_year'],
-            y=row['avg_arena'],
-            text=f"{row['avg_arena']:.0f}",
-            showarrow=False,
-            yshift=-15,  # abajo para no superponer
-            font=dict(color=color_avg, size=10)
-        )
-    
-    # -----------------------------
-    # 5. Layout PRO
-    # -----------------------------
-    fig.update_layout(
-        template="plotly_white",
-        height=500,
-        margin=dict(l=20, r=20, t=60, b=20),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1
-        ),
-        xaxis=dict(
-            title="Campaña",
-            showgrid=False
-        ),
-        yaxis=dict(
-            title="Arena Bombeada (tn)",
-            gridcolor="rgba(0,0,0,0.05)"
-        )
-    )
-    
-    # -----------------------------
     # 6. Mostrar en Streamlit
     # -----------------------------
     st.plotly_chart(fig, use_container_width=True)
+
+    # -----------------------------
+    # Fracspacing
+
 
 
 # --- Tab 3: Productividad ---
