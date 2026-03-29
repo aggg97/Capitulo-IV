@@ -780,7 +780,8 @@ grouped_petrolifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolíf
 # Calculate Fracspacing
 grouped_petrolifero['fracspacing'] = grouped_petrolifero['longitud_rama_horizontal_m'] / grouped_petrolifero['cantidad_fracturas']
 grouped_petrolifero = grouped_gasifero[
-    grouped_petrolifero['fracspacing'].notna()
+    (grouped_petrolifero['fracspacing'].notna()) &
+    (grouped_petrolifero['fracspacing'] > 0
 ]
 
 # Small explanation
@@ -819,7 +820,8 @@ grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].
 # Calculate Fracspacing
 grouped_gasifero['fracspacing'] = grouped_gasifero['longitud_rama_horizontal_m'] / grouped_gasifero['cantidad_fracturas']
 grouped_gasifero = grouped_gasifero[
-    grouped_gasifero['fracspacing'].notna()
+    (grouped_gasifero['fracspacing'].notna()) &
+    (grouped_gasifero['fracspacing'] > 0
 ]
 
 # Sort and take top 3 smallest fracspacing per year
