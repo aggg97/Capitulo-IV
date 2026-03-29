@@ -787,7 +787,7 @@ with tab2:
     
     # -------------------- Data --------------------
     pivot_table_agua = df_merged_VMUT.groupby('start_year').agg({
-        'agua_inyectada_m3': 'sum'
+        'agua_inyectada_m3': 'median'
     }).reset_index()
     
     # Opcional pero recomendado (evita NaN o ceros raros)
@@ -800,7 +800,7 @@ with tab2:
     
     fig_agua_plot.add_trace(go.Scatter(
         x=pivot_table_agua['start_year'],
-        y=pivot_table_agua['agua_inyectada_m3'],
+        y=pivot_table_agua['agua_inyectada_m3']/1000,
         mode='lines+markers',
         name='Agua Inyectada (m3)',
         line=dict(color='#1f77b4', width=3),
@@ -811,7 +811,7 @@ with tab2:
     for _, row in pivot_table_agua.iterrows():
         fig_agua_plot.add_annotation(
             x=row['start_year'],
-            y=row['agua_inyectada_m3'],
+            y=row['agua_inyectada_m3']/1000,
             text=f"{int(row['agua_inyectada_m3'])}",
             showarrow=False,
             yshift=12,
@@ -820,9 +820,9 @@ with tab2:
     
     # Layout
     fig_agua_plot.update_layout(
-        title="Total de Agua Inyectada por Año",
+        title="P50 Agua Inyectada por Año",
         xaxis_title="Campaña",
-        yaxis_title="Agua Inyectada (m3)",
+        yaxis_title="Agua Inyectada (km3)",
         template="plotly_white",
         hovermode="x unified",
         legend_title="Indicador"
