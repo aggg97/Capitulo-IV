@@ -351,115 +351,150 @@ st.plotly_chart(fig_gasifero, use_container_width=True)
 df_merged_VMUT_filtered = df_merged_VMUT[df_merged_VMUT['longitud_rama_horizontal_m'] > 0].drop_duplicates(subset='sigla')
 # -----------------------------
 
-# -----------------------------
-# Remove rows where longitud_rama_horizontal_m is zero and drop duplicates based on 'sigla'
-df_merged_VMUT_filtered = df_merged_VMUT[df_merged_VMUT['longitud_rama_horizontal_m'] > 0].drop_duplicates(subset='sigla')
-# -----------------------------
-
 import pandas as pd
 import streamlit as st
 
 st.subheader("Ranking según Cantidad de Etapas", divider="blue")
 
-# Aggregate the data to calculate max fractures for each sigla, empresaNEW, and start_year
-company_statistics_frac = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW', 'sigla']).agg(
-    max_fracturas=('cantidad_fracturas', 'max')
+# Aggregate the data to calculate max length for each sigla, empresaNEW, and start_year
+company_statistics = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW', 'sigla']).agg(
+    max_lenght=('longitud_rama_horizontal_m', 'max')
 ).reset_index()
 
-# Round to 0 decimal places
-company_statistics_frac['max_fracturas'] = company_statistics_frac['max_fracturas'].round(0)
+# Round the max_lenght to 0 decimal places
+company_statistics['max_lenght'] = company_statistics['max_lenght'].round(0)
 
-# Sort by start_year and max_fracturas to get the top 3 sigla per year
-company_statistics_frac_sorted = company_statistics_frac.sort_values(['start_year', 'max_fracturas'], ascending=[True, False])
+# Sort by start_year and max_lenght to get the top 3 sigla per year
+company_statistics_sorted = company_statistics.sort_values(['start_year', 'max_lenght'], ascending=[True, False])
 
-# Select the top 3 sigla for each year
-top_max_fracturas = company_statistics_frac_sorted.groupby('start_year').head(3)
+# Select the top 3 sigla for each year based on max_lenght
+top_max_lenght = company_statistics_sorted.groupby('start_year').head(3)
 
-# Create data for the table
-data_for_max_frac_table = []
+# Create data for the table with the year appearing only once for each start_year
+data_for_max_lenght_table = []
 previous_year = None
-for _, row in top_max_fracturas.iterrows():
-    year_value = int(row['start_year']) if row['start_year'] != previous_year else " "
-    data_for_max_frac_table.append([year_value, row['sigla'], row['empresaNEW'], row['max_fracturas']])
+for _, row in top_max_lenght.iterrows():
+    year_value = int(row['start_year']) if row['start_year'] != previous_year else " "  # Use blank for repeated years
+    data_for_max_lenght_table.append([year_value, row['sigla'], row['empresaNEW'], row['max_lenght']])
     previous_year = row['start_year']
 
-df_max_frac = pd.DataFrame(data_for_max_frac_table, columns=["Campaña", "Sigla", "Empresa", "Cantidad de Etapas Máxima"])
+# Convert to a dataframe
+df_max_lenght = pd.DataFrame(data_for_max_lenght_table, columns=["Campaña", "Sigla", "Empresa", "Longitud de Rama Maxima (metros)"])
 
+# Display the DataFrame in Streamlit
 st.write("**Top 3 Pozos con Máxima Cantidad de Etapas**")
-st.dataframe(df_max_frac, use_container_width=True)
+# Display the dataframe in Streamlit
+st.dataframe(df_max_lenght,use_container_width=True)
 
-
-# P50 de cantidad de etapas por empresa (calculado sobre la distribución completa de pozos)
-company_p50_frac = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW']).agg(
-    p50_fracturas=('cantidad_fracturas', 'median')
+# Aggregate the data to calculate avg length for each empresaNEW and start_year
+company_statistics_avg = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW']).agg(
+    avg_lenght=('longitud_rama_horizontal_m', 'median')
 ).reset_index()
 
-company_p50_frac['p50_fracturas'] = company_p50_frac['p50_fracturas'].round(0)
+# Round the avg_lenght to 0 decimal places
+company_statistics_avg['avg_lenght'] = company_statistics_avg['avg_lenght'].round(0)
 
-company_p50_frac_sorted = company_p50_frac.sort_values(['start_year', 'p50_fracturas'], ascending=[True, False])
-top_p50_frac = company_p50_frac_sorted.groupby('start_year').head(3)
+# Sort by start_year and avg_lenght to get the top 3 empresasNEW per year
+company_statistics_sorted_avg = company_statistics_avg.sort_values(['start_year', 'avg_lenght'], ascending=[True, False])
 
-data_for_p50_frac_table = []
+# Select the top 3 empresasNEW for each year based on avg_lenght
+top_avg_lenght = company_statistics_sorted_avg.groupby('start_year').head(3)
+
+# Create data for the table with the year appearing only once for each start_year
+data_for_avg_lenght_table = []
 previous_year = None
-for _, row in top_p50_frac.iterrows():
-    year_value = int(row['start_year']) if row['start_year'] != previous_year else " "
-    data_for_p50_frac_table.append([year_value, row['empresaNEW'], row['p50_fracturas']])
+for _, row in top_avg_lenght.iterrows():
+    year_value = int(row['start_year']) if row['start_year'] != previous_year else " "  # Use blank for repeated years
+    data_for_avg_lenght_table.append([year_value, row['empresaNEW'], row['avg_lenght']])
     previous_year = row['start_year']
 
-df_p50_frac = pd.DataFrame(data_for_p50_frac_table, columns=["Campaña", "Empresa", "P50 Cantidad de Etapas por Empresa"])
+# Convert to a dataframe
+df_avg_lenght = pd.DataFrame(data_for_avg_lenght_table, columns=["Campaña", "Empresa", "Longitud de Rama Promedio (metros)"])
 
-st.write("**Top 3 Empresas con Mayor P50 de Cantidad de Etapas**")
-st.dataframe(df_p50_frac, use_container_width=True)
+# Display the DataFrame in Streamlit
+st.write("**Top 3 Empresa con Máxima Cantidad Promedio de Etapas**")
+# Display the dataframe in Streamlit
+st.dataframe(df_avg_lenght,use_container_width=True)
 
 
 #----------
 
 st.subheader("Ranking según Longitud de Rama", divider="blue")
 
-# Max longitud de rama por pozo (sigla)
+# Aggregate the data to calculate max length for each sigla, empresaNEW, and start_year
 company_statistics = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW', 'sigla']).agg(
     max_lenght=('longitud_rama_horizontal_m', 'max')
 ).reset_index()
 
+# Round the avg_lenght to 2 decimal places
 company_statistics['max_lenght'] = company_statistics['max_lenght'].round(0)
 
+# Sort by start_year and max_lenght to get the top 3 sigla per year
 company_statistics_sorted = company_statistics.sort_values(['start_year', 'max_lenght'], ascending=[True, False])
-top_max_lenght = company_statistics_sorted.groupby('start_year').head(3)
 
+# Select the top 3 sigla for each year based on max_lenght
+top_max_lenght = company_statistics_sorted.groupby('start_year').head(3)  # Get the top 3 for each year
+
+# Create data for the table with the year appearing only once for each start_year
 data_for_max_lenght_table = []
 previous_year = None
 for _, row in top_max_lenght.iterrows():
-    year_value = int(row['start_year']) if row['start_year'] != previous_year else " "
+    year_value = int(row['start_year']) if row['start_year'] != previous_year else " "  # Use blank for repeated years
     data_for_max_lenght_table.append([year_value, row['sigla'], row['empresaNEW'], row['max_lenght']])
     previous_year = row['start_year']
 
+# Create Plotly Table for max_lenght
+fig_max_lenght = go.Figure(data=[go.Table(
+    header=dict(values=["Campaña", "Sigla", "Empresa", "Longitud de Rama Maxima (metros)"]),
+    cells=dict(
+        values=list(zip(*data_for_max_lenght_table)),  # Transpose the list to match columns
+        fill_color=['white'] * len(data_for_max_lenght_table),  # Keep the default background
+    )
+)])
+
+fig_max_lenght.update_layout(
+    title="Top 3 Pozos anuales con Longitud de Rama Maxima",
+    template="plotly_white"
+)
+
+
+# Convert to a dataframe
 df_max_lenght = pd.DataFrame(data_for_max_lenght_table, columns=["Campaña", "Sigla", "Empresa", "Longitud de Rama Máxima (metros)"])
 
 st.write("**Top 3 Pozos con Mayor Longitud de Rama**")
 st.dataframe(df_max_lenght, use_container_width=True)
 
 
-# P50 de longitud de rama por empresa (calculado sobre la distribución completa de pozos)
-company_p50_lenght = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW']).agg(
-    p50_lenght=('longitud_rama_horizontal_m', 'median')
+
+import plotly.graph_objects as go
+
+# Aggregate the data to calculate avg length for each empresaNEW and start_year
+company_statistics_avg = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW']).agg(
+    avg_lenght=('longitud_rama_horizontal_m', 'median')
 ).reset_index()
 
-company_p50_lenght['p50_lenght'] = company_p50_lenght['p50_lenght'].round(0)
+# Round the avg_lenght to 2 decimal places
+company_statistics_avg['avg_lenght'] = company_statistics_avg['avg_lenght'].round(0)
 
-company_p50_lenght_sorted = company_p50_lenght.sort_values(['start_year', 'p50_lenght'], ascending=[True, False])
-top_p50_lenght = company_p50_lenght_sorted.groupby('start_year').head(3)
+# Sort by start_year and avg_lenght to get the top 3 empresasNEW per year
+company_statistics_sorted_avg = company_statistics_avg.sort_values(['start_year', 'avg_lenght'], ascending=[True, False])
 
-data_for_p50_lenght_table = []
+# Select the top 3 empresasNEW for each year based on avg_lenght
+top_avg_lenght = company_statistics_sorted_avg.groupby('start_year').head(3)  # Get the top 3 for each year
+
+# Create data for the table with the year appearing only once for each start_year
+data_for_avg_lenght_table = []
 previous_year = None
-for _, row in top_p50_lenght.iterrows():
-    year_value = int(row['start_year']) if row['start_year'] != previous_year else " "
-    data_for_p50_lenght_table.append([year_value, row['empresaNEW'], row['p50_lenght']])
+for _, row in top_avg_lenght.iterrows():
+    year_value = int(row['start_year']) if row['start_year'] != previous_year else " "  # Use blank for repeated years
+    data_for_avg_lenght_table.append([year_value, row['empresaNEW'], row['avg_lenght']])
     previous_year = row['start_year']
 
-df_p50_lenght = pd.DataFrame(data_for_p50_lenght_table, columns=["Campaña", "Empresa", "P50 Longitud de Rama por Empresa (metros)"])
+# Convert to a dataframe
+df_avg_lenght = pd.DataFrame(data_for_avg_lenght_table, columns=["Campaña", "Empresa", "Longitud de Rama Promedio (metros)"])
 
-st.write("**Top 3 Empresas con Mayor P50 de Longitud de Rama**")
-st.dataframe(df_p50_lenght, use_container_width=True)
+st.write("**Top 3 Empresa con Mayor Longitud de Rama Promedio**")
+st.dataframe(df_avg_lenght, use_container_width=True)
 
 
 
@@ -489,6 +524,7 @@ grouped_petrolifero['agente_etapa'] = (
 grouped_petrolifero_sorted = grouped_petrolifero.sort_values(['start_year', 'Qo_peak'], ascending=[True, False])
 top_petrolifero = grouped_petrolifero_sorted.groupby('start_year').head(3)
 
+# Format Table
 data_petrolifero_table = []
 previous_year = None
 for _, row in top_petrolifero.iterrows():
@@ -499,27 +535,26 @@ for _, row in top_petrolifero.iterrows():
         'Empresa': row['empresaNEW'],
         'Caudal Pico de Petróleo (m3/d)': int(row['Qo_peak']),
         'Cantidad de Fracturas': (
-            int(row['cantidad_fracturas'])
-            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0
+            int(row['cantidad_fracturas']) 
+            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
             else None
-        ),
+            ),
         'Fracspacing (m/etapa)': (
-            int(row['fracspacing'])
-            if pd.notna(row['fracspacing']) and row['fracspacing'] > 0
+            int(row['fracspacing']) 
+            if pd.notna(row['fracspacing']) and row['fracspacing'] > 0 
             else None
-        ),
+            ),
         'Agente de Sosten por Etapa (tn/etapa)': (
-            int(row['agente_etapa'])
-            if pd.notna(row['agente_etapa']) and row['agente_etapa'] > 0
+            int(row['agente_etapa']) 
+            if pd.notna(row['agente_etapa']) and row['agente_etapa'] > 0 
             else None
-        )
+            )
     })
     previous_year = row['start_year']
 
 df_petrolifero_final = pd.DataFrame(data_petrolifero_table)
 st.write("**Tipo Petrolífero: Top 3 Pozos con Mayor Caudal Pico**")
 st.dataframe(df_petrolifero_final, use_container_width=True)
-
 
 # -------------------- Gasífero Pozos --------------------
 grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
@@ -540,6 +575,7 @@ grouped_gasifero['agente_etapa'] = (
 grouped_gasifero_sorted = grouped_gasifero.sort_values(['start_year', 'Qg_peak'], ascending=[True, False])
 top_gasifero = grouped_gasifero_sorted.groupby('start_year').head(3)
 
+# Format Table
 data_gasifero_table = []
 previous_year = None
 for _, row in top_gasifero.iterrows():
@@ -550,20 +586,20 @@ for _, row in top_gasifero.iterrows():
         'Empresa': row['empresaNEW'],
         'Caudal Pico de Gas (km3/d)': int(row['Qg_peak']),
         'Cantidad de Fracturas': (
-            int(row['cantidad_fracturas'])
-            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0
+            int(row['cantidad_fracturas']) 
+            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
             else None
-        ),
+            ),
         'Fracspacing (m/etapa)': (
-            int(row['fracspacing'])
-            if pd.notna(row['fracspacing']) and row['fracspacing'] > 0
+            int(row['fracspacing']) 
+            if pd.notna(row['fracspacing']) and row['fracspacing'] > 0 
             else None
-        ),
+            ),
         'Agente de Sosten por Etapa (tn/etapa)': (
-            int(row['agente_etapa'])
-            if pd.notna(row['agente_etapa']) and row['agente_etapa'] > 0
+            int(row['agente_etapa']) 
+            if pd.notna(row['agente_etapa']) and row['agente_etapa'] > 0 
             else None
-        )
+            )
     })
     previous_year = row['start_year']
 
@@ -571,84 +607,85 @@ df_gasifero_final = pd.DataFrame(data_gasifero_table)
 st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Caudal Pico**")
 st.dataframe(df_gasifero_final, use_container_width=True)
 
-
-# -------------------- Empresas: P50 Caudales Pico --------------------
+# -------------------- Empresas: Promedios --------------------
 
 # --- Petrolífero ---
-# P50 calculado directamente sobre todos los pozos petrolíferos de VMUT (sin pre-agrupar)
-p50_petro_emp = (
-    df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero']
-    .groupby(['start_year', 'empresaNEW'])
-    .agg(p50_Qo_peak=('Qo_peak', 'median'))
-    .reset_index()
-)
+grouped_petro_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
+    ['start_year', 'empresaNEW']
+).agg({
+    'Qo_peak': 'median',
+    'cantidad_fracturas': 'median'
+}).reset_index()
 
-top3_petro_emp = (
-    p50_petro_emp
-    .sort_values(['start_year', 'p50_Qo_peak'], ascending=[True, False])
-    .groupby('start_year')
-    .head(3)
-)
+# Ordenar y sacar Top 3 por año
+top3_petro_emp = grouped_petro_emp.sort_values(['start_year', 'Qo_peak'], ascending=[True, False]).groupby('start_year').head(3)
 
+# Lógica para no repetir el año en la visualización
 data_petro_final = []
 last_year = None
+
 for _, row in top3_petro_emp.iterrows():
     current_year = str(int(row['start_year']))
+    # Si el año es el mismo que el anterior, lo dejamos en blanco
     display_year = current_year if current_year != last_year else ""
+    
     data_petro_final.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'P50 Caudal Pico de Petróleo (m3/d)': round(row['p50_Qo_peak'], 0)
+        'Caudal Pico Promedio (m3/d)': round(row['Qo_peak'], 0)
     })
     last_year = current_year
 
-st.write("**Top 3 Empresas con Mayor P50 de Caudal Pico de Petróleo**")
+st.write("**Top 3 Empresas con Mayores Caudales Pico de Petróleo**")
 st.dataframe(pd.DataFrame(data_petro_final), use_container_width=True, hide_index=True)
 
 
 # --- Gasífero ---
-p50_gas_emp = (
-    df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero']
-    .groupby(['start_year', 'empresaNEW'])
-    .agg(p50_Qg_peak=('Qg_peak', 'median'))
-    .reset_index()
-)
+grouped_gas_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
+    ['start_year', 'empresaNEW']
+).agg({
+    'Qg_peak': 'median',
+    'cantidad_fracturas': 'median'
+}).reset_index()
 
-top3_gas_emp = (
-    p50_gas_emp
-    .sort_values(['start_year', 'p50_Qg_peak'], ascending=[True, False])
-    .groupby('start_year')
-    .head(3)
-)
+# Ordenar y sacar Top 3 por año
+top3_gas_emp = grouped_gas_emp.sort_values(['start_year', 'Qg_peak'], ascending=[True, False]).groupby('start_year').head(3)
 
+# Lógica para no repetir el año en la visualización
 data_gas_final = []
 last_year = None
+
 for _, row in top3_gas_emp.iterrows():
     current_year = str(int(row['start_year']))
+    # Si el año es el mismo que el anterior, lo dejamos en blanco
     display_year = current_year if current_year != last_year else ""
+    
     data_gas_final.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'P50 Caudal Pico de Gas (km3/d)': round(row['p50_Qg_peak'], 0)
+        'Caudal Pico Promedio (km3/d)': round(row['Qg_peak'], 0)
+    
     })
     last_year = current_year
 
-st.write("**Top 3 Empresas con Mayor P50 de Caudal Pico de Gas**")
+st.write("**Top 3 Empresas con Mayores Caudales Pico de Gas**")
 st.dataframe(pd.DataFrame(data_gas_final), use_container_width=True, hide_index=True)
+
 
 
 # -------------------- Arena Bombeada --------------------
 
 st.subheader("Ranking según Arena Bombeada", divider="blue")
 
+
 df_clean = df_merged_VMUT[
-    (df_merged_VMUT['start_year'] >= 2012) &
-    (df_merged_VMUT['arena_total_tn'] > 0) &
+    (df_merged_VMUT['start_year'] >= 2012) & 
+    (df_merged_VMUT['arena_total_tn'] > 0) & 
     (df_merged_VMUT['arena_total_tn'].notna())
 ].copy()
 
 
-# -------------------- Arena por Pozo (máximo) --------------------
+# -------------------- Arena Pozos --------------------
 
 grouped_arena = df_clean.groupby(
     ['start_year', 'sigla', 'empresaNEW']
@@ -658,6 +695,7 @@ grouped_arena = df_clean.groupby(
     'longitud_rama_horizontal_m': 'median'
 }).reset_index()
 
+# Métricas derivadas
 grouped_arena['fracspacing'] = (
     grouped_arena['longitud_rama_horizontal_m'] / grouped_arena['cantidad_fracturas']
 )
@@ -668,59 +706,66 @@ grouped_arena_sorted = grouped_arena.sort_values(
 
 top_arena = grouped_arena_sorted.groupby('start_year').head(3)
 
+# -------------------- Format Table --------------------
 data_arena_table = []
 previous_year = None
+
 for _, row in top_arena.iterrows():
     year_value = int(row['start_year']) if row['start_year'] != previous_year else " "
+
     data_arena_table.append({
         'Campaña': year_value,
         'Sigla': row['sigla'],
         'Empresa': row['empresaNEW'],
         'Máxima Arena Bombeada (tn)': (
-            int(row['arena_total_tn'])
-            if pd.notna(row['arena_total_tn']) and row['arena_total_tn'] > 0
+            int(row['arena_total_tn']) 
+            if pd.notna(row['arena_total_tn']) and row['arena_total_tn'] > 0 
             else None
         )
     })
+
     previous_year = row['start_year']
 
 df_arena_final = pd.DataFrame(data_arena_table)
+
 st.write("**Top 3 Pozos con Mayor Arena Bombeada**")
 st.dataframe(df_arena_final, use_container_width=True)
 
+# -------------------- Empresas: Arena Promedio --------------------
 
-# -------------------- Empresas: P50 Arena Bombeada --------------------
-# P50 calculado directamente sobre la distribución completa de pozos por empresa (sin pre-agrupar)
-
-p50_emp_arena = (
-    df_clean
-    .groupby(['start_year', 'empresaNEW'])
-    .agg(p50_arena=('arena_total_tn', 'median'))
-    .reset_index()
-)
+grouped_emp_arena = df_clean.groupby(
+    ['start_year', 'empresaNEW']
+).agg({
+    'arena_total_tn': 'median',
+    'cantidad_fracturas': 'median'
+}).reset_index()
 
 top_emp_arena = (
-    p50_emp_arena
-    .sort_values(['start_year', 'p50_arena'], ascending=[True, False])
+    grouped_emp_arena
+    .sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
     .groupby('start_year')
     .head(3)
 )
 
+# Format
 data_emp_arena = []
 last_year = None
+
 for _, row in top_emp_arena.iterrows():
     current_year = str(int(row['start_year']))
     display_year = current_year if current_year != last_year else ""
+
     data_emp_arena.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'P50 Arena Bombeada por Empresa (tn)': (
-            int(row['p50_arena'])
-            if pd.notna(row['p50_arena']) and row['p50_arena'] > 0
+        'Máxima Arena Promedio Bombeada (tn)': (
+            int(row['arena_total_tn']) 
+            if pd.notna(row['arena_total_tn']) and row['arena_total_tn'] > 0 
             else None
         )
     })
+
     last_year = current_year
 
-st.write("**Top 3 Empresas con Mayor P50 de Arena Bombeada**")
+st.write("**Top 3 Empresas con Mayor Arena Promedio Bombeada**")
 st.dataframe(pd.DataFrame(data_emp_arena), use_container_width=True, hide_index=True)
