@@ -25,8 +25,8 @@ if 'df' in st.session_state:
     # Recuperamos los datos de la memoria sin esperar un segundo
     data_sorted = st.session_state['df']
     data_sorted['date'] = pd.to_datetime(data_sorted['anio'].astype(str) + '-' + data_sorted['mes'].astype(str) + '-1')
-    data_sorted['gas_rate'] = data_sorted['prod_gas'] / df['tef']
-    data_sorted['oil_rate'] = data_sorted['prod_pet'] / df['tef']
+    data_sorted['gas_rate'] = data_sorted['prod_gas'] / data_sorted['tef']
+    data_sorted['oil_rate'] = data_sorted['prod_pet'] / data_sorted['tef']
     data_sorted = df.sort_values(by=['sigla', 'fecha_data'], ascending=True)
     
     st.info("Utilizando datos recuperados de la memoria.")
