@@ -659,7 +659,7 @@ with tab2:
             text=f"{row['max_arena']:.0f}",
             showarrow=False,
             yshift=12,
-            font=dict(color=blue, size=10)
+            font=dict(color='blue', size=10)
         )
     
     for _, row in statistics_arena.iterrows():
@@ -669,7 +669,7 @@ with tab2:
             text=f"{row['avg_arena']:.0f}",
             showarrow=False,
             yshift=-15,  # abajo para no superponer
-            font=dict(color=green, size=10)
+            font=dict(color='green', size=10)
         )
 
      # Update layout with labels and title
