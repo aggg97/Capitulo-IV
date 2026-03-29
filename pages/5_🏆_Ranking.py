@@ -358,7 +358,7 @@ st.subheader("Ranking según Cantidad de Etapas", divider="blue")
 
 # Aggregate the data to calculate max length for each sigla, empresaNEW, and start_year
 company_statistics = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW', 'sigla']).agg(
-    max_lenght=('cantidad_fracturas, 'max')
+    max_etapas=('cantidad_fracturas, 'max')
 ).reset_index()
 
 # Round the max_lenght to 0 decimal places
@@ -368,18 +368,18 @@ company_statistics['max_etapas'] = company_statistics['max_etapas'].round(0)
 company_statistics_sorted = company_statistics.sort_values(['start_year', 'max_etapas'], ascending=[True, False])
 
 # Select the top 3 sigla for each year based on max_lenght
-top_max_lenght = company_statistics_sorted.groupby('start_year').head(3)
+top_max_etapas = company_statistics_sorted.groupby('start_year').head(3)
 
 # Create data for the table with the year appearing only once for each start_year
-data_for_max_lenght_table = []
+data_for_max_etapas_table = []
 previous_year = None
-for _, row in top_max_lenght.iterrows():
+for _, row in top_max_etapas.iterrows():
     year_value = int(row['start_year']) if row['start_year'] != previous_year else " "  # Use blank for repeated years
-    data_for_max_lenght_table.append([year_value, row['sigla'], row['empresaNEW'], row['max_etapas']])
+    data_for_max_etapas_table.append([year_value, row['sigla'], row['empresaNEW'], row['max_etapas']])
     previous_year = row['start_year']
 
 # Convert to a dataframe
-df_max_etapas = pd.DataFrame(data_for_max_lenght_table, columns=["Campaña", "Sigla", "Empresa", "Máxima Cantidad de Etapas"])
+df_max_etapas = pd.DataFrame(data_for_max_etapas_table, columns=["Campaña", "Sigla", "Empresa", "Máxima Cantidad de Etapas"])
 
 # Display the DataFrame in Streamlit
 st.write("**Top 3 Pozos con Máxima Cantidad de Etapas**")
@@ -388,7 +388,7 @@ st.dataframe(df_max_etapas,use_container_width=True)
 
 # Aggregate the data to calculate avg length for each empresaNEW and start_year
 company_statistics_avg = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW']).agg(
-    avg_lenght=('cantidad_fracturas', 'median')
+    avg_etapas=('cantidad_fracturas', 'median')
 ).reset_index()
 
 # Round the avg_lenght to 0 decimal places
@@ -398,23 +398,23 @@ company_statistics_avg['avg_etapas'] = company_statistics_avg['avg_etapas'].roun
 company_statistics_sorted_avg = company_statistics_avg.sort_values(['start_year', 'avg_etapas'], ascending=[True, False])
 
 # Select the top 3 empresasNEW for each year based on avg_lenght
-top_avg_lenght = company_statistics_sorted_avg.groupby('start_year').head(3)
+top_avg_etapas = company_statistics_sorted_avg.groupby('start_year').head(3)
 
 # Create data for the table with the year appearing only once for each start_year
-data_for_avg_lenght_table = []
+data_for_avg_etpas_table = []
 previous_year = None
-for _, row in top_avg_lenght.iterrows():
+for _, row in top_avg_etapas.iterrows():
     year_value = int(row['start_year']) if row['start_year'] != previous_year else " "  # Use blank for repeated years
-    data_for_avg_lenght_table.append([year_value, row['empresaNEW'], row['avg_etapas']])
+    data_for_avg_etapas_table.append([year_value, row['empresaNEW'], row['avg_etapas']])
     previous_year = row['start_year']
 
 # Convert to a dataframe
-df_avg_lenght = pd.DataFrame(data_for_avg_lenght_table, columns=["Campaña", "Empresa", "P50 Cantidad de Etapas"])
+df_avg_lenght = pd.DataFrame(data_for_avg_etapas_table, columns=["Campaña", "Empresa", "P50 Cantidad de Etapas"])
 
 # Display the DataFrame in Streamlit
 st.write("**Top 3 Empresas con Máxima Cantidad de Etapas por Pozo**")
 # Display the dataframe in Streamlit
-st.dataframe(df_avg_lenght,use_container_width=True)
+st.dataframe(df_avg_etapas,use_container_width=True)
 
 
 #----------
