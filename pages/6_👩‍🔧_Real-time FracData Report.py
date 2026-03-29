@@ -742,27 +742,6 @@ with tab2:
     for _, row in gasifero_stats.iterrows():
         fig_lines.add_annotation(
             x=row['start_year'],
-            y=row['min_fracspacing'],
-            text=f"{row['min_fracspacing']:.0f}",
-            showarrow=False,
-            yshift=12,
-            font=dict(color='red', size=10)
-        )
-    
-    for _, row in petrolifero_stats.iterrows():
-        fig_lines.add_annotation(
-            x=row['start_year'],
-            y=row['min_fracspacing'],
-            text=f"{row['min_fracspacing']:.0f}",
-            showarrow=False,
-            yshift=-15,  # abajo para no superponer
-            font=dict(color='green', size=10)
-        )
-
-    # Add annotations 
-    for _, row in gasifero_stats.iterrows():
-        fig_lines.add_annotation(
-            x=row['start_year'],
             y=row['avg_fracspacing'],
             text=f"{row['avg_fracspacing']:.0f}",
             showarrow=False,
