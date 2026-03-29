@@ -730,16 +730,6 @@ for _, row in top_arena.iterrows():
             int(row['arena_total_tn']) 
             if pd.notna(row['arena_total_tn']) and row['arena_total_tn'] > 0 
             else None
-        ),
-        'Cantidad de Fracturas': (
-            int(row['cantidad_fracturas']) 
-            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
-            else None
-        ),
-        'Fracspacing (m/etapa)': (
-            int(row['fracspacing']) 
-            if pd.notna(row['fracspacing']) and row['fracspacing'] > 0 
-            else None
         )
     })
 
