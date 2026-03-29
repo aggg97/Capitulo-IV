@@ -27,7 +27,7 @@ if 'df' in st.session_state:
     data_sorted['date'] = pd.to_datetime(data_sorted['anio'].astype(str) + '-' + data_sorted['mes'].astype(str) + '-1')
     data_sorted['gas_rate'] = data_sorted['prod_gas'] / data_sorted['tef']
     data_sorted['oil_rate'] = data_sorted['prod_pet'] / data_sorted['tef']
-    data_sorted = data_sorted.sort_values(by=['sigla', 'fecha_data'], ascending=True)
+    data_sorted = data_sorted.sort_values(by=['sigla', 'date'], ascending=True)
     
     st.info("Utilizando datos recuperados de la memoria.")
     
