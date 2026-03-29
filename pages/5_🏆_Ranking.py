@@ -632,7 +632,7 @@ for _, row in top3_petro_emp.iterrows():
     data_petro_final.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'Caudal Pico P50 (m3/d)': round(row['Qo_peak'], 0)
+        'P50 Caudal Pico (m3/d)': round(row['Qo_peak'], 0)
     })
     last_year = current_year
 
@@ -663,7 +663,7 @@ for _, row in top3_gas_emp.iterrows():
     data_gas_final.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'Caudal Pico P50 (km3/d)': round(row['Qg_peak'], 0)
+        'P50 Caudal Pico (km3/d)': round(row['Qg_peak'], 0)
     
     })
     last_year = current_year
@@ -783,7 +783,7 @@ df_fracspacing_base = df_fracspacing_base[
     (df_fracspacing_base['fracspacing'] > 0)
 ]
 
-# -------------------- Petrolífero --------------------
+# -------------------- Petrolífero Pozos --------------------
 df_petro_frac = df_fracspacing_base[df_fracspacing_base['tipopozoNEW'] == 'Petrolífero']
 
 grouped_petrolifero = df_petro_frac.groupby(
@@ -813,8 +813,39 @@ df_petrolifero_final = pd.DataFrame(data_petrolifero_table)
 st.write("**Tipo Petrolífero: Top 3 Pozos con Menor Fracspacing**")
 st.dataframe(df_petrolifero_final, use_container_width=True, hide_index=True)
 
+# -------------------- Petrolífero Empresas (P50) --------------------
+p50_petro_emp = df_petro_frac.groupby(
+    ['start_year', 'empresaNEW']
+).agg(
+    p50_fracspacing=('fracspacing', 'median')
+).reset_index()
 
-# -------------------- Gasífero --------------------
+p50_petro_emp['p50_fracspacing'] = p50_petro_emp['p50_fracspacing'].round(0)
+
+top3_petro_emp = (
+    p50_petro_emp
+    .sort_values(['start_year', 'p50_fracspacing'], ascending=[True, True])
+    .groupby('start_year')
+    .head(3)
+)
+
+data_petro_emp = []
+last_year = None
+for _, row in top3_petro_emp.iterrows():
+    current_year = str(int(row['start_year']))
+    display_year = current_year if current_year != last_year else ""
+    data_petro_emp.append({
+        'Campaña': display_year,
+        'Empresa': row['empresaNEW'],
+        'P50 Fracspacing (m)': int(row['p50_fracspacing'])
+    })
+    last_year = current_year
+
+st.write("**Top 3 Empresas con Menor P50 Fracspacing - Petrolífero**")
+st.dataframe(pd.DataFrame(data_petro_emp), use_container_width=True, hide_index=True)
+
+
+# -------------------- Gasífero Pozos --------------------
 df_gas_frac = df_fracspacing_base[df_fracspacing_base['tipopozoNEW'] == 'Gasífero']
 
 grouped_gasifero = df_gas_frac.groupby(
@@ -843,3 +874,34 @@ for _, row in top_gasifero.iterrows():
 df_gasifero_final = pd.DataFrame(data_gasifero_table)
 st.write("**Tipo Gasífero: Top 3 Pozos con Menor Fracspacing**")
 st.dataframe(df_gasifero_final, use_container_width=True, hide_index=True)
+
+# -------------------- Gasífero Empresas (P50) --------------------
+p50_gas_emp = df_gas_frac.groupby(
+    ['start_year', 'empresaNEW']
+).agg(
+    p50_fracspacing=('fracspacing', 'median')
+).reset_index()
+
+p50_gas_emp['p50_fracspacing'] = p50_gas_emp['p50_fracspacing'].round(0)
+
+top3_gas_emp = (
+    p50_gas_emp
+    .sort_values(['start_year', 'p50_fracspacing'], ascending=[True, True])
+    .groupby('start_year')
+    .head(3)
+)
+
+data_gas_emp = []
+last_year = None
+for _, row in top3_gas_emp.iterrows():
+    current_year = str(int(row['start_year']))
+    display_year = current_year if current_year != last_year else ""
+    data_gas_emp.append({
+        'Campaña': display_year,
+        'Empresa': row['empresaNEW'],
+        'P50 Fracspacing (m)': int(row['p50_fracspacing'])
+    })
+    last_year = current_year
+
+st.write("**Top 3 Empresas con Menor P50 Fracspacing - Gasífero**")
+st.dataframe(pd.DataFrame(data_gas_emp), use_container_width=True, hide_index=True)
