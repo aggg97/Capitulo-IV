@@ -873,7 +873,7 @@ for _, row in top_gasifero.iterrows():
     previous_year = row['start_year']
 
 df_gasifero_final = pd.DataFrame(data_gasifero_table)
-st.write("**Tipo Gasífero: Top 3 Pozos con Menor Fracspacing (Fracspacing más Agresivo)**")
+st.write("**Tipo Gasífero: Top 3 Pozos con Fracspacing más Agresivo**")
 st.dataframe(df_gasifero_final, use_container_width=True, hide_index=True)
 
 # -------------------- Gasífero Empresas (P50) --------------------
