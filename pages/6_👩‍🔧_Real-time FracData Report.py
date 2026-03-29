@@ -780,6 +780,56 @@ with tab2:
     st.plotly_chart(fig_lines, use_container_width=True)
     st.markdown("Fracspacing = $\\frac{longitud\\_rama\\_horizontal\\_m}{cantidad\\_fracturas}$")
 
+#-----------
+    
+    st.subheader("Evolución de Agua Inyectada (Fm. Vaca Muerta)", divider="blue")
+
+    
+    # -------------------- Data --------------------
+    pivot_table_agua = df_merged_VMUT.groupby('start_year').agg({
+        'agua_inyectada_m3': 'sum'
+    }).reset_index()
+    
+    # Opcional pero recomendado (evita NaN o ceros raros)
+    pivot_table_agua = pivot_table_agua[
+        pivot_table_agua['agua_inyectada_m3'].notna()
+    ]
+    
+    # -------------------- Plot --------------------
+    fig_agua_plot = go.Figure()
+    
+    fig_agua_plot.add_trace(go.Scatter(
+        x=pivot_table_agua['start_year'],
+        y=pivot_table_agua['agua_inyectada_m3'],
+        mode='lines+markers',
+        name='Agua Inyectada (m3)',
+        line=dict(color='#1f77b4', width=3),
+        marker=dict(size=8)
+    ))
+    
+    # Annotations (tu estilo)
+    for _, row in pivot_table_agua.iterrows():
+        fig_agua_plot.add_annotation(
+            x=row['start_year'],
+            y=row['agua_inyectada_m3'],
+            text=f"{int(row['agua_inyectada_m3'])}",
+            showarrow=False,
+            yshift=12,
+            font=dict(color="#1f77b4", size=10)
+        )
+    
+    # Layout
+    fig_agua_plot.update_layout(
+        title="Total de Agua Inyectada por Año",
+        xaxis_title="Campaña",
+        yaxis_title="Agua Inyectada (m3)",
+        template="plotly_white",
+        hovermode="x unified",
+        legend_title="Indicador"
+    )
+    
+    # Streamlit render
+    st.plotly_chart(fig_agua_plot, use_container_width=True)
 
 # --- Tab 3: Productividad ---
 with tab3:
@@ -1000,3 +1050,4 @@ with tab3:
     st.plotly_chart(fig,use_container_width=True)
 
 # --------------------
+
