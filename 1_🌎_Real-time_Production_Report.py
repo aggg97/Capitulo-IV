@@ -28,12 +28,19 @@ def load_and_sort_data(dataset_url):
 # URLs for datasets
 dataset_url = "http://datos.energia.gob.ar/dataset/c846e79c-026c-4040-897f-1ad3543b407c/resource/b5b58cdc-9e07-41f9-b392-fb9ec68b0725/download/produccin-de-pozos-de-gas-y-petrleo-no-convencional.csv"
 
-# Load the production data
-data_sorted = load_and_sort_data(dataset_url)
 
-if data_sorted.empty:
-    st.error("Failed to load production data.")
-    st.stop()
+# --- Load the production data (Session State) ---
+if 'data_sorted' not in st.load_and_sort_data:
+    with st.spinner("🔄 Sincronizando los últimos datos oficiales de la Secretaría de Energía..."):
+        # Guardamos el resultado en el estado de la sesión
+        st.session_state['data_sorted'] = load_and_process_big_data()
+        st.success("¡Datos cargados y guardados en memoria!")
+
+# Acceso local para esta página
+df = st.session_state['data_sorted']
+
+st.success("✅ Datos cargados correctamente. La sesión está activa para todas las páginas.")
+
 
 # Replace company names in production data
 replacement_dict = {
