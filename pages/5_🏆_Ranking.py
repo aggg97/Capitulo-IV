@@ -376,8 +376,31 @@ def style_ranking_table(df, year_col="Campaña"):
         .apply(dim_repeated_years, subset=[year_col])
         .format({year_col: "{:.0f}"})           # sin decimales en el año
     )
-# ────────────────────────────────────────────────────────────────────────────
 
+# ── Helper reutilizable ──────────────────────────────────────────────────────
+def display_ranking_table(df, year_col="Campaña"):
+    df = df.copy()
+    df[year_col] = df[year_col].astype(int)
+
+    row_styles = []
+    prev_year = None
+    for val in df[year_col]:
+        if val == prev_year:
+            row_styles.append({year_col: "color: #bbbbbb; font-style: italic"})
+        else:
+            row_styles.append({year_col: "color: inherit; font-weight: bold"})
+        prev_year = val
+
+    def apply_row_style(row):
+        style_dict = row_styles[row.name]
+        return [style_dict.get(col, "") for col in df.columns]
+
+    styled = (
+        df.style
+        .apply(apply_row_style, axis=1)
+        .format({year_col: lambda x: str(x)})   # str(int) nunca agrega separador de miles
+    )
+    st.dataframe(styled, use_container_width=True, hide_index=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # -----------------------------
