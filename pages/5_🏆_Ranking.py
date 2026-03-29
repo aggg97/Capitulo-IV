@@ -384,7 +384,7 @@ df_max_etapas = pd.DataFrame(data_for_max_etapas_table, columns=["Campaña", "Si
 # Display the DataFrame in Streamlit
 st.write("**Top 3 Pozos con Máxima Cantidad de Etapas**")
 # Display the dataframe in Streamlit
-st.dataframe(df_max_etapas,use_container_width=True,hide_index=True))
+st.dataframe(df_max_etapas,use_container_width=True,hide_index=True)
 
 # Aggregate the data to calculate avg length for each empresaNEW and start_year
 company_statistics_avg = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW']).agg(
@@ -414,7 +414,7 @@ df_avg_etapas = pd.DataFrame(data_for_avg_etapas_table, columns=["Campaña", "Em
 # Display the DataFrame in Streamlit
 st.write("**Top 3 Empresas con Máxima Cantidad de Etapas por Pozo**")
 # Display the dataframe in Streamlit
-st.dataframe(df_avg_etapas,use_container_width=True,hide_index=True))
+st.dataframe(df_avg_etapas,use_container_width=True,hide_index=True)
 
 
 #----------
@@ -462,7 +462,7 @@ fig_max_lenght.update_layout(
 df_max_lenght = pd.DataFrame(data_for_max_lenght_table, columns=["Campaña", "Sigla", "Empresa", "Máxima Longitud de Rama (metros)"])
 
 st.write("**Top 3 Pozos con Mayor Longitud de Rama**")
-st.dataframe(df_max_lenght, use_container_width=True,hide_index=True))
+st.dataframe(df_max_lenght, use_container_width=True,hide_index=True)
 
 
 
@@ -494,7 +494,7 @@ for _, row in top_avg_lenght.iterrows():
 df_avg_lenght = pd.DataFrame(data_for_avg_lenght_table, columns=["Campaña", "Empresa", "P50 Longitud de Rama (metros)"])
 
 st.write("**Top 3 Empresa con Máxima Longitud de Rama por Pozo**")
-st.dataframe(df_avg_lenght, use_container_width=True,hide_index=True))
+st.dataframe(df_avg_lenght, use_container_width=True,hide_index=True)
 
 
 
@@ -554,7 +554,7 @@ for _, row in top_petrolifero.iterrows():
 
 df_petrolifero_final = pd.DataFrame(data_petrolifero_table)
 st.write("**Tipo Petrolífero: Top 3 Pozos con Mayor Caudal Pico**")
-st.dataframe(df_petrolifero_final, use_container_width=True,hide_index=True))
+st.dataframe(df_petrolifero_final, use_container_width=True,hide_index=True)
 
 # -------------------- Gasífero Pozos --------------------
 grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
@@ -605,7 +605,7 @@ for _, row in top_gasifero.iterrows():
 
 df_gasifero_final = pd.DataFrame(data_gasifero_table)
 st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Caudal Pico**")
-st.dataframe(df_gasifero_final, use_container_width=True,hide_index=True))
+st.dataframe(df_gasifero_final, use_container_width=True,hide_index=True)
 
 # -------------------- Empresas: Promedios --------------------
 
@@ -724,7 +724,7 @@ for _, row in top_arena.iterrows():
 df_arena_final = pd.DataFrame(data_arena_table)
 
 st.write("**Top 3 Pozos con Máxima Arena Bombeada**")
-st.dataframe(df_arena_final, use_container_width=True,hide_index=True))
+st.dataframe(df_arena_final, use_container_width=True,hide_index=True)
 
 # -------------------- Empresas: Arena Promedio --------------------
 
