@@ -694,58 +694,102 @@ df_clean = df_merged_VMUT[
 ].copy()
 
 
-# Top Siglas
-grouped_sigla = df_clean.groupby(['start_year', 'sigla']).agg({'arena_total_tn': 'max'}).reset_index()
-top_sigla = (grouped_sigla.sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
-             .groupby('start_year').head(3))
+# -------------------- Arena Pozos --------------------
 
-# Top Empresas
-grouped_empresa = df_clean.groupby(['start_year', 'empresaNEW']).agg({'arena_total_tn': 'median'}).reset_index()
-top_empresa = (grouped_empresa.sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
-               .groupby('start_year').head(3))
+grouped_arena = df_clean.groupby(
+    ['start_year', 'sigla', 'empresaNEW']
+).agg({
+    'arena_total_tn': 'max',
+    'cantidad_fracturas': 'median',
+    'longitud_rama_horizontal_m': 'median'
+}).reset_index()
 
-# 3. Función para limpiar la visualización (Años en blanco)
-def format_for_streamlit(df, name_col):
-    df_fmt = df.copy()
-    df_fmt['start_year'] = df_fmt['start_year'].astype(int)
-    
-    # Creamos una columna auxiliar para detectar duplicados de año
-    df_fmt['Campaña'] = df_fmt['start_year'].astype(str)
-    df_fmt.loc[df_fmt['Campaña'].duplicated(), 'Campaña'] = ""
-    
-    # Renombrar y seleccionar columnas finales
-    df_fmt = df_fmt.rename(columns={
-        name_col: 'Identificador',
-        'arena_total_tn': 'Arena (tn)'
+# Métricas derivadas
+grouped_arena['fracspacing'] = (
+    grouped_arena['longitud_rama_horizontal_m'] / grouped_arena['cantidad_fracturas']
+)
+
+grouped_arena_sorted = grouped_arena.sort_values(
+    ['start_year', 'arena_total_tn'], ascending=[True, False]
+)
+
+top_arena = grouped_arena_sorted.groupby('start_year').head(3)
+
+# -------------------- Format Table --------------------
+data_arena_table = []
+previous_year = None
+
+for _, row in top_arena.iterrows():
+    year_value = int(row['start_year']) if row['start_year'] != previous_year else " "
+
+    data_arena_table.append({
+        'Campaña': year_value,
+        'Sigla': row['sigla'],
+        'Empresa': row['empresaNEW'],
+        'Arena Total (tn)': (
+            int(row['arena_total_tn']) 
+            if pd.notna(row['arena_total_tn']) and row['arena_total_tn'] > 0 
+            else None
+        ),
+        'Cantidad de Fracturas': (
+            int(row['cantidad_fracturas']) 
+            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
+            else None
+        ),
+        'Fracspacing (m/etapa)': (
+            int(row['fracspacing']) 
+            if pd.notna(row['fracspacing']) and row['fracspacing'] > 0 
+            else None
+        )
     })
-    return df_fmt[['Campaña', 'Sigla', 'Arena Máxima (tn)']]
 
-# 4. Mostrar en Streamlit usando columnas
-col1, col2 = st.columns(2)
+    previous_year = row['start_year']
 
-with col1:
-    st.write("**Top 3 Pozos con Máxima Arena Bombeada**")
-    df_display_sigla = format_for_streamlit(top_sigla, 'sigla')
-    
-    # st.dataframe permite configuración de columnas (formato de número)
-    st.dataframe(
-        df_display_sigla,
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Arena (tn)": st.column_config.NumberColumn(format="%d tn")
-        }
-    )
+df_arena_final = pd.DataFrame(data_arena_table)
 
-with col2:
-    st.write("**Top 3 Empresas con Máxima Arena Promedio Bombeada**")
-    df_display_emp = format_for_streamlit(top_empresa, 'empresaNEW')
-    
-    st.dataframe(
-        df_display_emp,
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Arena (tn)": st.column_config.NumberColumn(format="%d tn")
-        }
-    )
+st.write("**Top 3 Pozos con Mayor Arena Bombeada**")
+st.dataframe(df_arena_final, use_container_width=True)
+
+# -------------------- Empresas: Arena Promedio --------------------
+
+grouped_emp_arena = df_clean.groupby(
+    ['start_year', 'empresaNEW']
+).agg({
+    'arena_total_tn': 'median',
+    'cantidad_fracturas': 'median'
+}).reset_index()
+
+top_emp_arena = (
+    grouped_emp_arena
+    .sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
+    .groupby('start_year')
+    .head(3)
+)
+
+# Format
+data_emp_arena = []
+last_year = None
+
+for _, row in top_emp_arena.iterrows():
+    current_year = str(int(row['start_year']))
+    display_year = current_year if current_year != last_year else ""
+
+    data_emp_arena.append({
+        'Campaña': display_year,
+        'Empresa': row['empresaNEW'],
+        'Arena Mediana (tn)': (
+            int(row['arena_total_tn']) 
+            if pd.notna(row['arena_total_tn']) and row['arena_total_tn'] > 0 
+            else None
+        ),
+        'Etapas (Mediana)': (
+            int(row['cantidad_fracturas']) 
+            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
+            else None
+        )
+    })
+
+    last_year = current_year
+
+st.write("**Top 3 Empresas con Mayor Arena Bombeada (Mediana)**")
+st.dataframe(pd.DataFrame(data_emp_arena), use_container_width=True, hide_index=True)
