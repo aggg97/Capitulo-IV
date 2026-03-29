@@ -769,6 +769,7 @@ st.dataframe(pd.DataFrame(data_emp_arena), use_container_width=True, hide_index=
 st.subheader("Ranking según Fracspacing", divider="blue")
 
 st.caption("Fracspacing = longitud_rama_horizontal_m / cantidad_fracturas")
+st.caption("Fracspacing más agresivo = Menor Fracspacing")
 
 # Calcular fracspacing de forma consistente para todos los pozos
 # Usamos df_merged_VMUT_filtered que ya tiene un registro por sigla (drop_duplicates)
@@ -805,12 +806,12 @@ for _, row in top_petrolifero.iterrows():
         'Campaña': year_value,
         'Sigla': row['sigla'],
         'Empresa': row['empresaNEW'],
-        'Fracspacing Mínimo (m/etapa)': int(row['fracspacing'])
+        'Mínimo Fracspacing (m)': int(row['fracspacing'])
     })
     previous_year = row['start_year']
 
 df_petrolifero_final = pd.DataFrame(data_petrolifero_table)
-st.write("**Tipo Petrolífero: Top 3 Pozos con Menor Fracspacing**")
+st.write("**Tipo Petrolífero: Top 3 Pozos con Fracspacing más Agresivo**")
 st.dataframe(df_petrolifero_final, use_container_width=True, hide_index=True)
 
 # -------------------- Petrolífero Empresas (P50) --------------------
@@ -841,7 +842,7 @@ for _, row in top3_petro_emp.iterrows():
     })
     last_year = current_year
 
-st.write("**Top 3 Empresas con Menor P50 Fracspacing - Petrolífero**")
+st.write("**Top 3 Empresas con Fracspacing más Agresivo por Pozo de Petróleo**")
 st.dataframe(pd.DataFrame(data_petro_emp), use_container_width=True, hide_index=True)
 
 
@@ -872,7 +873,7 @@ for _, row in top_gasifero.iterrows():
     previous_year = row['start_year']
 
 df_gasifero_final = pd.DataFrame(data_gasifero_table)
-st.write("**Tipo Gasífero: Top 3 Pozos con Menor Fracspacing**")
+st.write("**Tipo Gasífero: Top 3 Pozos con Menor Fracspacing (Fracspacing más Agresivo)**")
 st.dataframe(df_gasifero_final, use_container_width=True, hide_index=True)
 
 # -------------------- Gasífero Empresas (P50) --------------------
@@ -903,5 +904,5 @@ for _, row in top3_gas_emp.iterrows():
     })
     last_year = current_year
 
-st.write("**Top 3 Empresas con Menor P50 Fracspacing - Gasífero**")
+st.write("**Top 3 Empresas con Fracspacing más Agresivo por Pozo de Gas**")
 st.dataframe(pd.DataFrame(data_gas_emp), use_container_width=True, hide_index=True)
