@@ -4,36 +4,35 @@ import plotly.graph_objects as go
 import streamlit as st
 from PIL import Image
 
-# Load and preprocess the production data
-@st.cache_data
-def load_and_sort_data(dataset_url):
-    try:
-        df = pd.read_csv(dataset_url, usecols=[
-            'sigla', 'anio', 'mes', 'prod_pet', 'prod_gas', 'prod_agua',
-            'tef', 'empresa', 'areayacimiento', 'coordenadax', 'coordenaday',
-            'formprod', 'sub_tipo_recurso', 'tipopozo'
-        ])
-        df['date'] = pd.to_datetime(df['anio'].astype(str) + '-' + df['mes'].astype(str) + '-1')
-        df['gas_rate'] = df['prod_gas'] / df['tef']
-        df['oil_rate'] = df['prod_pet'] / df['tef']
-        df['water_rate'] = df['prod_agua'] / df['tef']
-        df['Np'] = df.groupby('sigla')['prod_pet'].cumsum()
-        df['Gp'] = df.groupby('sigla')['prod_gas'].cumsum()
-        df['Wp'] = df.groupby('sigla')['prod_agua'].cumsum()
-        return df
-    except Exception as e:
-        st.error(f"Error loading data: {e}")
-        return pd.DataFrame()
+# Load and sort the data
+# @st.cache_data
+# def load_and_sort_data(dataset_url):
+#     df = pd.read_csv(dataset_url, usecols=COLUMNS)
+#     df['date'] = pd.to_datetime(df['anio'].astype(str) + '-' + df['mes'].astype(str) + '-1')
+#     df['gas_rate'] = df['prod_gas'] / df['tef']
+#     df['oil_rate'] = df['prod_pet'] / df['tef']
+#     data_sorted = df.sort_values(by=['sigla', 'fecha_data'], ascending=True)
+#     return data_sorted
 
-# URLs for datasets
-dataset_url = "http://datos.energia.gob.ar/dataset/c846e79c-026c-4040-897f-1ad3543b407c/resource/b5b58cdc-9e07-41f9-b392-fb9ec68b0725/download/produccin-de-pozos-de-gas-y-petrleo-no-convencional.csv"
+# URL of the dataset
+#dataset_url = "http://datos.energia.gob.ar/dataset/c846e79c-026c-4040-897f-1ad3543b407c/resource/b5b58cdc-9e07-41f9-b392-fb9ec68b0725/download/produccin-de-pozos-de-gas-y-petrleo-no-convencional.csv"
 
-# Load the production data
-data_sorted = load_and_sort_data(dataset_url)
+# Load and sort the data using the cached function
+#data_sorted = load_and_sort_data(dataset_url)
 
-if data_sorted.empty:
-    st.error("Failed to load production data.")
-    st.stop()
+
+# Verificamos si los datos ya fueron cargados en la Main Page
+if 'df' in st.session_state:
+    # Recuperamos los datos de la memoria sin esperar un segundo
+    data_sorted = st.session_state['df']
+    
+    st.info("Utilizando datos recuperados de la memoria.")
+    
+else:
+    st.warning("⚠️ No se han cargado los datos. Por favor, vuelve a la Página Principal.")
+    
+    # El link para regresar
+    st.page_link("main.py", label="Ir a la Página Principal para cargar datos", icon="🏠")
 
 # Replace company names in production data
 replacement_dict = {
