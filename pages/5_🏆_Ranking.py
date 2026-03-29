@@ -632,12 +632,7 @@ for _, row in top3_petro_emp.iterrows():
     data_petro_final.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'Mediana Pico (m3/d)': round(row['Qo_peak'], 0),
-        'Etapas (Mediana)': (
-            int(row['cantidad_fracturas']) 
-            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
-            else None
-            )
+        'Caudal Pico Promedio (m3/d)': round(row['Qo_peak'], 0)
     })
     last_year = current_year
 
@@ -722,7 +717,7 @@ for _, row in top_arena.iterrows():
         'Campaña': year_value,
         'Sigla': row['sigla'],
         'Empresa': row['empresaNEW'],
-        'Arena Total (tn)': (
+        'Máxima Arena Bombeada (tn)': (
             int(row['arena_total_tn']) 
             if pd.notna(row['arena_total_tn']) and row['arena_total_tn'] > 0 
             else None
@@ -763,19 +758,14 @@ for _, row in top_emp_arena.iterrows():
     data_emp_arena.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'Arena Mediana (tn)': (
+        'Máxima Arena Promedio Bombeada (tn)': (
             int(row['arena_total_tn']) 
             if pd.notna(row['arena_total_tn']) and row['arena_total_tn'] > 0 
-            else None
-        ),
-        'Etapas (Mediana)': (
-            int(row['cantidad_fracturas']) 
-            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
             else None
         )
     })
 
     last_year = current_year
 
-st.write("**Top 3 Empresas con Mayor Arena Bombeada (Mediana)**")
+st.write("**Top 3 Empresas con Mayor Arena Promedio Bombeada**")
 st.dataframe(pd.DataFrame(data_emp_arena), use_container_width=True, hide_index=True)
