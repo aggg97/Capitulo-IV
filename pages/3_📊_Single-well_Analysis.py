@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from PIL import Image
 
-Load and sort the data
+#Load and sort the data
 @st.cache_data
 def load_and_sort_data(dataset_url):
     df = pd.read_csv(dataset_url, usecols=COLUMNS)
