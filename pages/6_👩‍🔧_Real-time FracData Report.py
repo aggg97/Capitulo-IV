@@ -684,10 +684,8 @@ with tab2:
 
     # -----------------------------
 
-
     df_merged_VMUT_filtered['fracspacing'] = df_merged_VMUT_filtered['longitud_rama_horizontal_m'] / df_merged_VMUT_filtered['cantidad_fracturas']
 
-    
     
     # Split by 'tipopozoNEW' and calculate statistics
     split_stats = df_merged_VMUT_filtered.groupby(['start_year', 'tipopozoNEW']).agg(
@@ -706,15 +704,18 @@ with tab2:
         x=gasifero_stats['start_year'],
         y=gasifero_stats['avg_fracspacing'],
         mode='lines',
-        name='Gasífero Avg Fracspacing',
-        line=dict(color='red')
+        name='Gasífero P50',
+        line=dict(color='red'),
+        marker=dict(size=8)
     ))
+    
     fig_lines.add_trace(go.Scatter(
         x=gasifero_stats['start_year'],
         y=gasifero_stats['min_fracspacing'],
         mode='lines',
-        name='Gasífero Min Fracspacing',
-        line=dict(color='red', dash='dot')
+        name='Gasífero Min',
+        line=dict(color='red', dash='dash'),
+        marker=dict(size=8)
     ))
     
     # Add lines for Petrolífero
@@ -723,23 +724,56 @@ with tab2:
         x=petrolifero_stats['start_year'],
         y=petrolifero_stats['avg_fracspacing'],
         mode='lines',
-        name='Petrolífero Avg Fracspacing',
-        line=dict(color='green')
+        name='Petrolífero P50',
+        line=dict(color='green'),
+        marker=dict(size=8)
     ))
     fig_lines.add_trace(go.Scatter(
         x=petrolifero_stats['start_year'],
         y=petrolifero_stats['min_fracspacing'],
         mode='lines',
-        name='Petrolífero Min Fracspacing',
-        line=dict(color='green', dash='dot')
+        name='Petrolífero Min',
+        line=dict(color='green', dash='dash'),
+        marker=dict(size=8)
     ))
     
-    fig_lines.update_layout(
-        title="Fracspacing Statistics for Gasífero and Petrolífero",
-        xaxis_title="Year",
-        yaxis_title="Fracspacing",
-        template="plotly_white"
-    )
+
+    # Add annotations 
+    for _, row in gasifero_stats.iterrows():
+        fig.add_annotation(
+            x=row['start_year'],
+            y=row['max_arena'],
+            text=f"{row['max_arena']:.0f}",
+            showarrow=False,
+            yshift=12,
+            font=dict(color='red', size=10)
+        )
+    
+    for _, row in petrolifero_stats.iterrows():
+        fig.add_annotation(
+            x=row['start_year'],
+            y=row['avg_arena'],
+            text=f"{row['avg_arena']:.0f}",
+            showarrow=False,
+            yshift=-15,  # abajo para no superponer
+            font=dict(color='green', size=10)
+        )
+
+     # Update layout with labels and title
+        fig.update_layout(
+            title='Evolución del Fracspacing (Fm. Vaca Muerta)',
+            xaxis_title='Campaña',
+            yaxis_title='Fracspacing (metros)',
+            template='plotly_white',
+            legend=dict(
+                orientation='h',  # Horizontal orientation
+                yanchor='bottom',  # Aligns the legend to the bottom of the plot
+                y=1.0,  # Adjusts the position of the legend (negative value places it below the plot)
+                xanchor='center',  # Aligns the legend to the center of the plot
+                x=0.5 # Centers the legend horizontally
+            )
+        )
+    
     
     
     # Mostrar en Streamlit
