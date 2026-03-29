@@ -668,12 +668,8 @@ for _, row in top3_gas_emp.iterrows():
     data_gas_final.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'Mediana Pico (km3/d)': round(row['Qg_peak'], 0),
-        'Etapas (Mediana)': (
-            int(row['cantidad_fracturas']) 
-            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
-            else None
-            )
+        'Caudal Pico Promedio (km3/d)': round(row['Qg_peak'], 0)
+    
     })
     last_year = current_year
 
