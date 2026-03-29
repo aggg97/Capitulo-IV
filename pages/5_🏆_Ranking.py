@@ -632,7 +632,7 @@ for _, row in top3_petro_emp.iterrows():
     data_petro_final.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'Caudal Pico Promedio (m3/d)': round(row['Qo_peak'], 0)
+        'Caudal Pico P50 (m3/d)': round(row['Qo_peak'], 0)
     })
     last_year = current_year
 
@@ -663,7 +663,7 @@ for _, row in top3_gas_emp.iterrows():
     data_gas_final.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'Caudal Pico Promedio (km3/d)': round(row['Qg_peak'], 0)
+        'Caudal Pico P50 (km3/d)': round(row['Qg_peak'], 0)
     
     })
     last_year = current_year
@@ -753,7 +753,7 @@ for _, row in top_emp_arena.iterrows():
     data_emp_arena.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'P50 Arena Promedio Bombeada (tn)': (
+        'P50 Arena Bombeada (tn)': (
             int(row['arena_total_tn']) 
             if pd.notna(row['arena_total_tn']) and row['arena_total_tn'] > 0 
             else None
