@@ -740,7 +740,7 @@ with tab2:
 
     # Add annotations 
     for _, row in gasifero_stats.iterrows():
-        fig.add_annotation(
+        fig_lines.add_annotation(
             x=row['start_year'],
             y=row['min_fracspacing'],
             text=f"{row['min_fracspacing']:.0f}",
@@ -750,7 +750,7 @@ with tab2:
         )
     
     for _, row in petrolifero_stats.iterrows():
-        fig.add_annotation(
+        fig_lines.add_annotation(
             x=row['start_year'],
             y=row['min_fracspacing'],
             text=f"{row['min_fracspacing']:.0f}",
@@ -761,7 +761,7 @@ with tab2:
 
     # Add annotations 
     for _, row in gasifero_stats.iterrows():
-        fig.add_annotation(
+        fig_lines.add_annotation(
             x=row['start_year'],
             y=row['avg_fracspacing'],
             text=f"{row['avg_fracspacing']:.0f}",
@@ -771,7 +771,7 @@ with tab2:
         )
     
     for _, row in petrolifero_stats.iterrows():
-        fig.add_annotation(
+        fig_lines.add_annotation(
             x=row['start_year'],
             y=row['avg_fracspacing'],
             text=f"{row['avg_fracspacing']:.0f}",
@@ -781,7 +781,7 @@ with tab2:
         )
 
      # Update layout with labels and title
-        fig.update_layout(
+        fig_lines.update_layout(
             title='Evolución del Fracspacing (Fm. Vaca Muerta)',
             xaxis_title='Campaña',
             yaxis_title='Fracspacing (metros)',
