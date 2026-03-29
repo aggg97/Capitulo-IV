@@ -607,27 +607,20 @@ with tab2:
     st.plotly_chart(fig, use_container_width=True)
 
     #----------------
-    st.subheader("Evolución de Arena Bombeada por Pozo", divider="blue")
     
-    # -----------------------------
-    # 1. Limpiar datos
-    # -----------------------------
+
     df_arena = df_merged_VMUT_filtered[
         (df_merged_VMUT_filtered['arena_total_tn'].notna()) &
         (df_merged_VMUT_filtered['arena_total_tn'] > 0)
     ].copy()
     
-    # -----------------------------
-    # 2. Agregar estadísticas
-    # -----------------------------
+
     statistics_arena = df_arena.groupby(['start_year']).agg(
         max_arena=('arena_total_tn', 'max'),
         avg_arena=('arena_total_tn', 'median')
     ).reset_index()
     
-    # -----------------------------
-    # 3. Plot
-    # -----------------------------
+
     fig = go.Figure()
 
     
@@ -687,15 +680,10 @@ with tab2:
             )
         )
     
-    # -----------------------------
-    # 6. Mostrar en Streamlit
-    # -----------------------------
     st.plotly_chart(fig, use_container_width=True)
 
     # -----------------------------
-  
-    st.subheader("Evolución del Fracspacing por Tipo de Pozo")
-    
+
 
     df_merged_VMUT['fracspacing'] = df_merged_VMUT['longitud_rama_horizontal_m'] / df_merged_VMUT['cantidad_fracturas']
     
@@ -704,8 +692,8 @@ with tab2:
     
     # Colores personalizados
     color_map = {
-        'Gasífero': '#FF7F50',   # naranja/rojizo
-        'Petrolífero': '#228B22' # verde
+        'Gasífero': 'red',   
+        'Petrolífero': 'green'
     }
     
     for tipo in ['Gasífero', 'Petrolífero']:
