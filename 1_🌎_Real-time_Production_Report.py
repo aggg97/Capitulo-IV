@@ -33,7 +33,7 @@ dataset_url = "http://datos.energia.gob.ar/dataset/c846e79c-026c-4040-897f-1ad35
 if 'data_sorted' not in st.load_and_sort_data:
     with st.spinner("🔄 Sincronizando los últimos datos oficiales de la Secretaría de Energía..."):
         # Guardamos el resultado en el estado de la sesión
-        st.session_state['data_sorted'] = load_and_process_big_data()
+        st.session_state['data_sorted'] = load_and_sort_data()
         st.success("¡Datos cargados y guardados en memoria!")
 
 # Acceso local para esta página
