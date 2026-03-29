@@ -743,7 +743,7 @@ with tab2:
         fig.add_annotation(
             x=row['start_year'],
             y=row['min_fracspacing'],
-            text=f"{row['max_arena']:.0f}",
+            text=f"{row['min_fracspacing']:.0f}",
             showarrow=False,
             yshift=12,
             font=dict(color='red', size=10)
@@ -753,7 +753,7 @@ with tab2:
         fig.add_annotation(
             x=row['start_year'],
             y=row['min_fracspacing'],
-            text=f"{row['avg_arena']:.0f}",
+            text=f"{row['min_fracspacing']:.0f}",
             showarrow=False,
             yshift=-15,  # abajo para no superponer
             font=dict(color='green', size=10)
@@ -764,7 +764,7 @@ with tab2:
         fig.add_annotation(
             x=row['start_year'],
             y=row['avg_fracspacing'],
-            text=f"{row['max_arena']:.0f}",
+            text=f"{row['avg_fracspacing']:.0f}",
             showarrow=False,
             yshift=12,
             font=dict(color='red', size=10)
@@ -774,7 +774,7 @@ with tab2:
         fig.add_annotation(
             x=row['start_year'],
             y=row['avg_fracspacing'],
-            text=f"{row['avg_arena']:.0f}",
+            text=f"{row['avg_fracspacing']:.0f}",
             showarrow=False,
             yshift=-15,  # abajo para no superponer
             font=dict(color='green', size=10)
