@@ -21,19 +21,19 @@ from PIL import Image
 #data_sorted = load_and_sort_data(dataset_url)
 
 
-# Verificamos si los datos ya fueron cargados en la Main Page
+#Verificamos si los datos ya fueron cargados en la Main Page
 if 'df' in st.session_state:
     # Recuperamos los datos de la memoria sin esperar un segundo
     data_sorted = st.session_state['df']
+    data_sorted['date'] = pd.to_datetime(data_sorted['anio'].astype(str) + '-' + data_sorted['mes'].astype(str) + '-1')
+    data_sorted['gas_rate'] = data_sorted['prod_gas'] / data_sorted['tef']
+    data_sorted['oil_rate'] = data_sorted['prod_pet'] / data_sorted['tef']
+    data_sorted = data_sorted.sort_values(by=['sigla', 'date'], ascending=True)
     
     st.info("Utilizando datos recuperados de la memoria.")
     
 else:
     st.warning("⚠️ No se han cargado los datos. Por favor, vuelve a la Página Principal.")
-    
-    # El link para regresar
-    st.page_link("main.py", label="Ir a la Página Principal para cargar datos", icon="🏠")
-
 
 # Replace company names in production data
 replacement_dict = {
