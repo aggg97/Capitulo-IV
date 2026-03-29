@@ -687,25 +687,65 @@ st.dataframe(pd.DataFrame(data_gas_final), use_container_width=True, hide_index=
 st.subheader("Ranking según Arena Bombeada", divider="blue")
 
 
-
-# Siglas
-
-df_sigla_display = pd.DataFrame(data_sigla_table)
-
-df_sigla_display.columns = ["Campaña", "Sigla", "Máxima Arena Bombeada (tn)"]
-
-st.subheader("Top 3 Siglas con la Mayor Cantidad de Arena Bombeada por Año")
-
-st.dataframe(df_sigla_display, use_container_width=True)
+df_clean = df_merged_VMUT[
+    (df_merged_VMUT['start_year'] >= 2012) & 
+    (df_merged_VMUT['arena_total_tn'] > 0) & 
+    (df_merged_VMUT['arena_total_tn'].notna())
+].copy()
 
 
+# Top Siglas
+grouped_sigla = df_clean.groupby(['start_year', 'sigla']).agg({'arena_total_tn': 'max'}).reset_index()
+top_sigla = (grouped_sigla.sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
+             .groupby('start_year').head(3))
 
-# Empresas
+# Top Empresas
+grouped_empresa = df_clean.groupby(['start_year', 'empresaNEW']).agg({'arena_total_tn': 'median'}).reset_index()
+top_empresa = (grouped_empresa.sort_values(['start_year', 'arena_total_tn'], ascending=[True, False])
+               .groupby('start_year').head(3))
 
-df_empresa_display = pd.DataFrame(data_empresa_table)
+# 3. Función para limpiar la visualización (Años en blanco)
+def format_for_streamlit(df, name_col):
+    df_fmt = df.copy()
+    df_fmt['start_year'] = df_fmt['start_year'].astype(int)
+    
+    # Creamos una columna auxiliar para detectar duplicados de año
+    df_fmt['Campaña'] = df_fmt['start_year'].astype(str)
+    df_fmt.loc[df_fmt['Campaña'].duplicated(), 'Campaña'] = ""
+    
+    # Renombrar y seleccionar columnas finales
+    df_fmt = df_fmt.rename(columns={
+        name_col: 'Identificador',
+        'arena_total_tn': 'Arena (tn)'
+    })
+    return df_fmt[['Campaña', 'Sigla', 'Arena Máxima (tn)']]
 
-df_empresa_display.columns = ["Campaña", "Empresa", "Prom. Arena Bombeada (tn)"]
+# 4. Mostrar en Streamlit usando columnas
+col1, col2 = st.columns(2)
 
-st.subheader("Top 3 Empresas con el Mayor Promedio de Arena Bombeada por Año")
+with col1:
+    st.write("**Top 3 Pozos con Máxima Arena Bombeada**")
+    df_display_sigla = format_for_streamlit(top_sigla, 'sigla')
+    
+    # st.dataframe permite configuración de columnas (formato de número)
+    st.dataframe(
+        df_display_sigla,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Arena (tn)": st.column_config.NumberColumn(format="%d tn")
+        }
+    )
 
-st.dataframe(df_empresa_display, use_container_width=True)
+with col2:
+    st.write("**Top 3 Empresas con Máxima Arena Promedio Bombeada**")
+    df_display_emp = format_for_streamlit(top_empresa, 'empresaNEW')
+    
+    st.dataframe(
+        df_display_emp,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Arena (tn)": st.column_config.NumberColumn(format="%d tn")
+        }
+    )
