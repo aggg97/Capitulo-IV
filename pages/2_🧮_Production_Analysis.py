@@ -4,24 +4,6 @@ import plotly.graph_objects as go
 from PIL import Image
 import plotly.express as px
 
-# Define the columns for the dataset
-COLUMNS = [
-    'sigla',  # well identifier
-    'anio',  # year
-    'mes',  # month
-    'prod_pet',  # oil production
-    'prod_gas',  # gas production
-    'prod_agua',  # water production
-    'iny_gas',  # gas injection
-    'tef',  # effective time
-    'tipoextraccion',  # extraction type
-    'tipopozo',  # well type
-    'empresa',  # company
-    'formacion',  # formation
-    'areayacimiento',  # field area
-    'fecha_data'  # data date
-]
-
 # Load and sort the data
 @st.cache_data
 def load_and_sort_data(dataset_url):
