@@ -685,7 +685,8 @@ with tab2:
     # -----------------------------
 
 
-    df_merged_VMUT['fracspacing'] = df_merged_VMUT['longitud_rama_horizontal_m'] / df_merged_VMUT['cantidad_fracturas']
+    df_merged_VMUT_filtered['fracspacing'] = df_merged_VMUT_filtered['longitud_rama_horizontal_m'] / df_merged_VMUT_filtered['cantidad_fracturas']
+
     
     
     # Split by 'tipopozoNEW' and calculate statistics
