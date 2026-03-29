@@ -600,6 +600,42 @@ with tab2:
             x=0.5 # Centers the legend horizontally
         )
     )
+
+   # Add annotations 
+    for _, row in statistics_arena.iterrows():
+        fig.add_annotation(
+            x=row['start_year'],
+            y=row['max_arena'],
+            text=f"{row['max_arena']:.0f}",
+            showarrow=False,
+            yshift=12,
+            font=dict(color=blue, size=10)
+        )
+    
+    for _, row in statistics_arena.iterrows():
+        fig.add_annotation(
+            x=row['start_year'],
+            y=row['avg_arena'],
+            text=f"{row['avg_arena']:.0f}",
+            showarrow=False,
+            yshift=-15,  # abajo para no superponer
+            font=dict(color=green, size=10)
+        )
+
+     # Update layout with labels and title
+        fig.update_layout(
+            title='Evolución de Arena Bombeada (Fm. Vaca Muerta)',
+            xaxis_title='Campaña',
+            yaxis_title='Arena Bombeada (tn)',
+            template='plotly_white',
+            legend=dict(
+                orientation='h',  # Horizontal orientation
+                yanchor='bottom',  # Aligns the legend to the bottom of the plot
+                y=1.0,  # Adjusts the position of the legend (negative value places it below the plot)
+                xanchor='center',  # Aligns the legend to the center of the plot
+                x=0.5 # Centers the legend horizontally
+            )
+        )
     
     # Show the plot
     #fig.show()
