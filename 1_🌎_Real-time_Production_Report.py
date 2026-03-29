@@ -30,17 +30,14 @@ dataset_url = "http://datos.energia.gob.ar/dataset/c846e79c-026c-4040-897f-1ad35
 
 
 # --- Load the production data (Session State) ---
-if 'data_sorted' not in st.load_and_sort_data:
+if 'data_sorted' not in st.session_state:
     with st.spinner("🔄 Sincronizando los últimos datos oficiales de la Secretaría de Energía..."):
         # Guardamos el resultado en el estado de la sesión
-        st.session_state['data_sorted'] = load_and_sort_data()
-        st.success("¡Datos cargados y guardados en memoria!")
+        st.session_state['data_sorted'] = load_and_sort_data(dataset_url)
+        st.success("✅ Datos cargados correctamente. La sesión está activa para todas las páginas.")
 
 # Acceso local para esta página
 df = st.session_state['data_sorted']
-
-st.success("✅ Datos cargados correctamente. La sesión está activa para todas las páginas.")
-
 
 # Replace company names in production data
 replacement_dict = {
