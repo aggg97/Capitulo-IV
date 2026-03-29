@@ -778,6 +778,7 @@ with tab2:
     
     # Mostrar en Streamlit
     st.plotly_chart(fig_lines, use_container_width=True)
+    st.markdown("Fracspacing is calculated as $\\frac{longitud\\_rama\\_horizontal\\_m}{cantidad\\_fracturas}$")
 
 
 # --- Tab 3: Productividad ---
