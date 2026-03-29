@@ -358,7 +358,7 @@ st.subheader("Ranking según Cantidad de Etapas", divider="blue")
 
 # Aggregate the data to calculate max length for each sigla, empresaNEW, and start_year
 company_statistics = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW', 'sigla']).agg(
-    max_lenght=('cantidad_etapas, 'max')
+    max_lenght=('cantidad_fracturas, 'max')
 ).reset_index()
 
 # Round the max_lenght to 0 decimal places
@@ -388,7 +388,7 @@ st.dataframe(df_max_etapas,use_container_width=True)
 
 # Aggregate the data to calculate avg length for each empresaNEW and start_year
 company_statistics_avg = df_merged_VMUT_filtered.groupby(['start_year', 'empresaNEW']).agg(
-    avg_lenght=('cantidad_etapas', 'median')
+    avg_lenght=('cantidad_fracturas', 'median')
 ).reset_index()
 
 # Round the avg_lenght to 0 decimal places
