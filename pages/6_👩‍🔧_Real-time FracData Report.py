@@ -690,7 +690,7 @@ with tab2:
     
     
     # Split by 'tipopozoNEW' and calculate statistics
-    split_stats = df_merged_VMUT.groupby(['start_year', 'tipopozoNEW']).agg(
+    split_stats = df_merged_VMUT_filtered.groupby(['start_year', 'tipopozoNEW']).agg(
         avg_fracspacing=('fracspacing', 'median'),
         min_fracspacing=('fracspacing', 'min'),
         std_fracspacing=('fracspacing', 'std')
