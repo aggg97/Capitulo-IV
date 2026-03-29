@@ -42,25 +42,36 @@ gas_gp_palette = ['#FF0000', '#FFA07A', '#FA8072', '#E9967A', '#F08080', '#CD5C5
 oil_np_palette = ['#008000', '#006400', '#90EE90', '#98FB98', '#8FBC8F', '#3CB371', '#2E8B57', '#808000', '#556B2F', '#6B8E23']
 water_wp_palette = ['#0000FF', '#0000CD', '#00008B', '#000080', '#191970', '#7B68EE', '#6A5ACD', '#483D8B', '#B0E0E6', '#ADD8E6', '#87CEFA', '#87CEEB', '#00BFFF', '#B0C4DE', '#1E90FF', '#6495ED']
 
-# Reorder and rename the columns in the DataFrame
-@st.cache(allow_output_mutation=True)
-def load_and_sort_data(dataset_url):
-    df = pd.read_csv(dataset_url, usecols=COLUMNS)
-    data_sorted = df.sort_values(by=['sigla', 'fecha_data'], ascending=True)
-    data_sorted = data_sorted[COLUMNS]
-    data_sorted['gas_rate'] = data_sorted['prod_gas'] / data_sorted['tef']
-    data_sorted['oil_rate'] = data_sorted['prod_pet'] / data_sorted['tef']
-    data_sorted['water_rate'] = data_sorted['prod_agua'] / data_sorted['tef']
-    data_sorted['Np'] = data_sorted.groupby('sigla')['prod_pet'].cumsum()
-    data_sorted['Gp'] = data_sorted.groupby('sigla')['prod_gas'].cumsum()
-    data_sorted['Wp'] = data_sorted.groupby('sigla')['prod_agua'].cumsum()
-    return data_sorted
+# Load and sort the data
+# @st.cache_data
+# def load_and_sort_data(dataset_url):
+#     df = pd.read_csv(dataset_url, usecols=COLUMNS)
+#     df['date'] = pd.to_datetime(df['anio'].astype(str) + '-' + df['mes'].astype(str) + '-1')
+#     df['gas_rate'] = df['prod_gas'] / df['tef']
+#     df['oil_rate'] = df['prod_pet'] / df['tef']
+#     data_sorted = df.sort_values(by=['sigla', 'fecha_data'], ascending=True)
+#     return data_sorted
 
 # URL of the dataset
-dataset_url = "http://datos.energia.gob.ar/dataset/c846e79c-026c-4040-897f-1ad3543b407c/resource/b5b58cdc-9e07-41f9-b392-fb9ec68b0725/download/produccin-de-pozos-de-gas-y-petrleo-no-convencional.csv"
+#dataset_url = "http://datos.energia.gob.ar/dataset/c846e79c-026c-4040-897f-1ad3543b407c/resource/b5b58cdc-9e07-41f9-b392-fb9ec68b0725/download/produccin-de-pozos-de-gas-y-petrleo-no-convencional.csv"
 
 # Load and sort the data using the cached function
-data_sorted = load_and_sort_data(dataset_url)
+#data_sorted = load_and_sort_data(dataset_url)
+
+
+# Verificamos si los datos ya fueron cargados en la Main Page
+if 'df' in st.session_state:
+    # Recuperamos los datos de la memoria sin esperar un segundo
+    data_sorted = st.session_state['df']
+    
+    st.info("Utilizando datos recuperados de la memoria.")
+    
+else:
+    st.warning("⚠️ No se han cargado los datos. Por favor, vuelve a la Página Principal.")
+    
+    # El link para regresar
+    st.page_link("main.py", label="Ir a la Página Principal para cargar datos", icon="🏠")
+
 
 # Add a new column "date" by combining year and month
 data_sorted['date'] = pd.to_datetime(data_sorted['anio'].astype(str) + '-' + data_sorted['mes'].astype(str) + '-1')
