@@ -5,20 +5,31 @@ from PIL import Image
 import plotly.express as px
 
 # Load and sort the data
-@st.cache_data
-def load_and_sort_data(dataset_url):
-    df = pd.read_csv(dataset_url, usecols=COLUMNS)
-    df['date'] = pd.to_datetime(df['anio'].astype(str) + '-' + df['mes'].astype(str) + '-1')
-    df['gas_rate'] = df['prod_gas'] / df['tef']
-    df['oil_rate'] = df['prod_pet'] / df['tef']
-    data_sorted = df.sort_values(by=['sigla', 'fecha_data'], ascending=True)
-    return data_sorted
+# @st.cache_data
+# def load_and_sort_data(dataset_url):
+#     df = pd.read_csv(dataset_url, usecols=COLUMNS)
+#     df['date'] = pd.to_datetime(df['anio'].astype(str) + '-' + df['mes'].astype(str) + '-1')
+#     df['gas_rate'] = df['prod_gas'] / df['tef']
+#     df['oil_rate'] = df['prod_pet'] / df['tef']
+#     data_sorted = df.sort_values(by=['sigla', 'fecha_data'], ascending=True)
+#     return data_sorted
 
 # URL of the dataset
-dataset_url = "http://datos.energia.gob.ar/dataset/c846e79c-026c-4040-897f-1ad3543b407c/resource/b5b58cdc-9e07-41f9-b392-fb9ec68b0725/download/produccin-de-pozos-de-gas-y-petrleo-no-convencional.csv"
+#dataset_url = "http://datos.energia.gob.ar/dataset/c846e79c-026c-4040-897f-1ad3543b407c/resource/b5b58cdc-9e07-41f9-b392-fb9ec68b0725/download/produccin-de-pozos-de-gas-y-petrleo-no-convencional.csv"
 
 # Load and sort the data using the cached function
-data_sorted = load_and_sort_data(dataset_url)
+#data_sorted = load_and_sort_data(dataset_url)
+
+
+# Verificamos si los datos ya fueron cargados en la Main Page
+if 'df' in st.session_state:
+    # Recuperamos los datos de la memoria sin esperar un segundo
+    df = st.session_state['df']
+    
+    st.info("Utilizando datos recuperados de la memoria (Session State).")
+    
+else:
+    st.warning("⚠️ No se han cargado los datos. Por favor, vuelve a la Página Principal (Real-time Production Report).")
 
 # Sidebar filters
 st.header(f":blue[Análisis de Producción No Convencional]")
