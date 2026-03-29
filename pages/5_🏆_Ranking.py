@@ -764,3 +764,63 @@ for _, row in top_emp_arena.iterrows():
 
 st.write("**Top 3 Empresas con Máxima Arena Bombeada por Pozo**")
 st.dataframe(pd.DataFrame(data_emp_arena), use_container_width=True, hide_index=True)
+
+#--------------
+
+st.subheader("Ranking según Fracspacing")
+
+# --- Calcular fracspacing ---
+df_merged_VMUT['fracspacing'] = df_merged_VMUT['longitud_rama_horizontal_m'] / df_merged_VMUT['cantidad_fracturas']
+
+# --- Procesar Petrolífero ---
+grouped_petrolifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
+    ['start_year', 'sigla', 'empresaNEW']
+).agg({'fracspacing': 'min'}).reset_index()
+
+grouped_petrolifero = grouped_petrolifero.drop_duplicates(subset=['start_year', 'sigla'], keep='first')
+grouped_petrolifero_sorted = grouped_petrolifero.sort_values(['start_year', 'fracspacing'], ascending=[True, True])
+top_petrolifero = grouped_petrolifero_sorted.groupby('start_year').head(3)
+
+# Preparar datos para tabla
+data_petrolifero_table = []
+previous_year = None
+for _, row in top_petrolifero.iterrows():
+    year_value = row['start_year'] if row['start_year'] != previous_year else " "
+    data_petrolifero_table.append({
+        'start_year': year_value,
+        'sigla': row['sigla'],
+        'empresaNEW': row['empresaNEW'],
+        'fracspacing': int(row['fracspacing']) if pd.notna(row['fracspacing']) and row['fracspacing'] > 0 else None
+    })
+    previous_year = row['start_year']
+
+# --- Procesar Gasífero ---
+grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
+    ['start_year', 'sigla', 'empresaNEW']
+).agg({'fracspacing': 'min'}).reset_index()
+
+grouped_gasifero = grouped_gasifero.drop_duplicates(subset=['start_year', 'sigla'], keep='first')
+grouped_gasifero_sorted = grouped_gasifero.sort_values(['start_year', 'fracspacing'], ascending=[True, True])
+top_gasifero = grouped_gasifero_sorted.groupby('start_year').head(3)
+
+data_gasifero_table = []
+previous_year = None
+for _, row in top_gasifero.iterrows():
+    year_value = row['start_year'] if row['start_year'] != previous_year else " "
+    data_gasifero_table.append({
+        'start_year': year_value,
+        'sigla': row['sigla'],
+        'empresaNEW': row['empresaNEW'],
+        'fracspacing': int(row['fracspacing']) if pd.notna(row['fracspacing']) and row['fracspacing'] > 0 else None
+    })
+    previous_year = row['start_year']
+
+# --- Convertir a DataFrame y mostrar en Streamlit ---
+df_petrolifero_table = pd.DataFrame(data_petrolifero_table)
+df_gasifero_table = pd.DataFrame(data_gasifero_table)
+
+st.write("**Tipo Petrolífero: Top 3 Pozos con Menor Fracspacing**")
+st.dataframe(df_petrolifero_table, use_container_width=True, hide_index=True)
+
+st.write("**Tipo Gasífero: Top 3 Pozos con Menor Fracspacing**")
+st.dataframe(df_gasifero_table, use_container_width=True, hide_index=True)
