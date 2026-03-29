@@ -26,7 +26,7 @@ if 'df' in st.session_state:
     # Recuperamos los datos de la memoria sin esperar un segundo
     data_sorted = st.session_state['df']
     
-    st.info("Utilizando datos recuperados de la memoria (Session State).")
+    st.info("Utilizando datos recuperados de la memoria.")
     
 else:
     st.warning("⚠️ No se han cargado los datos. Por favor, vuelve a la Página Principal.")
