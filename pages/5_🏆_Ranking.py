@@ -353,31 +353,6 @@ df_merged_VMUT_filtered = df_merged_VMUT[df_merged_VMUT['longitud_rama_horizonta
 # -----------------------------
 
 # ── Helper reutilizable ──────────────────────────────────────────────────────
-def style_ranking_table(df, year_col="Campaña"):
-    """
-    Recibe un DataFrame con el año real en cada fila (int).
-    Devuelve un Styler donde el año se muestra en gris claro cuando
-    es igual al de la fila anterior, simulando el efecto 'sin repetir'
-    pero sin romper el ordenamiento interactivo de Streamlit.
-    """
-    def dim_repeated_years(col):
-        styles = []
-        prev = None
-        for val in col:
-            if val == prev:
-                styles.append("color: #cccccc")   # gris claro = "vacío visual"
-            else:
-                styles.append("color: inherit; font-weight: bold")
-            prev = val
-        return styles
-
-    return (
-        df.style
-        .apply(dim_repeated_years, subset=[year_col])
-        .format({year_col: "{:.0f}"})           # sin decimales en el año
-    )
-
-# ── Helper reutilizable ──────────────────────────────────────────────────────
 def display_ranking_table(df, year_col="Campaña"):
     df = df.copy()
     df[year_col] = df[year_col].astype(int)
@@ -398,7 +373,7 @@ def display_ranking_table(df, year_col="Campaña"):
     styled = (
         df.style
         .apply(apply_row_style, axis=1)
-        .format({year_col: lambda x: str(x)})   # str(int) nunca agrega separador de miles
+        .format({year_col: lambda x: str(x)})
     )
     st.dataframe(styled, use_container_width=True, hide_index=True)
 
