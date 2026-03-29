@@ -29,7 +29,10 @@ if 'df' in st.session_state:
     st.info("Utilizando datos recuperados de la memoria (Session State).")
     
 else:
-    st.warning("⚠️ No se han cargado los datos. Por favor, vuelve a la Página Principal (Real-time Production Report).")
+    st.warning("⚠️ No se han cargado los datos. Por favor, vuelve a la Página Principal.")
+    
+    # El link para regresar
+    st.page_link("main.py", label="Ir a la Página Principal para cargar datos", icon="🏠")
 
 # Sidebar filters
 st.header(f":blue[Análisis de Producción No Convencional]")
