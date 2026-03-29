@@ -688,45 +688,81 @@ with tab2:
     df_merged_VMUT['fracspacing'] = df_merged_VMUT['longitud_rama_horizontal_m'] / df_merged_VMUT['cantidad_fracturas']
     
     
-    fig_lines = go.Figure()
+    # Calcular estadísticas por tipo de pozo y año
+    stats_tipo = df_merged_VMUT.groupby(['start_year', 'tipopozoNEW']).agg(
+        max_fracspacing=('fracspacing', 'max'),
+        avg_fracspacing=('fracspacing', 'median')
+    ).reset_index()
     
-    # Colores personalizados
+    # Colores
     color_map = {
-        'Gasífero': 'red',   
-        'Petrolífero': 'green'
+        'Gasífero': 'green',       
+        'Petrolífero': 'red'     
     }
     
-    for tipo in ['Gasífero', 'Petrolífero']:
-        df_tipo = split_stats[split_stats['tipopozoNEW'] == tipo]
-        if not df_tipo.empty:
-            # P50 → linea sólida
-            fig_lines.add_trace(go.Scatter(
-                x=df_tipo['start_year'],
-                y=df_tipo['avg_fracspacing'],
-                mode='lines+markers',
-                name=f'{tipo} P50',
-                line=dict(color=color_map[tipo], width=3, dash='solid'),
-                marker=dict(size=8)
-            ))
-            # Max → linea dashed
-            fig_lines.add_trace(go.Scatter(
-                x=df_tipo['start_year'],
-                y=df_tipo['avg_fracspacing'] + df_tipo['std_fracspacing'],  # si querés max aproximado, o usa 'max' si lo calculaste
-                mode='lines+markers',
-                name=f'{tipo} Max',
-                line=dict(color=color_map[tipo], width=3, dash='dash'),
-                marker=dict(size=8)
-            ))
+    # Crear figura
+    fig = go.Figure()
     
-    fig_lines.update_layout(
-        xaxis_title="Year",
-        yaxis_title="Fracspacing",
-        template="plotly_white",
+    for tipo in stats_tipo['tipopozoNEW'].unique():
+        df_tipo = stats_tipo[stats_tipo['tipopozoNEW'] == tipo]
+        
+        if df_tipo.empty:
+            continue  # saltar si no hay datos
+    
+        # Línea P50 (mediana) → full
+        fig.add_trace(go.Scatter(
+            x=df_tipo['start_year'],
+            y=df_tipo['avg_fracspacing'],
+            mode='lines+markers',
+            name=f'{tipo} P50',
+            line=dict(color=color_map[tipo], width=3, dash='solid'),
+            marker=dict(size=8)
+        ))
+    
+        # Línea MAX → dashed
+        fig.add_trace(go.Scatter(
+            x=df_tipo['start_year'],
+            y=df_tipo['max_fracspacing'],
+            mode='lines+markers',
+            name=f'{tipo} Max',
+            line=dict(color=color_map[tipo], width=3, dash='dash'),
+            marker=dict(size=8)
+        ))
+    
+        # Anotaciones P50
+        for _, row in df_tipo.iterrows():
+            fig.add_annotation(
+                x=row['start_year'],
+                y=row['avg_fracspacing'],
+                text=f"{int(row['avg_fracspacing'])}",
+                showarrow=False,
+                yshift=-12,
+                font=dict(color=color_map[tipo], size=10)
+            )
+    
+        # Anotaciones MAX
+        for _, row in df_tipo.iterrows():
+            fig.add_annotation(
+                x=row['start_year'],
+                y=row['max_fracspacing'],
+                text=f"{int(row['max_fracspacing'])}",
+                showarrow=False,
+                yshift=12,
+                font=dict(color=color_map[tipo], size=10)
+            )
+    
+    # Layout
+    fig.update_layout(
+        title="Fracspacing por Tipo de Pozo (Max y P50)",
+        xaxis_title="Campaña",
+        yaxis_title="Fracspacing (m/etapa)",
         legend_title="Indicador",
+        template="plotly_white",
         hovermode="x unified"
     )
-    st.plotly_chart(fig_lines, use_container_width=True)
-
+    
+    # Mostrar en Streamlit
+    st.plotly_chart(fig, use_container_width=True)
 
 
 # --- Tab 3: Productividad ---
