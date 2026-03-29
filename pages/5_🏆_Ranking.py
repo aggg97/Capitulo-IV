@@ -401,7 +401,7 @@ company_statistics_sorted_avg = company_statistics_avg.sort_values(['start_year'
 top_avg_etapas = company_statistics_sorted_avg.groupby('start_year').head(3)
 
 # Create data for the table with the year appearing only once for each start_year
-data_for_avg_etpas_table = []
+data_for_avg_etapas_table = []
 previous_year = None
 for _, row in top_avg_etapas.iterrows():
     year_value = int(row['start_year']) if row['start_year'] != previous_year else " "  # Use blank for repeated years
