@@ -766,32 +766,37 @@ st.write("**Top 3 Empresas con Máxima Arena Bombeada por Pozo**")
 st.dataframe(pd.DataFrame(data_emp_arena), use_container_width=True, hide_index=True)
 
 #--------------
-
 st.subheader("Ranking según Fracspacing", divider="blue")
 
-# -------------------- Petrolífero Pozos --------------------
-grouped_petrolifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
-    ['start_year', 'sigla', 'empresaNEW']
-).agg({
-    'longitud_rama_horizontal_m': 'median',
-    'cantidad_fracturas': 'median'
-}).reset_index()
+st.caption("Fracspacing = longitud_rama_horizontal_m / cantidad_fracturas")
 
-# Calculate Fracspacing
-grouped_petrolifero['fracspacing'] = grouped_petrolifero['longitud_rama_horizontal_m'] / grouped_petrolifero['cantidad_fracturas']
-grouped_petrolifero = grouped_gasifero[
-    (grouped_petrolifero['fracspacing'].notna()) &
-    (grouped_petrolifero['fracspacing'] > 0)
+# Calcular fracspacing de forma consistente para todos los pozos
+# Usamos df_merged_VMUT_filtered que ya tiene un registro por sigla (drop_duplicates)
+df_fracspacing_base = df_merged_VMUT_filtered.copy()
+df_fracspacing_base['fracspacing'] = (
+    df_fracspacing_base['longitud_rama_horizontal_m'] / df_fracspacing_base['cantidad_fracturas']
+)
+
+# Filtrar registros válidos (fracspacing > 0 y no nulo)
+df_fracspacing_base = df_fracspacing_base[
+    (df_fracspacing_base['fracspacing'].notna()) &
+    (df_fracspacing_base['fracspacing'] > 0)
 ]
 
-# Small explanation
-st.caption("Fracspacing is calculated as horizontal length divided by number of fractures (fracspacing = longitud_rama_horizontal_m / cantidad_fracturas).")
+# -------------------- Petrolífero --------------------
+df_petro_frac = df_fracspacing_base[df_fracspacing_base['tipopozoNEW'] == 'Petrolífero']
 
-# Sort and take top 3 smallest fracspacing per year
-grouped_petrolifero_sorted = grouped_petrolifero.sort_values(['start_year', 'fracspacing'], ascending=[True, True])
+grouped_petrolifero = df_petro_frac.groupby(
+    ['start_year', 'sigla', 'empresaNEW']
+).agg(
+    fracspacing=('fracspacing', 'min')
+).reset_index()
+
+grouped_petrolifero_sorted = grouped_petrolifero.sort_values(
+    ['start_year', 'fracspacing'], ascending=[True, True]
+)
 top_petrolifero = grouped_petrolifero_sorted.groupby('start_year').head(3)
 
-# Format Table
 data_petrolifero_table = []
 previous_year = None
 for _, row in top_petrolifero.iterrows():
@@ -800,7 +805,7 @@ for _, row in top_petrolifero.iterrows():
         'Campaña': year_value,
         'Sigla': row['sigla'],
         'Empresa': row['empresaNEW'],
-        'Fracspacing (m/etapa)': int(row['fracspacing']) if pd.notna(row['fracspacing']) else None
+        'Fracspacing Mínimo (m/etapa)': int(row['fracspacing'])
     })
     previous_year = row['start_year']
 
@@ -809,26 +814,20 @@ st.write("**Tipo Petrolífero: Top 3 Pozos con Menor Fracspacing**")
 st.dataframe(df_petrolifero_final, use_container_width=True, hide_index=True)
 
 
-# -------------------- Gasífero Pozos --------------------
-grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
+# -------------------- Gasífero --------------------
+df_gas_frac = df_fracspacing_base[df_fracspacing_base['tipopozoNEW'] == 'Gasífero']
+
+grouped_gasifero = df_gas_frac.groupby(
     ['start_year', 'sigla', 'empresaNEW']
-).agg({
-    'longitud_rama_horizontal_m': 'median',
-    'cantidad_fracturas': 'median'
-}).reset_index()
+).agg(
+    fracspacing=('fracspacing', 'min')
+).reset_index()
 
-# Calculate Fracspacing
-grouped_gasifero['fracspacing'] = grouped_gasifero['longitud_rama_horizontal_m'] / grouped_gasifero['cantidad_fracturas']
-grouped_gasifero = grouped_gasifero[
-    (grouped_gasifero['fracspacing'].notna()) &
-    (grouped_gasifero['fracspacing'] > 0)
-]
-
-# Sort and take top 3 smallest fracspacing per year
-grouped_gasifero_sorted = grouped_gasifero.sort_values(['start_year', 'fracspacing'], ascending=[True, True])
+grouped_gasifero_sorted = grouped_gasifero.sort_values(
+    ['start_year', 'fracspacing'], ascending=[True, True]
+)
 top_gasifero = grouped_gasifero_sorted.groupby('start_year').head(3)
 
-# Format Table
 data_gasifero_table = []
 previous_year = None
 for _, row in top_gasifero.iterrows():
@@ -837,7 +836,7 @@ for _, row in top_gasifero.iterrows():
         'Campaña': year_value,
         'Sigla': row['sigla'],
         'Empresa': row['empresaNEW'],
-        'Fracspacing (m/etapa)': int(row['fracspacing']) if pd.notna(row['fracspacing']) else None
+        'Fracspacing Mínimo (m/etapa)': int(row['fracspacing'])
     })
     previous_year = row['start_year']
 
