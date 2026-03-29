@@ -688,11 +688,13 @@ with tab2:
     df_merged_VMUT['fracspacing'] = df_merged_VMUT['longitud_rama_horizontal_m'] / df_merged_VMUT['cantidad_fracturas']
     
     
-    # Calcular estadísticas por tipo de pozo y año
-    stats_tipo = df_merged_VMUT.groupby(['start_year', 'tipopozoNEW']).agg(
-        max_fracspacing=('fracspacing', 'max'),
-        avg_fracspacing=('fracspacing', 'median')
+    # Split by 'tipopozoNEW' and calculate statistics
+    split_stats = df_merged_VMUT.groupby(['start_year', 'tipopozoNEW']).agg(
+        avg_fracspacing=('fracspacing', 'median'),
+        min_fracspacing=('fracspacing', 'min'),
+        std_fracspacing=('fracspacing', 'std')
     ).reset_index()
+
     
     # Create Line Plot for Gasífero and Petrolífero Statistics
     fig_lines = go.Figure()
