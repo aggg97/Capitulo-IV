@@ -409,7 +409,7 @@ for _, row in top_avg_etapas.iterrows():
     previous_year = row['start_year']
 
 # Convert to a dataframe
-df_avg_lenght = pd.DataFrame(data_for_avg_etapas_table, columns=["Campaña", "Empresa", "P50 Cantidad de Etapas"])
+df_avg_etapas = pd.DataFrame(data_for_avg_etapas_table, columns=["Campaña", "Empresa", "P50 Cantidad de Etapas"])
 
 # Display the DataFrame in Streamlit
 st.write("**Top 3 Empresas con Máxima Cantidad de Etapas por Pozo**")
