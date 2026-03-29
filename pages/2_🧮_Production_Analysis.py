@@ -24,7 +24,7 @@ import plotly.express as px
 # Verificamos si los datos ya fueron cargados en la Main Page
 if 'df' in st.session_state:
     # Recuperamos los datos de la memoria sin esperar un segundo
-    df = st.session_state['df']
+    data_sorted = st.session_state['df']
     
     st.info("Utilizando datos recuperados de la memoria (Session State).")
     
