@@ -944,7 +944,7 @@ with tab2:
 
 
     
-    # Layout (igual a tus otros plots)
+    # Layout 
     fig.update_layout(
         title='Evolución de Propante por Etapa (Fm. Vaca Muerta)',
         xaxis_title='Campaña',
@@ -983,13 +983,13 @@ with tab2:
     # --- Gráfico Plotly
     fig_plot = go.Figure()
     
-    # Mean
+    # Median
     fig_plot.add_trace(go.Scatter(
         x=pivot_table['start_year'],
         y=pivot_table['median_AS_x_volumen_inyectado'],
         mode='lines+markers',
-        name='Mean',
-        line=dict(color='blue', width=2)
+        name='P50',
+        line=dict(color='pink', width=2)
     ))
     
     # Min
@@ -998,7 +998,7 @@ with tab2:
         y=pivot_table['min_AS_x_volumen_inyectado'],
         mode='lines+markers',
         name='Min',
-        line=dict(color='red', dash='dot', width=2)
+        line=dict(color='blue', dash='dot', width=2)
     ))
     
     # Max
@@ -1007,17 +1007,36 @@ with tab2:
         y=pivot_table['max_AS_x_volumen_inyectado'],
         mode='lines+markers',
         name='Max',
-        line=dict(color='green', dash='dot', width=2)
+        line=dict(color='orange', dash='dot', width=2)
     ))
+
+
+    for _, row in gasifero_stats.iterrows():
+        fig.add_annotation(
+            x=row['start_year'],
+            y=row['median_AS_x_volumen_inyectado'],
+            text=f"{row['median_AS_x_volumen_inyectado']:.0f}",
+            showarrow=False,
+            yshift=-15,
+            font=dict(color='pink', size=10)
+        )
+
+
     
-    # Layout
-    fig_plot.update_layout(
+    # Layout 
+    fig.update_layout(
         title="Evolución de la Concentración de Agente de Sosten Por Volumen Inyectado (Fm. Vaca Muerta)",
-        xaxis_title="Campaña",
+        xaxis_title='Campaña',
         yaxis_title="Arena por Volumen Inyectado [tn/1000m³]",
-        template="plotly_white",
-        showlegend=True
-    )
+        template='plotly_white',
+        legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=1.0,
+            xanchor='center',
+            x=0.5
+        )
+   
     
     # Mostrar en Streamlit
     st.plotly_chart(fig_plot, use_container_width=True)
