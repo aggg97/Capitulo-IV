@@ -715,7 +715,7 @@ with tab2:
     fig_lines.add_trace(go.Scatter(
         x=gasifero_stats['start_year'],
         y=gasifero_stats['min_fracspacing'],
-        mode='lines+markers',,
+        mode='lines+markers',
         name='Gasífero Min',
         line=dict(color='red', dash='dash'),
         marker=dict(size=8)
