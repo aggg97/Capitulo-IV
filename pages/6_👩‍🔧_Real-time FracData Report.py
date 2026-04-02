@@ -966,27 +966,29 @@ with tab2:
     
     # --- Filtrar años mayores a 2012
     df_filtered = df_merged_VMUT[df_merged_VMUT['start_year'] > 2012]
+
+    st.divider()
+
+    df_merged_VMUT['AS_x_volumen_inyectado'] = (
+    df_merged_VMUT['arena_total_tn'] / df_merged_VMUT['agua_inyectada_m3'/1000]
+    ).replace([np.inf, -np.inf], np.nan)
     
-    # --- Calcular AS x Volumen Inyectado (tn/1000m³)
-    df_filtered['AS_x_volumen_inyectado'] = df_filtered['arena_total_tn'] / (df_filtered['agua_inyectada_m3'] / 1000)
-    
-    # --- Pivot table para mean, min y max por año
-    pivot_table = df_filtered.pivot_table(
-        index='start_year',
-        values='AS_x_volumen_inyectado',
-        aggfunc=['median', 'min', 'max']
+    petrolifero_stats = df_merged_VMUT[
+        (df_merged_VMUT['start_year'] > 2012)
+    ].groupby('start_year').agg(
+        median_as=('AS_x_volumen_inyectado', 'median'),
+        max_as=('AS_x_volumen_inyectado', 'max'),
+        min_as=('AS_x_volumen_inyectado', 'min') 
     ).reset_index()
     
-    # --- Flatten columnas
-    pivot_table.columns = ['start_year', 'median_AS_x_volumen_inyectado', 'min_AS_x_volumen_inyectado', 'max_AS_x_volumen_inyectado']
-    
+
     # --- Gráfico Plotly
     fig_plot = go.Figure()
     
     # Median
     fig_plot.add_trace(go.Scatter(
         x=pivot_table['start_year'],
-        y=pivot_table['median_AS_x_volumen_inyectado'],
+        y=pivot_table['median_as'],
         mode='lines+markers',
         name='P50',
         line=dict(color='pink', width=2)
@@ -995,7 +997,7 @@ with tab2:
     # Min
     fig_plot.add_trace(go.Scatter(
         x=pivot_table['start_year'],
-        y=pivot_table['min_AS_x_volumen_inyectado'],
+        y=pivot_table['min_as'],
         mode='lines+markers',
         name='Min',
         line=dict(color='blue', dash='dot', width=2)
@@ -1004,7 +1006,7 @@ with tab2:
     # Max
     fig_plot.add_trace(go.Scatter(
         x=pivot_table['start_year'],
-        y=pivot_table['max_AS_x_volumen_inyectado'],
+        y=pivot_table['max_as'],
         mode='lines+markers',
         name='Max',
         line=dict(color='orange', dash='dot', width=2)
@@ -1014,8 +1016,8 @@ with tab2:
     for _, row in gasifero_stats.iterrows():
         fig.add_annotation(
             x=row['start_year'],
-            y=row['median_AS_x_volumen_inyectado'],
-            text=f"{row['median_AS_x_volumen_inyectado']:.0f}",
+            y=row['median_as'],
+            text=f"{row['median_as']:.0f}",
             showarrow=False,
             yshift=-15,
             font=dict(color='pink', size=10)
