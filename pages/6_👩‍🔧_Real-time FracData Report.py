@@ -963,9 +963,6 @@ with tab2:
     st.plotly_chart(fig, use_container_width=True)
 
     # -----------------------------------------------------
-    
-    # --- Filtrar años mayores a 2012
-    df_filtered = df_merged_VMUT[df_merged_VMUT['start_year'] > 2012]
 
     st.divider()
 
