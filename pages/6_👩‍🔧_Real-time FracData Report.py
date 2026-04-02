@@ -1010,7 +1010,7 @@ with tab2:
     ))
 
 
-    for _, row in gasifero_stats.iterrows():
+    for _, row in as_stats.iterrows():
         fig.add_annotation(
             x=row['start_year'],
             y=row['median_as'],
