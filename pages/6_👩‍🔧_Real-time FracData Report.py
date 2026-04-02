@@ -846,7 +846,8 @@ with tab2:
         (df_merged_VMUT['start_year'] > 2012)
     ].groupby('start_year').agg(
         median_prop=('prop_x_etapa', 'median'),
-        max_prop=('prop_x_etapa', 'max')
+        max_prop=('prop_x_etapa', 'max'),
+        min_arena=('arena_total_tn', 'min') 
     ).reset_index()
     
     # Gasífero
@@ -855,7 +856,8 @@ with tab2:
         (df_merged_VMUT['start_year'] > 2012)
     ].groupby('start_year').agg(
         median_prop=('prop_x_etapa', 'median'),
-        max_prop=('prop_x_etapa', 'max')
+        max_prop=('prop_x_etapa', 'max'),
+        min_arena=('arena_total_tn', 'min') 
     ).reset_index()
     
     # Figura
@@ -879,6 +881,18 @@ with tab2:
         line=dict(color='green', dash='dash'),
         marker=dict(size=8)
     ))
+
+    fig.add_trace(go.Scatter(
+        x=petrolifero_stats['start_year'],
+        y=petrolifero_stats['min_prop'],
+        mode='lines+markers',
+        name='Petrolífero Min',
+        line=dict(color='#90EE90', dash='dash'),
+        marker=dict(size=8)
+    ))
+
+
+    
     
     # --- Gasífero ---
     fig.add_trace(go.Scatter(
@@ -896,6 +910,15 @@ with tab2:
         mode='lines+markers',
         name='Gasífero Max',
         line=dict(color='red', dash='dash'),
+        marker=dict(size=8)
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=gasifero_stats['start_year'],
+        y=gasifero_stats['min_prop'],
+        mode='lines+markers',
+        name='Gasífero Min',
+        line=dict(color='#F08080', dash='dash'),
         marker=dict(size=8)
     ))
     
@@ -919,6 +942,8 @@ with tab2:
             yshift=-15,
             font=dict(color='red', size=10)
         )
+
+
     
     # Layout (igual a tus otros plots)
     fig.update_layout(
