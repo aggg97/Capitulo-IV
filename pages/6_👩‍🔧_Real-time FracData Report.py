@@ -1022,7 +1022,6 @@ with tab2:
         )
 
 
-    
     # Layout 
     fig.update_layout(
         title="Evolución de la Concentración de Agente de Sosten Por Volumen Inyectado (Fm. Vaca Muerta)",
@@ -1036,6 +1035,7 @@ with tab2:
             xanchor='center',
             x=0.5
         )
+    )
    
     
     # Mostrar en Streamlit
