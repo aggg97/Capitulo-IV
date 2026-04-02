@@ -978,10 +978,10 @@ with tab2:
     
 
     # --- Gráfico Plotly
-    fig_plot = go.Figure()
+    fig_as = go.Figure()
     
     # Median
-    fig_plot.add_trace(go.Scatter(
+    fig_as.add_trace(go.Scatter(
         x=as_stats['start_year'],
         y=as_stats['median_as'],
         mode='lines+markers',
@@ -990,7 +990,7 @@ with tab2:
     ))
     
     # Min
-    fig_plot.add_trace(go.Scatter(
+    fig_as.add_trace(go.Scatter(
         x=as_stats['start_year'],
         y=as_stats['min_as'],
         mode='lines+markers',
@@ -999,7 +999,7 @@ with tab2:
     ))
     
     # Max
-    fig_plot.add_trace(go.Scatter(
+    fig_as.add_trace(go.Scatter(
         x=as_stats['start_year'],
         y=as_stats['max_as'],
         mode='lines+markers',
@@ -1009,7 +1009,7 @@ with tab2:
 
 
     for _, row in as_stats.iterrows():
-        fig.add_annotation(
+        fig_as.add_annotation(
             x=row['start_year'],
             y=row['median_as'],
             text=f"{row['median_as']:.0f}",
@@ -1020,7 +1020,7 @@ with tab2:
 
 
     # Layout 
-    fig.update_layout(
+    fig_as.update_layout(
         title="Evolución de la Concentración de Agente de Sosten Por Volumen Inyectado (Fm. Vaca Muerta)",
         xaxis_title='Campaña',
         yaxis_title="Arena por Volumen Inyectado [tn/1000m³]",
@@ -1036,7 +1036,7 @@ with tab2:
    
     
     # Mostrar en Streamlit
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig_as, use_container_width=True)
 
 # --- Tab 3: Productividad ---
 with tab3:
