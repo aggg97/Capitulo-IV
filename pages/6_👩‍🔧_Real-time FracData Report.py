@@ -986,7 +986,7 @@ with tab2:
         y=as_stats['median_as'],
         mode='lines+markers',
         name='P50',
-        line=dict(color='pink', width=2)
+        line=dict(color='#FF4D8D', width=2)
     ))
     
     # Min
@@ -1015,7 +1015,7 @@ with tab2:
             text=f"{row['median_as']:.0f}",
             showarrow=False,
             yshift=-15,
-            font=dict(color='pink', size=10)
+            font=dict(color='#FF4D8D', size=10)
         )
 
 
