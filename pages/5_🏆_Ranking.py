@@ -1084,3 +1084,69 @@ for _, row in top3_gas_emp.iterrows():
 
 st.write("**Top 3 Empresas Gasíferas con Mayor Propante por Etapa**")
 st.dataframe(pd.DataFrame(data_gas_emp), use_container_width=True, hide_index=True)
+
+import pandas as pd
+import streamlit as st
+
+# -------------------- Top Pozos Petrolíferos --------------------
+grouped_petro_pozos = df_prop_emp[df_prop_emp['tipopozoNEW'] == 'Petrolífero'].groupby(
+    ['start_year', 'pozoNEW']
+).agg(
+    prop_x_etapa_min=('prop_x_etapa', 'min')
+).reset_index()
+
+top3_petro_pozos = (
+    grouped_petro_pozos
+    .sort_values(['start_year', 'prop_x_etapa_min'], ascending=[True, True])  # Ascendente para mínimo
+    .groupby('start_year')
+    .head(3)
+)
+
+data_petro_pozos = []
+last_year = None
+for _, row in top3_petro_pozos.iterrows():
+    current_year = str(int(row['start_year']))
+    display_year = current_year if current_year != last_year else ""
+
+    data_petro_pozos.append({
+        'Campaña': display_year,
+        'Pozo': row['pozoNEW'],
+        'Min Prop x Etapa (tn/etapa)': round(row['prop_x_etapa_min'], 0)
+    })
+
+    last_year = current_year
+
+st.write("**Top 3 Pozos Petrolíferos con Menor Propante por Etapa**")
+st.dataframe(pd.DataFrame(data_petro_pozos), use_container_width=True, hide_index=True)
+
+
+# -------------------- Top Empresas Petrolíferas (mínimo) --------------------
+grouped_petro_emp_min = df_prop_emp[df_prop_emp['tipopozoNEW'] == 'Petrolífero'].groupby(
+    ['start_year', 'empresaNEW']
+).agg(
+    prop_x_etapa_min=('prop_x_etapa', 'min')
+).reset_index()
+
+top3_petro_emp_min = (
+    grouped_petro_emp_min
+    .sort_values(['start_year', 'prop_x_etapa_min'], ascending=[True, True])
+    .groupby('start_year')
+    .head(3)
+)
+
+data_petro_emp_min = []
+last_year = None
+for _, row in top3_petro_emp_min.iterrows():
+    current_year = str(int(row['start_year']))
+    display_year = current_year if current_year != last_year else ""
+
+    data_petro_emp_min.append({
+        'Campaña': display_year,
+        'Empresa': row['empresaNEW'],
+        'Min Prop x Etapa (tn/etapa)': round(row['prop_x_etapa_min'], 0)
+    })
+
+    last_year = current_year
+
+st.write("**Top 3 Empresas Petrolíferas con Menor Propante por Etapa**")
+st.dataframe(pd.DataFrame(data_petro_emp_min), use_container_width=True, hide_index=True)
