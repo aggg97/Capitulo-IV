@@ -834,7 +834,6 @@ with tab2:
     # -------------------- Prop x Etapa --------------------
 
     st.divider()
-    st.write("### Evolución de Propante por Etapa")
 
     df_merged_VMUT['prop_x_etapa'] = (
     df_merged_VMUT['arena_total_tn'] / df_merged_VMUT['cantidad_fracturas']
