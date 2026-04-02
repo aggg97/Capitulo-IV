@@ -840,7 +840,8 @@ with tab2:
     
     # Petrolífero
     petrolifero_stats = df_merged_VMUT[
-        df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'
+        (df_merged_VMUT['tipopozoNEW'] == 'Petrolífero') &
+        (df_merged_VMUT['start_year'] > 2012)
     ].groupby('start_year').agg(
         median_prop=('prop_x_etapa', 'median'),
         max_prop=('prop_x_etapa', 'max')
@@ -848,7 +849,8 @@ with tab2:
     
     # Gasífero
     gasifero_stats = df_merged_VMUT[
-        df_merged_VMUT['tipopozoNEW'] == 'Gasífero'
+        (df_merged_VMUT['tipopozoNEW'] == 'Gasífero') &
+        (df_merged_VMUT['start_year'] > 2012)
     ].groupby('start_year').agg(
         median_prop=('prop_x_etapa', 'median'),
         max_prop=('prop_x_etapa', 'max')
