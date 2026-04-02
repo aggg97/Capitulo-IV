@@ -1081,5 +1081,15 @@ for _, row in top3_gas_emp.iterrows():
 
     last_year = current_year
 
+# 🔥 NUEVO: sorting robusto
+df_gas = pd.DataFrame(data_gas_emp)
+
+df_gas['Campaña_sort'] = df_gas['Campaña'].replace("", None).ffill().astype(int)
+
+df_gas = df_gas.sort_values(
+    ['Campaña_sort', 'P50 Prop x Etapa (tn/etapa)'],
+    ascending=[True, False]
+)
+
 st.write("**Top 3 Empresas Gasíferas con Mayor Propante por Etapa**")
-st.dataframe(pd.DataFrame(data_gas_emp), use_container_width=True, hide_index=True)
+st.dataframe(df_gas.drop(columns=['Campaña_sort']), use_container_width=True, hide_index=True)
