@@ -970,7 +970,7 @@ with tab2:
     df_merged_VMUT['arena_total_tn'] / (df_merged_VMUT['agua_inyectada_m3'] / 1000)
     ).replace([np.inf, -np.inf], np.nan)
     
-    petrolifero_stats = df_merged_VMUT[
+    as_stats = df_merged_VMUT[
         (df_merged_VMUT['start_year'] > 2012)
     ].groupby('start_year').agg(
         median_as=('AS_x_volumen_inyectado', 'median'),
@@ -984,8 +984,8 @@ with tab2:
     
     # Median
     fig_plot.add_trace(go.Scatter(
-        x=pivot_table['start_year'],
-        y=pivot_table['median_as'],
+        x=as_stats['start_year'],
+        y=as_stats['median_as'],
         mode='lines+markers',
         name='P50',
         line=dict(color='pink', width=2)
@@ -993,8 +993,8 @@ with tab2:
     
     # Min
     fig_plot.add_trace(go.Scatter(
-        x=pivot_table['start_year'],
-        y=pivot_table['min_as'],
+        x=as_stats['start_year'],
+        y=as_stats['min_as'],
         mode='lines+markers',
         name='Min',
         line=dict(color='blue', dash='dot', width=2)
@@ -1002,8 +1002,8 @@ with tab2:
     
     # Max
     fig_plot.add_trace(go.Scatter(
-        x=pivot_table['start_year'],
-        y=pivot_table['max_as'],
+        x=as_stats['start_year'],
+        y=as_stats['max_as'],
         mode='lines+markers',
         name='Max',
         line=dict(color='orange', dash='dot', width=2)
