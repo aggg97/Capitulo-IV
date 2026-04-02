@@ -967,7 +967,7 @@ with tab2:
     st.divider()
 
     df_merged_VMUT['AS_x_volumen_inyectado'] = (
-    df_merged_VMUT['arena_total_tn'] / df_merged_VMUT['agua_inyectada_m3'/1000]
+    df_merged_VMUT['arena_total_tn'] / (df_merged_VMUT['agua_inyectada_m3'] / 1000)
     ).replace([np.inf, -np.inf], np.nan)
     
     petrolifero_stats = df_merged_VMUT[
