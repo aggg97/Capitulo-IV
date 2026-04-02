@@ -829,6 +829,107 @@ with tab2:
     # Streamlit render
     st.plotly_chart(fig_agua_plot, use_container_width=True)
 
+    # -------------------- Prop x Etapa --------------------
+
+    st.divider()
+    st.write("### Evolución de Propante por Etapa")
+    
+    # Petrolífero
+    petrolifero_stats = df_merged_VMUT[
+        df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'
+    ].groupby('start_year').agg(
+        median_prop=('prop_x_etapa', 'median'),
+        max_prop=('prop_x_etapa', 'max')
+    ).reset_index()
+    
+    # Gasífero
+    gasifero_stats = df_merged_VMUT[
+        df_merged_VMUT['tipopozoNEW'] == 'Gasífero'
+    ].groupby('start_year').agg(
+        median_prop=('prop_x_etapa', 'median'),
+        max_prop=('prop_x_etapa', 'max')
+    ).reset_index()
+    
+    # Figura
+    fig = go.Figure()
+    
+    # --- Petrolífero ---
+    fig.add_trace(go.Scatter(
+        x=petrolifero_stats['start_year'],
+        y=petrolifero_stats['median_prop'],
+        mode='lines+markers',
+        name='Petrolífero P50',
+        line=dict(color='green'),
+        marker=dict(size=8)
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=petrolifero_stats['start_year'],
+        y=petrolifero_stats['max_prop'],
+        mode='lines+markers',
+        name='Petrolífero Max',
+        line=dict(color='green', dash='dash'),
+        marker=dict(size=8)
+    ))
+    
+    # --- Gasífero ---
+    fig.add_trace(go.Scatter(
+        x=gasifero_stats['start_year'],
+        y=gasifero_stats['median_prop'],
+        mode='lines+markers',
+        name='Gasífero P50',
+        line=dict(color='red'),
+        marker=dict(size=8)
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=gasifero_stats['start_year'],
+        y=gasifero_stats['max_prop'],
+        mode='lines+markers',
+        name='Gasífero Max',
+        line=dict(color='red', dash='dash'),
+        marker=dict(size=8)
+    ))
+    
+    # --- Annotations estilo consistente ---
+    for _, row in petrolifero_stats.iterrows():
+        fig.add_annotation(
+            x=row['start_year'],
+            y=row['median_prop'],
+            text=f"{row['median_prop']:.0f}",
+            showarrow=False,
+            yshift=10,
+            font=dict(color='green', size=10)
+        )
+    
+    for _, row in gasifero_stats.iterrows():
+        fig.add_annotation(
+            x=row['start_year'],
+            y=row['median_prop'],
+            text=f"{row['median_prop']:.0f}",
+            showarrow=False,
+            yshift=-15,
+            font=dict(color='red', size=10)
+        )
+    
+    # Layout (igual a tus otros plots)
+    fig.update_layout(
+        title='Evolución de Propante por Etapa (Fm. Vaca Muerta)',
+        xaxis_title='Campaña',
+        yaxis_title='Propante por Etapa (tn/etapa)',
+        template='plotly_white',
+        legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=1.0,
+            xanchor='center',
+            x=0.5
+        )
+    )
+    
+    # Render
+    st.plotly_chart(fig, use_container_width=True)
+
 # --- Tab 3: Productividad ---
 with tab3:
 
