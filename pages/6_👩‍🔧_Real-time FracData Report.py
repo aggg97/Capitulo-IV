@@ -941,8 +941,6 @@ with tab2:
             yshift=-15,
             font=dict(color='red', size=10)
         )
-
-
     
     # Layout 
     fig.update_layout(
@@ -1038,7 +1036,7 @@ with tab2:
    
     
     # Mostrar en Streamlit
-    st.plotly_chart(fig_plot, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True)
 
 # --- Tab 3: Productividad ---
 with tab3:
