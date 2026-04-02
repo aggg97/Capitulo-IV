@@ -1045,7 +1045,7 @@ for _, row in top3_petro_emp.iterrows():
 
     last_year = current_year
 
-st.write("**Top 3 Empresas Petrolíferas con Mayor Propante por Etapa**")
+st.write("**Top 3 Empresas con Mayor Propante por Etapa por Pozo de Petróleo**")
 st.dataframe(pd.DataFrame(data_petro_emp), use_container_width=True, hide_index=True)
 
 
@@ -1079,7 +1079,7 @@ for _, row in top3_gas_emp.iterrows():
 
     last_year = current_year
 
-st.write("**Top 3 Empresas Gasíferas con Mayor Propante por Etapa**")
+st.write("**Top 3 Empresas con Mayor Propante por Etapa por Pozo de Gas**")
 st.dataframe(pd.DataFrame(data_gas_emp), use_container_width=True, hide_index=True)
 
 
@@ -1117,7 +1117,7 @@ for _, row in top_petro.iterrows():
 
 df_petro_prop_final = pd.DataFrame(data_petro_table)
 
-st.write("**Tipo Petrolífero: Top 3 Pozos con Mayor Propante por Etapa**")
+st.write("**Tipo Petrolífero: Top 3 Pozos con Menor Propante por Etapa**")
 st.dataframe(df_petro_prop_final, use_container_width=True, hide_index=True)
 
 
@@ -1154,7 +1154,7 @@ for _, row in top_gas.iterrows():
 
 df_gas_prop_final = pd.DataFrame(data_gas_table)
 
-st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Propante por Etapa**")
+st.write("**Tipo Gasífero: Top 3 Pozos con Menor Propante por Etapa**")
 st.dataframe(df_gas_prop_final, use_container_width=True, hide_index=True)
 
 # -------------------- Empresas: Propante por Etapa (P50) --------------------
@@ -1206,7 +1206,7 @@ for _, row in top3_petro_emp.iterrows():
 
     last_year = current_year
 
-st.write("**Top 3 Empresas Petrolíferas con Mayor Propante por Etapa**")
+st.write("**Top 3 Empresas con Menor Propante por Etapa por Pozo de Petróleo**")
 st.dataframe(pd.DataFrame(data_petro_emp), use_container_width=True, hide_index=True)
 
 
@@ -1240,7 +1240,7 @@ for _, row in top3_gas_emp.iterrows():
 
     last_year = current_year
 
-st.write("**Top 3 Empresas Gasíferas con Mayor Propante por Etapa**")
+st.write("**Top 3 Empresas con Menor Propante por Etapa por Pozo de Gas**")
 st.dataframe(pd.DataFrame(data_gas_emp), use_container_width=True, hide_index=True)
 
 
