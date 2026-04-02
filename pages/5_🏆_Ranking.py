@@ -933,7 +933,7 @@ df_petro_prop = df_prop_base[df_prop_base['tipopozoNEW'] == 'Petrolífero']
 grouped_petro = df_petro_prop.groupby(
     ['start_year', 'sigla', 'empresaNEW']
 ).agg(
-    prop_x_etapa_max=('prop_x_etapa_max', 'max')
+    prop_x_etapa_max=('prop_x_etapa', 'max')
 ).reset_index()
 
 grouped_petro_sorted = grouped_petro.sort_values(
@@ -970,7 +970,7 @@ df_gas_prop = df_prop_base[df_prop_base['tipopozoNEW'] == 'Gasífero']
 grouped_gas = df_gas_prop.groupby(
     ['start_year', 'sigla', 'empresaNEW']
 ).agg(
-    prop_x_etapa_max=('prop_x_etapa_max', 'max')
+    prop_x_etapa_max=('prop_x_etapa', 'max')
 ).reset_index()
 
 grouped_gas_sorted = grouped_gas.sort_values(
@@ -1090,7 +1090,7 @@ df_petro_prop = df_prop_base[df_prop_base['tipopozoNEW'] == 'Petrolífero']
 grouped_petro = df_petro_prop.groupby(
     ['start_year', 'sigla', 'empresaNEW']
 ).agg(
-    prop_x_etapa_min=('prop_x_etapa_min', 'min')
+    prop_x_etapa_min=('prop_x_etapa', 'min')
 ).reset_index()
 
 grouped_petro_sorted = grouped_petro.sort_values(
@@ -1127,7 +1127,7 @@ df_gas_prop = df_prop_base[df_prop_base['tipopozoNEW'] == 'Gasífero']
 grouped_gas = df_gas_prop.groupby(
     ['start_year', 'sigla', 'empresaNEW']
 ).agg(
-    prop_x_etapa_min=('prop_x_etapa_min', 'min')
+    prop_x_etapa_min=('prop_x_etapa', 'min')
 ).reset_index()
 
 grouped_gas_sorted = grouped_gas.sort_values(
