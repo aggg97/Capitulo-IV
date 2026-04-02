@@ -998,3 +998,88 @@ df_gas_prop_final = pd.DataFrame(data_gas_table)
 
 st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Propante por Etapa**")
 st.dataframe(df_gas_prop_final, use_container_width=True, hide_index=True)
+
+# -------------------- Empresas: Propante por Etapa (P50) --------------------
+
+st.subheader("Ranking Empresas según Propante por Etapa", divider="blue")
+
+st.caption("P50 Prop x Etapa = mediana de (arena_total_tn / cantidad_fracturas) por empresa")
+
+# Base (reutiliza si ya lo calculaste antes)
+df_prop_emp = df_merged_VMUT.copy()
+df_prop_emp['prop_x_etapa'] = (
+    df_prop_emp['arena_total_tn'] / df_prop_emp['cantidad_fracturas']
+)
+
+# Filtrar valores válidos
+df_prop_emp = df_prop_emp[
+    (df_prop_emp['prop_x_etapa'].notna()) &
+    (df_prop_emp['prop_x_etapa'] > 0)
+]
+
+# -------------------- Petrolífero Empresas --------------------
+grouped_petro_emp = df_prop_emp[df_prop_emp['tipopozoNEW'] == 'Petrolífero'].groupby(
+    ['start_year', 'empresaNEW']
+).agg(
+    prop_x_etapa=('prop_x_etapa', 'median')
+).reset_index()
+
+top3_petro_emp = (
+    grouped_petro_emp
+    .sort_values(['start_year', 'prop_x_etapa'], ascending=[True, False])
+    .groupby('start_year')
+    .head(3)
+)
+
+# Formato tabla
+data_petro_emp = []
+last_year = None
+
+for _, row in top3_petro_emp.iterrows():
+    current_year = str(int(row['start_year']))
+    display_year = current_year if current_year != last_year else ""
+
+    data_petro_emp.append({
+        'Campaña': display_year,
+        'Empresa': row['empresaNEW'],
+        'P50 Prop x Etapa (tn/etapa)': round(row['prop_x_etapa'], 0)
+    })
+
+    last_year = current_year
+
+st.write("**Top 3 Empresas Petrolíferas con Mayor Propante por Etapa**")
+st.dataframe(pd.DataFrame(data_petro_emp), use_container_width=True, hide_index=True)
+
+
+# -------------------- Gasífero Empresas --------------------
+grouped_gas_emp = df_prop_emp[df_prop_emp['tipopozoNEW'] == 'Gasífero'].groupby(
+    ['start_year', 'empresaNEW']
+).agg(
+    prop_x_etapa=('prop_x_etapa', 'median')
+).reset_index()
+
+top3_gas_emp = (
+    grouped_gas_emp
+    .sort_values(['start_year', 'prop_x_etapa'], ascending=[True, False])
+    .groupby('start_year')
+    .head(3)
+)
+
+# Formato tabla
+data_gas_emp = []
+last_year = None
+
+for _, row in top3_gas_emp.iterrows():
+    current_year = str(int(row['start_year']))
+    display_year = current_year if current_year != last_year else ""
+
+    data_gas_emp.append({
+        'Campaña': display_year,
+        'Empresa': row['empresaNEW'],
+        'P50 Prop x Etapa (tn/etapa)': round(row['prop_x_etapa'], 0)
+    })
+
+    last_year = current_year
+
+st.write("**Top 3 Empresas Gasíferas con Mayor Propante por Etapa**")
+st.dataframe(pd.DataFrame(data_gas_emp), use_container_width=True, hide_index=True)
