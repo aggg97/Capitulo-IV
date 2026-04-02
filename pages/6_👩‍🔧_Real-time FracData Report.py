@@ -778,7 +778,6 @@ with tab2:
     
     # Mostrar en Streamlit
     st.plotly_chart(fig_lines, use_container_width=True)
-    st.markdown("Fracspacing = $\\frac{longitud\\_rama\\_horizontal\\_m}{cantidad\\_fracturas}$")
 
 #-----------
 
@@ -833,6 +832,10 @@ with tab2:
 
     st.divider()
     st.write("### Evolución de Propante por Etapa")
+
+    df_merged_VMUT['prop_x_etapa'] = (
+    df_merged_VMUT['arena_total_tn'] / df_merged_VMUT['cantidad_fracturas']
+    ).replace([np.inf, -np.inf], np.nan)
     
     # Petrolífero
     petrolifero_stats = df_merged_VMUT[
