@@ -1159,11 +1159,6 @@ st.dataframe(df_gas_prop_final, use_container_width=True, hide_index=True)
 
 # -------------------- Empresas: Propante por Etapa (P50) --------------------
 
-st.subheader("Ranking Empresas según Propante por Etapa", divider="blue")
-
-st.caption("P50 Prop x Etapa = mediana de (arena_total_tn / cantidad_fracturas) por empresa")
-st.caption("La cantidad de arena por etapa es otro indicador de agresividad en la completacion")
-
 # Base (reutiliza si ya lo calculaste antes)
 df_prop_emp = df_merged_VMUT.copy()
 df_prop_emp['prop_x_etapa'] = (
