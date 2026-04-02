@@ -963,48 +963,30 @@ with tab2:
     st.plotly_chart(fig, use_container_width=True)
 
     # -----------------------------------------------------
-
-    # --- Agente de sosten por Vol inyectado
-
-    # --- Step 0: Optional filter for years > 2012
+    
+    # --- Filtrar años mayores a 2012
     df_filtered = df_merged_VMUT[df_merged_VMUT['start_year'] > 2012]
     
-    # --- Step 1: Calculate AS x Volumen Inyectado (tn/1000m³)
+    # --- Calcular AS x Volumen Inyectado (tn/1000m³)
     df_filtered['AS_x_volumen_inyectado'] = df_filtered['arena_total_tn'] / (df_filtered['agua_inyectada_m3'] / 1000)
     
-    # --- Step 2: Pivot table to calculate mean, min, and max per year
+    # --- Pivot table para mean, min y max por año
     pivot_table = df_filtered.pivot_table(
         index='start_year',
         values='AS_x_volumen_inyectado',
-        aggfunc={'AS_x_volumen_inyectado': ['mean', 'min', 'max']}
+        aggfunc=['median', 'min', 'max']
     ).reset_index()
     
-    # --- Step 3: Flatten multi-level columns
-    pivot_table.columns = ['start_year', 'mean_AS_x_volumen_inyectado', 'min_AS_x_volumen_inyectado', 'max_AS_x_volumen_inyectado']
+    # --- Flatten columnas
+    pivot_table.columns = ['start_year', 'median_AS_x_volumen_inyectado', 'min_AS_x_volumen_inyectado', 'max_AS_x_volumen_inyectado']
     
-    # --- Step 4: Streamlit table using Plotly
-    fig_table = go.Figure(data=[go.Table(
-        header=dict(values=["Año", "Mean AS x Volumen Inyectado [tn/1000m³]", "Min AS x Volumen Inyectado [tn/1000m³]", "Max AS x Volumen Inyectado [tn/1000m³]"],
-                    fill_color='lightgrey', align='center'),
-        cells=dict(values=[
-            pivot_table['start_year'],
-            pivot_table['mean_AS_x_volumen_inyectado'].round(2),
-            pivot_table['min_AS_x_volumen_inyectado'].round(2),
-            pivot_table['max_AS_x_volumen_inyectado'].round(2),
-        ],
-        fill_color='white', align='center')
-    )])
-    fig_table.update_layout(title="AS x Volumen Inyectado per Year (tn/1000m³)", template="plotly_white")
-    
-    st.plotly_chart(fig_table, use_container_width=True)
-    
-    # --- Step 5: Plotly line plot for mean, min, max
+    # --- Gráfico Plotly
     fig_plot = go.Figure()
     
     # Mean
     fig_plot.add_trace(go.Scatter(
         x=pivot_table['start_year'],
-        y=pivot_table['mean_AS_x_volumen_inyectado'],
+        y=pivot_table['median_AS_x_volumen_inyectado'],
         mode='lines+markers',
         name='Mean',
         line=dict(color='blue', width=2)
@@ -1030,15 +1012,15 @@ with tab2:
     
     # Layout
     fig_plot.update_layout(
-        title="AS x Volumen Inyectado per Year (tn/1000m³)",
-        xaxis_title="Year",
-        yaxis_title="AS x Volumen Inyectado [tn/1000m³]",
+        title="Evolución de la Concentración de Agente de Sosten Por Volumen Inyectado (Fm. Vaca Muerta)",
+        xaxis_title="Campaña",
+        yaxis_title="Arena por Volumen Inyectado [tn/1000m³]",
         template="plotly_white",
         showlegend=True
     )
     
+    # Mostrar en Streamlit
     st.plotly_chart(fig_plot, use_container_width=True)
-
 
 # --- Tab 3: Productividad ---
 with tab3:
