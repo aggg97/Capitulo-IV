@@ -1241,7 +1241,7 @@ for _, row in top3_gas_emp.iterrows():
     last_year = current_year
 
 st.write("**Top 3 Empresas Gasíferas con Mayor Propante por Etapa**")
-st.dataframe(pd.DataFrame(data_gas_emp), use_container_width=True, hide_index=True
+st.dataframe(pd.DataFrame(data_gas_emp), use_container_width=True, hide_index=True)
 
 
 
