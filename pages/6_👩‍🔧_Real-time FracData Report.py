@@ -847,7 +847,7 @@ with tab2:
     ].groupby('start_year').agg(
         median_prop=('prop_x_etapa', 'median'),
         max_prop=('prop_x_etapa', 'max'),
-        min_arena=('arena_total_tn', 'min') 
+        min_prop=('arena_total_tn', 'min') 
     ).reset_index()
     
     # Gasífero
