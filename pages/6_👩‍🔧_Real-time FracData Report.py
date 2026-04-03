@@ -1044,7 +1044,7 @@ with tab2:
     st.divider()
 
     df_merged_VMUT['proppant_intensity'] = (
-    df_merged_VMUT['arena_total_tn'] / df_merged_VMUT['agua_inyelongitud_rama_horizontal_mctada_m3'] 
+    df_merged_VMUT['arena_total_tn'] / df_merged_VMUT['longitud_rama_horizontal_m'] 
     ).replace([np.inf, -np.inf], np.nan)
     
     proppant_intensity_stats = df_merged_VMUT[
