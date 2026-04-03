@@ -1091,7 +1091,7 @@ with tab2:
         fig_pi.add_annotation(
             x=row['start_year'],
             y=row['median_prop_int'],
-            text=f"{row['median_prop_int']:.0f}",
+            text=f"{row['median_prop_int']:.1f}",
             showarrow=False,
             yshift=-15,
             font=dict(color='#FF4D8D', size=10)
