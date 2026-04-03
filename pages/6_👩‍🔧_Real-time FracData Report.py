@@ -1337,6 +1337,7 @@ with tab3:
 
 # --------------------
 
+    # --- CÁLCULO DE COLUMNAS POR ETAPA ---
     df_merged_VMUT['Qo_peak_x_etapa'] = (
         df_merged_VMUT['Qo_peak'] / df_merged_VMUT['cantidad_fracturas']
     ).replace([np.inf, -np.inf], np.nan)
@@ -1344,10 +1345,13 @@ with tab3:
     df_merged_VMUT['Qg_peak_x_etapa'] = (
         df_merged_VMUT['Qg_peak'] / df_merged_VMUT['cantidad_fracturas']
     ).replace([np.inf, -np.inf], np.nan)
-
-    grouped_petrolifero_etapa = df_merged_VMUT[
-        df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'
-    ].groupby(['start_year']).agg({
+    
+    # =================================================================
+    # GRÁFICO 3: Petrolífero por Etapa
+    # =================================================================
+    grouped_petrolifero_etapa = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
+        ['start_year']
+    ).agg({
         'Qo_peak_x_etapa': [
             'max',
             lambda x: np.percentile(x, 50),
@@ -1356,213 +1360,100 @@ with tab3:
         ]
     }).reset_index()
     
+    # Nombres de columnas consistentes
+    grouped_petrolifero_etapa.columns = ['start_year', 'max_oil', 'p50_oil', 'p90_oil', 'p10_oil']
     
+    fig_oil_etapa = go.Figure()
     
-    # Step 1: Process Data for Petrolífero to get max and average oil rate
-    grouped_petrolifero_etapa = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
-        ['start_year']
-    ).agg({
-        'Qo_peak_x_etapa': [
-                'max',
-                lambda x: np.percentile(x, 50),
-                lambda x: np.percentile(x, 90),
-                lambda x: np.percentile(x, 10)
-            ]
-    }).reset_index()
-    
-    # Flatten column names
-    grouped_petrolifero_etapa.columns = ['start_year', 'max_oil_rate_etapa', 'p50_oil_rate_etapa', 'p10_oil_rate_etapa', 'p90_oil_rate_etapa']
-    
-    # Step 2: Plot the data
-    fig = go.Figure()
-    
-    # Plot maximum oil rate (dotted line)
-    fig.add_trace(go.Scatter(
-        x=grouped_petrolifero_etapa['start_year'],
-        y=grouped_petrolifero_etapa['max_oil_rate_etapa'],
-        mode='lines+markers',
-        name='Caudal Pico de Petróleo por Etapa (Max)',
-        line=dict(dash='dot', color='green'),
-        marker=dict(symbol='circle', size=8, color='green')
+    # Max
+    fig_oil_etapa.add_trace(go.Scatter(
+        x=grouped_petrolifero_etapa['start_year'], y=grouped_petrolifero_etapa['max_oil'],
+        mode='lines+markers', name='Max', line=dict(dash='dot', color='green')
+    ))
+    # P50
+    fig_oil_etapa.add_trace(go.Scatter(
+        x=grouped_petrolifero_etapa['start_year'], y=grouped_petrolifero_etapa['p50_oil'],
+        mode='lines+markers', name='P50', line=dict(color='green')
+    ))
+    # P90 (Línea superior de confianza)
+    fig_oil_etapa.add_trace(go.Scatter(
+        x=grouped_petrolifero_etapa['start_year'], y=grouped_petrolifero_etapa['p90_oil'],
+        mode='lines+markers', name='P90', line=dict(color='black', width=1)
+    ))
+    # P10 (Línea inferior de confianza)
+    fig_oil_etapa.add_trace(go.Scatter(
+        x=grouped_petrolifero_etapa['start_year'], y=grouped_petrolifero_etapa['p10_oil'],
+        mode='lines+markers', name='P10', line=dict(color='black', width=1)
     ))
     
-    # Plot average oil rate (solid line)
-    fig.add_trace(go.Scatter(
-        x=grouped_petrolifero_etapa['start_year'],
-        y=grouped_petrolifero_etapa['p50_oil_rate_etapa'],
-        mode='lines+markers',
-        name='Caudal Pico de Petróleo por Etapa (P50)',
-        line=dict(color='green'),
-        marker=dict(symbol='circle', size=8, color='green')
-    ))
-
-    # Plot P90 oil rate (solid line)
-    fig.add_trace(go.Scatter(
-        x=grouped_petrolifero_etapa['start_year'],
-        y=grouped_petrolifero_etapa['p10_oil_rate_etapa'],
-        mode='lines+markers',
-        name='Caudal Pico de Petróleo por Etapa (P10)',
-        line=dict(color='black'),
-        marker=dict(symbol='circle', size=8, color='green')
-    ))
-
-    # Plot P10 oil rate (solid line)
-    fig.add_trace(go.Scatter(
-        x=grouped_petrolifero_etapa['start_year'],
-        y=grouped_petrolifero_etapa['p90_oil_rate_etapa'],
-        mode='lines+markers',
-        name='Caudal Pico de Petróleo por Etapa (P90)',
-        line=dict(color='black'),
-        marker=dict(symbol='circle', size=8, color='green')
-    ))
+    # Anotaciones (Max y P50)
+    for _, row in grouped_petrolifero_etapa.iterrows():
+        if not np.isnan(row['max_oil']):
+            fig_oil_etapa.add_annotation(x=row['start_year'], y=row['max_oil'], text=str(int(row['max_oil'])),
+                                         showarrow=False, ay=-40, font=dict(color='green'), bgcolor='white')
+        if not np.isnan(row['p50_oil']):
+            fig_oil_etapa.add_annotation(x=row['start_year'], y=row['p50_oil'], text=str(int(row['p50_oil'])),
+                                         showarrow=False, ay=40, font=dict(color='green'), bgcolor='white')
     
-    # Add annotations for max oil rate
-    for i, row in grouped_petrolifero_etapa.iterrows():
-        fig.add_annotation(
-            x=row['start_year'],
-            y=row['max_oil_rate_etapa'],
-            text=str(int(row['max_oil_rate_etapa'])),  # Convert to integer (no decimals)
-            showarrow=False,
-            arrowhead=2,
-            ax=0,
-            ay=-40,
-            font=dict(size=10, color='green'),
-            bgcolor='white'
-        )
-    
-    # Add annotations for average oil rate
-    for i, row in grouped_petrolifero_etapa.iterrows():
-        fig.add_annotation(
-            x=row['start_year'],
-            y=row['p50_oil_rate_etapa'],
-            text=str(int(row['p50_oil_rate_etapa'])),  # Convert to integer (no decimals)
-            showarrow=False,
-            arrowhead=2,
-            ax=0,
-            ay=40,
-            font=dict(size=10, color='green'),
-            bgcolor='white'
-        )
-    
-    # Step 3: Customize Layout
-    fig.update_layout(
-        title="Tipo Petrolífero: Evolución de Caudal Pico por Etapa (Maximo y Percentiles)",
-        xaxis_title="Campaña",
-        yaxis_title="Caudal de Petróleo por Etapa (m3/d/m)",
-        template="plotly_white",
-        legend=dict(
-            orientation='h',  # Horizontal orientation
-            yanchor='bottom',  # Aligns the legend to the bottom of the plot
-            y=1.0,  # Adjusts the position of the legend (negative value places it below the plot)
-            xanchor='center',  # Aligns the legend to the center of the plot
-            x=0.5 # Centers the legend horizontally
-        )
+    fig_oil_etapa.update_layout(
+        title="Petrolífero: Caudal Pico de Petróleo por Etapa",
+        xaxis_title="Campaña", yaxis_title="m3/d/etapa",
+        template="plotly_white", legend=dict(orientation='h', y=1.1, x=0.5, xanchor='center')
     )
-    
-     #fig.show()
-    st.plotly_chart(fig,use_container_width=True)
+    st.plotly_chart(fig_oil_etapa, use_container_width=True)
     
     
-    # Step 1: Process Data for Gasífero to get max and average gas rate
+    # =================================================================
+    # GRÁFICO 4: Gasífero por Etapa (CORREGIDO)
+    # =================================================================
     grouped_gasifero_etapa = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
         ['start_year']
     ).agg({
-        'Qg_peak_etapa': [
-                'max',
-                lambda x: np.percentile(x, 50),
-                lambda x: np.percentile(x, 90),
-                lambda x: np.percentile(x, 10)
-            ]
+        'Qg_peak_x_etapa': [ # <-- AQUÍ ESTABA EL ERROR (usabas Qg_peak)
+            'max',
+            lambda x: np.percentile(x, 50),
+            lambda x: np.percentile(x, 90),
+            lambda x: np.percentile(x, 10)
+        ]
     }).reset_index()
     
-    # Flatten column names
-    grouped_gasifero_etapa.columns = ['start_year', 'max_gas_rate_etapa', 'p50_gas_rate_etapa', 'p10_gas_rate_etapa', 'p90_gas_rate_etapa']
+    grouped_gasifero_etapa.columns = ['start_year', 'max_gas', 'p50_gas', 'p90_gas', 'p10_gas']
     
-    # Step 2: Plot the data
-    fig = go.Figure()
+    fig_gas_etapa = go.Figure()
     
-    # Plot maximum gas rate (dotted line)
-    fig.add_trace(go.Scatter(
-        x=grouped_gasifero_etapa['start_year'],
-        y=grouped_gasifero_etapa['max_gas_rate_etapa'],
-        mode='lines+markers',
-        name='Caudal Pico de Gas por Etapa (Max)',
-        line=dict(dash='dot', color='red'),
-        marker=dict(symbol='circle', size=8, color='red')
+    # Max
+    fig_gas_etapa.add_trace(go.Scatter(
+        x=grouped_gasifero_etapa['start_year'], y=grouped_gasifero_etapa['max_gas'],
+        mode='lines+markers', name='Max', line=dict(dash='dot', color='red')
+    ))
+    # P50
+    fig_gas_etapa.add_trace(go.Scatter(
+        x=grouped_gasifero_etapa['start_year'], y=grouped_gasifero_etapa['p50_gas'],
+        mode='lines+markers', name='P50', line=dict(color='red')
+    ))
+    # P90
+    fig_gas_etapa.add_trace(go.Scatter(
+        x=grouped_gasifero_etapa['start_year'], y=grouped_gasifero_etapa['p90_gas'],
+        mode='lines+markers', name='P90', line=dict(color='black', width=1)
+    ))
+    # P10
+    fig_gas_etapa.add_trace(go.Scatter(
+        x=grouped_gasifero_etapa['start_year'], y=grouped_gasifero_etapa['p10_gas'],
+        mode='lines+markers', name='P10', line=dict(color='black', width=1)
     ))
     
-    # Plot average gas rate (solid line)
-    fig.add_trace(go.Scatter(
-        x=grouped_gasifero_etapa['start_year'],
-        y=grouped_gasifero_etapa['p50_gas_rate_etapa'],
-        mode='lines+markers',
-        name='Caudal Pico de Gas por Etapa (P50)',
-        line=dict(color='red'),
-        marker=dict(symbol='circle', size=8, color='red')
-    ))
-
-    # Plot average gas rate (solid line)
-    fig.add_trace(go.Scatter(
-        x=grouped_gasifero_etapa['start_year'],
-        y=grouped_gasifero_etapa['p90_gas_rate_etapa'],
-        mode='lines+markers',
-        name='Caudal Pico de Gas por Etapa (P10)',
-        line=dict(color='black'),
-        marker=dict(symbol='circle', size=8, color='red')
-    ))
-
-    # Plot average gas rate (solid line)
-    fig.add_trace(go.Scatter(
-        x=grouped_gasifero_etapa['start_year'],
-        y=grouped_gasifero_etapa['p10_gas_rate_etapa'],
-        mode='lines+markers',
-        name='Caudal Pico de Gas por Etapa (P90)',
-        line=dict(color='black'),
-        marker=dict(symbol='circle', size=8, color='red')
-    ))
- 
-    # Add annotations for max gas rate
-    for i, row in grouped_gasifero_etapa.iterrows():
-        fig.add_annotation(
-            x=row['start_year'],
-            y=row['max_gas_rate_etapa'],
-            text=str(int(row['max_gas_rate_etapa'])),  # Convert to integer (no decimals)
-            showarrow=False,
-            arrowhead=2,
-            ax=0,
-            ay=-40,
-            font=dict(size=10, color='red'),
-            bgcolor='white'
-        )
+    # Anotaciones (Max y P50)
+    for _, row in grouped_gasifero_etapa.iterrows():
+        if not np.isnan(row['max_gas']):
+            fig_gas_etapa.add_annotation(x=row['start_year'], y=row['max_gas'], text=str(int(row['max_gas'])),
+                                         showarrow=False, ay=-40, font=dict(color='red'), bgcolor='white')
+        if not np.isnan(row['p50_gas']):
+            fig_gas_etapa.add_annotation(x=row['start_year'], y=row['p50_gas'], text=str(int(row['p50_gas'])),
+                                         showarrow=False, ay=40, font=dict(color='red'), bgcolor='white')
     
-    # Add annotations for average gas rate
-    for i, row in grouped_gasifero_etapa.iterrows():
-        fig.add_annotation(
-            x=row['start_year'],
-            y=row['p50_gas_rate_etapa'],
-            text=str(int(row['p50_gas_rate_etapa'])),  # Convert to integer (no decimals)
-            showarrow=False,
-            arrowhead=2,
-            ax=0,
-            ay=40,
-            font=dict(size=10, color='red'),
-            bgcolor='white'
-        )
-    
-    # Step 3: Customize Layout
-    fig.update_layout(
-        title="Tipo Gasífero: Evolución de Caudal Pico por Etapa (Maximo y Percentiles)",
-        xaxis_title="Campaña",
-        yaxis_title="Caudal de Gas por Etapa (km3/d/m)",
-        template="plotly_white",
-        legend=dict(
-            orientation='h',  # Horizontal orientation
-            yanchor='bottom',  # Aligns the legend to the bottom of the plot
-            y=1.0,  # Adjusts the position of the legend (negative value places it below the plot)
-            xanchor='center',  # Aligns the legend to the center of the plot
-            x=0.5 # Centers the legend horizontally
-        )
+    fig_gas_etapa.update_layout(
+        title="Gasífero: Caudal Pico de Gas por Etapa",
+        xaxis_title="Campaña", yaxis_title="km3/d/etapa",
+        template="plotly_white", legend=dict(orientation='h', y=1.1, x=0.5, xanchor='center')
     )
-    
-     #fig.show()
-    st.plotly_chart(fig,use_container_width=True)
+    st.plotly_chart(fig_gas_etapa, use_container_width=True)
