@@ -1434,8 +1434,8 @@ with tab3:
     for i, row in grouped_petrolifero.iterrows():
         fig.add_annotation(
             x=row['start_year'],
-            y=row['avg_oil_rate_etapa'],
-            text=str(int(row['avg_oil_rate_etapa'])),  # Convert to integer (no decimals)
+            y=row['p50_oil_rate_etapa'],
+            text=str(int(row['p50_oil_rate_etapa'])),  # Convert to integer (no decimals)
             showarrow=False,
             arrowhead=2,
             ax=0,
@@ -1476,7 +1476,7 @@ with tab3:
     }).reset_index()
     
     # Flatten column names
-    grouped_gasifero.columns = ['start_year', 'max_gas_rate', 'avg_gas_rate', 'p10_gas_rate', 'p90_gas_rate']
+    grouped_gasifero.columns = ['start_year', 'max_gas_rate_etapa', 'p50_gas_rate_etapa', 'p10_gas_rate_etapa', 'p90_gas_rate_etapa']
     
     # Step 2: Plot the data
     fig = go.Figure()
@@ -1484,7 +1484,7 @@ with tab3:
     # Plot maximum gas rate (dotted line)
     fig.add_trace(go.Scatter(
         x=grouped_gasifero['start_year'],
-        y=grouped_gasifero['max_gas_rate'],
+        y=grouped_gasifero['max_gas_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Gas por Etapa (Max)',
         line=dict(dash='dot', color='red'),
@@ -1494,7 +1494,7 @@ with tab3:
     # Plot average gas rate (solid line)
     fig.add_trace(go.Scatter(
         x=grouped_gasifero['start_year'],
-        y=grouped_gasifero['avg_gas_rate'],
+        y=grouped_gasifero['p50_gas_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Gas por Etapa (P50)',
         line=dict(color='red'),
@@ -1504,7 +1504,7 @@ with tab3:
     # Plot average gas rate (solid line)
     fig.add_trace(go.Scatter(
         x=grouped_gasifero['start_year'],
-        y=grouped_gasifero['p90_gas_rate'],
+        y=grouped_gasifero['p90_gas_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Gas por Etapa (P10)',
         line=dict(color='black'),
@@ -1514,7 +1514,7 @@ with tab3:
     # Plot average gas rate (solid line)
     fig.add_trace(go.Scatter(
         x=grouped_gasifero['start_year'],
-        y=grouped_gasifero['p10_gas_rate'],
+        y=grouped_gasifero['p10_gas_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Gas por Etapa (P90)',
         line=dict(color='black'),
@@ -1525,8 +1525,8 @@ with tab3:
     for i, row in grouped_gasifero.iterrows():
         fig.add_annotation(
             x=row['start_year'],
-            y=row['max_gas_rate'],
-            text=str(int(row['max_gas_rate'])),  # Convert to integer (no decimals)
+            y=row['max_gas_rate_etapa'],
+            text=str(int(row['max_gas_rate_etapa'])),  # Convert to integer (no decimals)
             showarrow=False,
             arrowhead=2,
             ax=0,
@@ -1539,8 +1539,8 @@ with tab3:
     for i, row in grouped_gasifero.iterrows():
         fig.add_annotation(
             x=row['start_year'],
-            y=row['avg_gas_rate'],
-            text=str(int(row['avg_gas_rate'])),  # Convert to integer (no decimals)
+            y=row['p50_gas_rate_etapa'],
+            text=str(int(row['p50_gas_rate_etapa'])),  # Convert to integer (no decimals)
             showarrow=False,
             arrowhead=2,
             ax=0,
