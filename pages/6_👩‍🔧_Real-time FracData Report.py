@@ -1061,8 +1061,8 @@ with tab2:
     
     # Median
     fig_pi.add_trace(go.Scatter(
-        x=as_stats['start_year'],
-        y=as_stats['median_prop_int'],
+        x=proppant_intensity_stats['start_year'],
+        y=proppant_intensity_stats['median_prop_int'],
         mode='lines+markers',
         name='P50',
         line=dict(color='#FF4D8D', width=2)
@@ -1070,8 +1070,8 @@ with tab2:
     
     # Min
     fig_pi.add_trace(go.Scatter(
-        x=as_stats['start_year'],
-        y=as_stats['min_prop_int'],
+        x=proppant_intensity_stats['start_year'],
+        y=proppant_intensity_stats['min_prop_int'],
         mode='lines+markers',
         name='Min',
         line=dict(color='blue', dash='dot', width=2)
@@ -1079,8 +1079,8 @@ with tab2:
     
     # Max
     fig_pi.add_trace(go.Scatter(
-        x=as_stats['start_year'],
-        y=as_stats['max_prop_int'],
+        x=proppant_intensity_stats['start_year'],
+        y=proppant_intensity_stats['max_prop_int'],
         mode='lines+markers',
         name='Max',
         line=dict(color='orange', dash='dot', width=2)
