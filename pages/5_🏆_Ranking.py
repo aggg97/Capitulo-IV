@@ -1349,7 +1349,8 @@ df_merged_VMUT['Qg_peak_x_etapa'] = (
 ).replace([np.inf, -np.inf], np.nan)
 
 # -------------------- Petrolífero Pozos --------------------
-grouped_petrolifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
+grouped_petrolifero = [(df_merged_VMUT['tipopozoNEW'] == 'Petrolífero') &
+(df_merged_VMUT['start_year'] > 2012)].groupby(
     ['start_year', 'sigla', 'empresaNEW']
 ).agg({
     'Qo_peak_x_etapa': 'max',
@@ -1404,7 +1405,8 @@ st.write("**Tipo Petrolífero: Top 3 Pozos con Mayor Caudal Pico por Etapa**")
 st.dataframe(df_petrolifero_final, use_container_width=True,hide_index=True)
 
 # -------------------- Gasífero Pozos --------------------
-grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
+grouped_gasifero = [(df_merged_VMUT['tipopozoNEW'] == 'Gasífero') &
+(df_merged_VMUT['start_year'] > 2012)].groupby(
     ['start_year', 'sigla', 'empresaNEW']
 ).agg({
     'Qg_peak_x_etapa': 'max',
@@ -1421,6 +1423,7 @@ grouped_gasifero['agente_etapa'] = (
 
 grouped_gasifero_sorted = grouped_gasifero.sort_values(['start_year', 'Qg_peak_x_etapa'], ascending=[True, False])
 top_gasifero = grouped_gasifero_sorted.groupby('start_year').head(3)
+
 
 # Format Table
 data_gasifero_table = []
@@ -1461,7 +1464,8 @@ st.dataframe(df_gasifero_final, use_container_width=True,hide_index=True)
 # -------------------- Empresas: Promedios --------------------
 
 # --- Petrolífero ---
-grouped_petro_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
+grouped_petro_emp = [(df_merged_VMUT['tipopozoNEW'] == 'Petrolífero') &
+(df_merged_VMUT['start_year'] > 2012)].groupby(
     ['start_year', 'empresaNEW']
 ).agg({
     'Qo_peak_x_etapa': 'median',
@@ -1492,7 +1496,8 @@ st.dataframe(pd.DataFrame(data_petro_final), use_container_width=True, hide_inde
 
 
 # --- Gasífero ---
-grouped_gas_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
+grouped_gas_emp = [(df_merged_VMUT['tipopozoNEW'] == 'Gasífero') &
+(df_merged_VMUT['start_year'] > 2012)].groupby(
     ['start_year', 'empresaNEW']
 ).agg({
     'Qg_peak_x_etapa': 'median',
