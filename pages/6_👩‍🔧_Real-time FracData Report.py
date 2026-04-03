@@ -1337,7 +1337,6 @@ with tab3:
 
 # --------------------
 
-    df_filtered = df_merged_VMUT[df_merged_VMUT['start_year'] > 2012].copy()
 
     # --- CÁLCULO DE COLUMNAS POR ETAPA ---
     df_merged_VMUT['Qo_peak_x_etapa'] = (
