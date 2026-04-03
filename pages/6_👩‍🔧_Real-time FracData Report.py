@@ -1038,6 +1038,85 @@ with tab2:
     # Mostrar en Streamlit
     st.plotly_chart(fig_as, use_container_width=True)
 
+    # ------------------------------------------------
+    # Proppant Intensity
+
+    st.divider()
+
+    df_merged_VMUT['proppant_intensity'] = (
+    df_merged_VMUT['arena_total_tn'] / df_merged_VMUT['agua_inyelongitud_rama_horizontal_mctada_m3'] 
+    ).replace([np.inf, -np.inf], np.nan)
+    
+    proppant_intensity_stats = df_merged_VMUT[
+        (df_merged_VMUT['start_year'] > 2012)
+    ].groupby('start_year').agg(
+        median_prop_int=('proppant_intensity', 'median'),
+        max_prop_int=('proppant_intensity', 'max'),
+        min_prop_int=('proppant_intensity', 'min') 
+    ).reset_index()
+    
+
+    # --- Gráfico Plotly
+    fig_pi = go.Figure()
+    
+    # Median
+    fig_pi.add_trace(go.Scatter(
+        x=as_stats['start_year'],
+        y=as_stats['median_prop_int'],
+        mode='lines+markers',
+        name='P50',
+        line=dict(color='#FF4D8D', width=2)
+    ))
+    
+    # Min
+    fig_pi.add_trace(go.Scatter(
+        x=as_stats['start_year'],
+        y=as_stats['min_prop_int'],
+        mode='lines+markers',
+        name='Min',
+        line=dict(color='blue', dash='dot', width=2)
+    ))
+    
+    # Max
+    fig_pi.add_trace(go.Scatter(
+        x=as_stats['start_year'],
+        y=as_stats['max_prop_int'],
+        mode='lines+markers',
+        name='Max',
+        line=dict(color='orange', dash='dot', width=2)
+    ))
+
+
+    for _, row in proppant_intensity_stats.iterrows():
+        fig_pi.add_annotation(
+            x=row['start_year'],
+            y=row['median_prop_int'],
+            text=f"{row['median_prop_int']:.0f}",
+            showarrow=False,
+            yshift=-15,
+            font=dict(color='#FF4D8D', size=10)
+        )
+
+
+    # Layout 
+    fig_pi.update_layout(
+        title="Evolución de la Intensidad de Propante (Fm. Vaca Muerta)",
+        xaxis_title='Campaña',
+        yaxis_title="Intensidad de Propante [tn/m]",
+        template='plotly_white',
+        legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=1.0,
+            xanchor='center',
+            x=0.5
+        )
+    )
+   
+    
+    # Mostrar en Streamlit
+    st.plotly_chart(fig_pi, use_container_width=True)
+
 # --- Tab 3: Productividad ---
 with tab3:
 
