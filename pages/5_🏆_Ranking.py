@@ -1349,8 +1349,11 @@ df_merged_VMUT['Qg_peak_x_etapa'] = (
 ).replace([np.inf, -np.inf], np.nan)
 
 # -------------------- Petrolífero Pozos --------------------
-grouped_petrolifero = [(df_merged_VMUT['tipopozoNEW'] == 'Petrolífero') &
-(df_merged_VMUT['start_year'] > 2012)].groupby(
+grouped_petrolifero = df_merged_VMUT[
+        (df_merged_VMUT['tipopozoNEW'] == 'Petrolífero') &
+        (df_merged_VMUT['start_year'] > 2012)
+    ].groupby(
+
     ['start_year', 'sigla', 'empresaNEW']
 ).agg({
     'Qo_peak_x_etapa': 'max',
@@ -1405,8 +1408,11 @@ st.write("**Tipo Petrolífero: Top 3 Pozos con Mayor Caudal Pico por Etapa**")
 st.dataframe(df_petrolifero_final, use_container_width=True,hide_index=True)
 
 # -------------------- Gasífero Pozos --------------------
-grouped_gasifero = [(df_merged_VMUT['tipopozoNEW'] == 'Gasífero') &
-(df_merged_VMUT['start_year'] > 2012)].groupby(
+grouped_gasifero = df_merged_VMUT[
+        (df_merged_VMUT['tipopozoNEW'] == 'Gasífero') &
+        (df_merged_VMUT['start_year'] > 2012)
+    ].groupby(
+
     ['start_year', 'sigla', 'empresaNEW']
 ).agg({
     'Qg_peak_x_etapa': 'max',
@@ -1464,8 +1470,10 @@ st.dataframe(df_gasifero_final, use_container_width=True,hide_index=True)
 # -------------------- Empresas: Promedios --------------------
 
 # --- Petrolífero ---
-grouped_petro_emp = [(df_merged_VMUT['tipopozoNEW'] == 'Petrolífero') &
-(df_merged_VMUT['start_year'] > 2012)].groupby(
+grouped_petro_emp = df_merged_VMUT[
+        (df_merged_VMUT['tipopozoNEW'] == 'Petrolífero') &
+        (df_merged_VMUT['start_year'] > 2012)
+    ].groupby(
     ['start_year', 'empresaNEW']
 ).agg({
     'Qo_peak_x_etapa': 'median',
@@ -1496,8 +1504,11 @@ st.dataframe(pd.DataFrame(data_petro_final), use_container_width=True, hide_inde
 
 
 # --- Gasífero ---
-grouped_gas_emp = [(df_merged_VMUT['tipopozoNEW'] == 'Gasífero') &
-(df_merged_VMUT['start_year'] > 2012)].groupby(
+grouped_gas_emp = df_merged_VMUT[
+        (df_merged_VMUT['tipopozoNEW'] == 'Gasífero') &
+        (df_merged_VMUT['start_year'] > 2012)
+    ].groupby(
+
     ['start_year', 'empresaNEW']
 ).agg({
     'Qg_peak_x_etapa': 'median',
@@ -1526,4 +1537,6 @@ for _, row in top3_gas_emp.iterrows():
 
 st.write("**Top 3 Empresas con Mayores Caudales Pico de Gas por Etapa por Pozo**")
 st.dataframe(pd.DataFrame(data_gas_final), use_container_width=True, hide_index=True)
+
+
 
