@@ -1333,3 +1333,184 @@ for _, row in top_emp_as.iterrows():
 st.write("**Top 3 Empresas con Mayor cc de Agente de Sosten por Volumen Inyectado por Pozo**")
 st.dataframe(pd.DataFrame(data_emp_arena), use_container_width=True, hide_index=True)
 
+
+#------------------------------------------
+st.subheader("Ranking según Caudales Pico por Etapa", divider="blue")
+
+import numpy as np
+
+# --- CÁLCULO DE COLUMNAS POR ETAPA ---
+df_merged_VMUT['Qo_peak_x_etapa'] = (
+    df_merged_VMUT['Qo_peak'] / df_merged_VMUT['cantidad_fracturas']
+).replace([np.inf, -np.inf], np.nan)
+
+df_merged_VMUT['Qg_peak_x_etapa'] = (
+    df_merged_VMUT['Qg_peak'] / df_merged_VMUT['cantidad_fracturas']
+).replace([np.inf, -np.inf], np.nan)
+
+# -------------------- Petrolífero Pozos --------------------
+grouped_petrolifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
+    ['start_year', 'sigla', 'empresaNEW']
+).agg({
+    'Qo_peak_x_etapa': 'max',
+    'longitud_rama_horizontal_m': 'median',
+    'cantidad_fracturas': 'median',
+    'arena_bombeada_nacional_tn': 'sum',
+    'arena_bombeada_importada_tn': 'sum'
+}).reset_index()
+
+grouped_petrolifero['fracspacing'] = grouped_petrolifero['longitud_rama_horizontal_m'] / grouped_petrolifero['cantidad_fracturas']
+grouped_petrolifero['agente_etapa'] = (
+    grouped_petrolifero['arena_bombeada_nacional_tn'] + grouped_petrolifero['arena_bombeada_importada_tn']
+) / grouped_petrolifero['cantidad_fracturas']
+
+grouped_petrolifero_sorted = grouped_petrolifero.sort_values(['start_year', 'Qo_peak_x_etapa'], ascending=[True, False])
+top_petrolifero = grouped_petrolifero_sorted.groupby('start_year').head(3)
+
+# Format Table
+data_petrolifero_table = []
+previous_year = None
+for _, row in top_petrolifero.iterrows():
+    year_value = int(row['start_year']) if row['start_year'] != previous_year else " "
+    data_petrolifero_table.append({
+        'Campaña': year_value,
+        'Sigla': row['sigla'],
+        'Empresa': row['empresaNEW'],
+        'Caudal Pico de Petróleo por Etapa (m3/d/etapa)': int(row['Qo_peak_x_etapa']),
+        'Cantidad de Fracturas': (
+            int(row['cantidad_fracturas']) 
+            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
+            else None
+            ),
+        'Fracspacing (m/etapa)': (
+            int(row['fracspacing']) 
+            if pd.notna(row['fracspacing']) and row['fracspacing'] > 0 
+            else None
+            ),
+        'Agente de Sosten por Etapa (tn/etapa)': (
+            int(row['agente_etapa']) 
+            if pd.notna(row['agente_etapa']) and row['agente_etapa'] > 0 
+            else None
+            )
+    })
+    previous_year = row['start_year']
+
+df_petrolifero_final = pd.DataFrame(data_petrolifero_table)
+st.write("**Tipo Petrolífero: Top 3 Pozos con Mayor Caudal Pico por Etapa**")
+st.dataframe(df_petrolifero_final, use_container_width=True,hide_index=True)
+
+# -------------------- Gasífero Pozos --------------------
+grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
+    ['start_year', 'sigla', 'empresaNEW']
+).agg({
+    'Qg_peak_etapa': 'max',
+    'longitud_rama_horizontal_m': 'median',
+    'cantidad_fracturas': 'median',
+    'arena_bombeada_nacional_tn': 'sum',
+    'arena_bombeada_importada_tn': 'sum'
+}).reset_index()
+
+grouped_gasifero['fracspacing'] = grouped_gasifero['longitud_rama_horizontal_m'] / grouped_gasifero['cantidad_fracturas']
+grouped_gasifero['agente_etapa'] = (
+    grouped_gasifero['arena_bombeada_nacional_tn'] + grouped_gasifero['arena_bombeada_importada_tn']
+) / grouped_gasifero['cantidad_fracturas']
+
+grouped_gasifero_sorted = grouped_gasifero.sort_values(['start_year', 'Qg_peak_etapa'], ascending=[True, False])
+top_gasifero = grouped_gasifero_sorted.groupby('start_year').head(3)
+
+# Format Table
+data_gasifero_table = []
+previous_year = None
+for _, row in top_gasifero.iterrows():
+    year_value = int(row['start_year']) if row['start_year'] != previous_year else " "
+    data_gasifero_table.append({
+        'Campaña': year_value,
+        'Sigla': row['sigla'],
+        'Empresa': row['empresaNEW'],
+        'Caudal Pico de Gas por Etapa (km3/d/etapa)': int(row['Qg_peak_etapa']),
+        'Cantidad de Fracturas': (
+            int(row['cantidad_fracturas']) 
+            if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
+            else None
+            ),
+        'Fracspacing (m/etapa)': (
+            int(row['fracspacing']) 
+            if pd.notna(row['fracspacing']) and row['fracspacing'] > 0 
+            else None
+            ),
+        'Agente de Sosten por Etapa (tn/etapa)': (
+            int(row['agente_etapa']) 
+            if pd.notna(row['agente_etapa']) and row['agente_etapa'] > 0 
+            else None
+            )
+    })
+    previous_year = row['start_year']
+
+df_gasifero_final = pd.DataFrame(data_gasifero_table)
+st.write("**Tipo Gasífero: Top 3 Pozos con Mayor Caudal Pico por Etapa**")
+st.dataframe(df_gasifero_final, use_container_width=True,hide_index=True)
+
+# -------------------- Empresas: Promedios --------------------
+
+# --- Petrolífero ---
+grouped_petro_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
+    ['start_year', 'empresaNEW']
+).agg({
+    'Qo_peak_etapa': 'median',
+    'cantidad_fracturas': 'median'
+}).reset_index()
+
+# Ordenar y sacar Top 3 por año
+top3_petro_emp = grouped_petro_emp.sort_values(['start_year', 'Qo_peak_etapa'], ascending=[True, False]).groupby('start_year').head(3)
+
+# Lógica para no repetir el año en la visualización
+data_petro_final = []
+last_year = None
+
+for _, row in top3_petro_emp.iterrows():
+    current_year = str(int(row['start_year']))
+    # Si el año es el mismo que el anterior, lo dejamos en blanco
+    display_year = current_year if current_year != last_year else ""
+    
+    data_petro_final.append({
+        'Campaña': display_year,
+        'Empresa': row['empresaNEW'],
+        'P50 Caudal Pico por Etapa (m3/d/etapa)': round(row['Qo_peak_etapa'], 0)
+    })
+    last_year = current_year
+
+st.write("**Top 3 Empresas con Mayores Caudales Pico de Petróleo por Etapa**")
+st.dataframe(pd.DataFrame(data_petro_final), use_container_width=True, hide_index=True)
+
+
+# --- Gasífero ---
+grouped_gas_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
+    ['start_year', 'empresaNEW']
+).agg({
+    'Qg_peak_etapa': 'median',
+    'cantidad_fracturas': 'median'
+}).reset_index()
+
+# Ordenar y sacar Top 3 por año
+top3_gas_emp = grouped_gas_emp.sort_values(['start_year', 'Qg_peak_etapa'], ascending=[True, False]).groupby('start_year').head(3)
+
+# Lógica para no repetir el año en la visualización
+data_gas_final = []
+last_year = None
+
+for _, row in top3_gas_emp.iterrows():
+    current_year = str(int(row['start_year']))
+    # Si el año es el mismo que el anterior, lo dejamos en blanco
+    display_year = current_year if current_year != last_year else ""
+    
+    data_gas_final.append({
+        'Campaña': display_year,
+        'Empresa': row['empresaNEW'],
+        'P50 Caudal Pico por Etapa (km3/d/etapa)': round(row['Qg_peak_etapa'], 0)
+    
+    })
+    last_year = current_year
+
+st.write("**Top 3 Empresas con Mayores Caudales Pico de Gas por Etapa**")
+st.dataframe(pd.DataFrame(data_gas_final), use_container_width=True, hide_index=True)
+
