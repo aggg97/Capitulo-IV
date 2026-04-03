@@ -1337,6 +1337,8 @@ with tab3:
 
 # --------------------
 
+    df_filtered = df_merged_VMUT[df_merged_VMUT['start_year'] > 2012].copy()
+
     # --- CÁLCULO DE COLUMNAS POR ETAPA ---
     df_merged_VMUT['Qo_peak_x_etapa'] = (
         df_merged_VMUT['Qo_peak'] / df_merged_VMUT['cantidad_fracturas']
@@ -1349,9 +1351,10 @@ with tab3:
     # =================================================================
     # GRÁFICO 3: Petrolífero por Etapa
     # =================================================================
-    grouped_petrolifero_etapa = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
-        ['start_year']
-    ).agg({
+    grouped_petrolifero_etapa = df_merged_VMUT[
+    (df_merged_VMUT['tipopozoNEW'] == 'Petrolífero') & 
+    (df_merged_VMUT['start_year'] > 2012)
+    ].groupby(['start_year']).agg({
         'Qo_peak_x_etapa': [
             'max',
             lambda x: np.nanpercentile(x, 50) if not x.dropna().empty else np.nan,
@@ -1406,10 +1409,11 @@ with tab3:
     # =================================================================
     # GRÁFICO 4: Gasífero por Etapa (CORREGIDO)
     # =================================================================
-    grouped_gasifero_etapa = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
-        ['start_year']
-    ).agg({
-        'Qg_peak_x_etapa': [ # <-- AQUÍ ESTABA EL ERROR (usabas Qg_peak)
+    grouped_petrolifero_etapa = df_merged_VMUT[
+    (df_merged_VMUT['tipopozoNEW'] == 'Gasífero') & 
+    (df_merged_VMUT['start_year'] > 2012)
+    ].groupby(['start_year']).agg({
+        'Qo_peak_x_etapa': [
             'max',
             lambda x: np.nanpercentile(x, 50) if not x.dropna().empty else np.nan,
             lambda x: np.nanpercentile(x, 90) if not x.dropna().empty else np.nan,
