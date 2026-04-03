@@ -1243,7 +1243,9 @@ st.dataframe(pd.DataFrame(data_gas_emp), use_container_width=True, hide_index=Tr
 st.subheader("Ranking según Agente de Sosten por Volumen Inyectado", divider="blue")
 
 # Step 1: Calculate AS x volumen inyectado (tn/1000m3) for each row
-df_merged_VMUT['AS_x_volumen_inyectado'] = df_merged_VMUT['arena_total_tn'] / (df_merged_VMUT['agua_inyectada_m3'] / 1000)
+df_merged_VMUT['AS_x_volumen_inyectado'] = df_merged_VMUT['arena_total_tn'] / (
+    df_merged_VMUT['agua_inyectada_m3'].replace(0, pd.NA) / 1000
+)
 
 df_clean = df_merged_VMUT[
     (df_merged_VMUT['start_year'] >= 2012) & 
@@ -1264,13 +1266,14 @@ grouped_as_sorted = grouped_as.sort_values(
     ['start_year', 'AS_x_volumen_inyectado'], ascending=[True, False]
 )
 
-top_as = grouped_arena_sorted.groupby('start_year').head(3)
+top_as = grouped_as_sorted.groupby('start_year').head(3)
+
 
 # -------------------- Format Table --------------------
 data_arena_table = []
 previous_year = None
 
-for _, row in top_arena.iterrows():
+for _, row in top_as.iterrows():
     year_value = int(row['start_year']) if row['start_year'] != previous_year else " "
 
     data_arena_table.append({
@@ -1289,18 +1292,18 @@ for _, row in top_arena.iterrows():
 df_arena_final = pd.DataFrame(data_arena_table)
 
 st.write("**Top 3 Pozos con Mayor cc de Agente de Sosten por Volumen Inyectado**")
-st.dataframe(df_arena_final, use_container_width=True,hide_index=True)
+st.dataframe(df_arena_final, use_container_width=True, hide_index=True)
 
-# -------------------- Empresas: Arena Promedio --------------------
+
+# -------------------- Empresas: AS por Vol Inyectado --------------------
 
 grouped_emp_as = df_clean.groupby(
     ['start_year', 'empresaNEW']
 ).agg({
     'AS_x_volumen_inyectado': 'median',
-
 }).reset_index()
 
-top_emp_as= (
+top_emp_as = (
     grouped_emp_as
     .sort_values(['start_year', 'AS_x_volumen_inyectado'], ascending=[True, False])
     .groupby('start_year')
@@ -1311,7 +1314,7 @@ top_emp_as= (
 data_emp_arena = []
 last_year = None
 
-for _, row in top_emp_arena.iterrows():
+for _, row in top_emp_as.iterrows():
     current_year = str(int(row['start_year']))
     display_year = current_year if current_year != last_year else ""
 
@@ -1328,5 +1331,5 @@ for _, row in top_emp_arena.iterrows():
     last_year = current_year
 
 st.write("**Top 3 Empresas con Mayor cc de Agente de Sosten por Volumen Inyectado por Pozo**")
-st.dataframe(pd.DataFrame(data_emp_as), use_container_width=True, hide_index=True)
+st.dataframe(pd.DataFrame(data_emp_arena), use_container_width=True, hide_index=True)
 
