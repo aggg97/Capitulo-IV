@@ -1467,7 +1467,7 @@ with tab3:
     grouped_gasifero_etapa = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
         ['start_year']
     ).agg({
-        'Qg_peak': [
+        'Qg_peak_etapa': [
                 'max',
                 lambda x: np.percentile(x, 50),
                 lambda x: np.percentile(x, 90),
