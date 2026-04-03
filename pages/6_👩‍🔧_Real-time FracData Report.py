@@ -1359,7 +1359,7 @@ with tab3:
     
     
     # Step 1: Process Data for Petrolífero to get max and average oil rate
-    grouped_petrolifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
+    grouped_petrolifero_etapa = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
         ['start_year']
     ).agg({
         'Qo_peak_x_etapa': [
@@ -1371,15 +1371,15 @@ with tab3:
     }).reset_index()
     
     # Flatten column names
-    grouped_petrolifero.columns = ['start_year', 'max_oil_rate_etapa', 'p50_oil_rate_etapa', 'p10_oil_rate_etapa', 'p90_oil_rate_etapa']
+    grouped_petrolifero_etapa.columns = ['start_year', 'max_oil_rate_etapa', 'p50_oil_rate_etapa', 'p10_oil_rate_etapa', 'p90_oil_rate_etapa']
     
     # Step 2: Plot the data
     fig = go.Figure()
     
     # Plot maximum oil rate (dotted line)
     fig.add_trace(go.Scatter(
-        x=grouped_petrolifero['start_year'],
-        y=grouped_petrolifero['max_oil_rate_etapa'],
+        x=grouped_petrolifero_etapa['start_year'],
+        y=grouped_petrolifero_etapa['max_oil_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Petróleo por Etapa (Max)',
         line=dict(dash='dot', color='green'),
@@ -1388,8 +1388,8 @@ with tab3:
     
     # Plot average oil rate (solid line)
     fig.add_trace(go.Scatter(
-        x=grouped_petrolifero['start_year'],
-        y=grouped_petrolifero['p50_oil_rate_etapa'],
+        x=grouped_petrolifero_etapa['start_year'],
+        y=grouped_petrolifero_etapa['p50_oil_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Petróleo por Etapa (P50)',
         line=dict(color='green'),
@@ -1398,8 +1398,8 @@ with tab3:
 
     # Plot P90 oil rate (solid line)
     fig.add_trace(go.Scatter(
-        x=grouped_petrolifero['start_year'],
-        y=grouped_petrolifero['p10_oil_rate_etapa'],
+        x=grouped_petrolifero_etapa['start_year'],
+        y=grouped_petrolifero_etapa['p10_oil_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Petróleo por Etapa (P10)',
         line=dict(color='black'),
@@ -1408,8 +1408,8 @@ with tab3:
 
     # Plot P10 oil rate (solid line)
     fig.add_trace(go.Scatter(
-        x=grouped_petrolifero['start_year'],
-        y=grouped_petrolifero['p90_oil_rate_etapa'],
+        x=grouped_petrolifero_etapa['start_year'],
+        y=grouped_petrolifero_etapa['p90_oil_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Petróleo por Etapa (P90)',
         line=dict(color='black'),
@@ -1417,7 +1417,7 @@ with tab3:
     ))
     
     # Add annotations for max oil rate
-    for i, row in grouped_petrolifero.iterrows():
+    for i, row in grouped_petrolifero_etapa.iterrows():
         fig.add_annotation(
             x=row['start_year'],
             y=row['max_oil_rate_etapa'],
@@ -1431,7 +1431,7 @@ with tab3:
         )
     
     # Add annotations for average oil rate
-    for i, row in grouped_petrolifero.iterrows():
+    for i, row in grouped_petrolifero_etapa.iterrows():
         fig.add_annotation(
             x=row['start_year'],
             y=row['p50_oil_rate_etapa'],
@@ -1464,7 +1464,7 @@ with tab3:
     
     
     # Step 1: Process Data for Gasífero to get max and average gas rate
-    grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
+    grouped_gasifero_etapa = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
         ['start_year']
     ).agg({
         'Qg_peak': [
@@ -1476,15 +1476,15 @@ with tab3:
     }).reset_index()
     
     # Flatten column names
-    grouped_gasifero.columns = ['start_year', 'max_gas_rate_etapa', 'p50_gas_rate_etapa', 'p10_gas_rate_etapa', 'p90_gas_rate_etapa']
+    grouped_gasifero_etapa.columns = ['start_year', 'max_gas_rate_etapa', 'p50_gas_rate_etapa', 'p10_gas_rate_etapa', 'p90_gas_rate_etapa']
     
     # Step 2: Plot the data
     fig = go.Figure()
     
     # Plot maximum gas rate (dotted line)
     fig.add_trace(go.Scatter(
-        x=grouped_gasifero['start_year'],
-        y=grouped_gasifero['max_gas_rate_etapa'],
+        x=grouped_gasifero_etapa['start_year'],
+        y=grouped_gasifero_etapa['max_gas_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Gas por Etapa (Max)',
         line=dict(dash='dot', color='red'),
@@ -1493,8 +1493,8 @@ with tab3:
     
     # Plot average gas rate (solid line)
     fig.add_trace(go.Scatter(
-        x=grouped_gasifero['start_year'],
-        y=grouped_gasifero['p50_gas_rate_etapa'],
+        x=grouped_gasifero_etapa['start_year'],
+        y=grouped_gasifero_etapa['p50_gas_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Gas por Etapa (P50)',
         line=dict(color='red'),
@@ -1503,8 +1503,8 @@ with tab3:
 
     # Plot average gas rate (solid line)
     fig.add_trace(go.Scatter(
-        x=grouped_gasifero['start_year'],
-        y=grouped_gasifero['p90_gas_rate_etapa'],
+        x=grouped_gasifero_etapa['start_year'],
+        y=grouped_gasifero_etapa['p90_gas_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Gas por Etapa (P10)',
         line=dict(color='black'),
@@ -1513,8 +1513,8 @@ with tab3:
 
     # Plot average gas rate (solid line)
     fig.add_trace(go.Scatter(
-        x=grouped_gasifero['start_year'],
-        y=grouped_gasifero['p10_gas_rate_etapa'],
+        x=grouped_gasifero_etapa['start_year'],
+        y=grouped_gasifero_etapa['p10_gas_rate_etapa'],
         mode='lines+markers',
         name='Caudal Pico de Gas por Etapa (P90)',
         line=dict(color='black'),
@@ -1522,7 +1522,7 @@ with tab3:
     ))
  
     # Add annotations for max gas rate
-    for i, row in grouped_gasifero.iterrows():
+    for i, row in grouped_gasifero_etapa.iterrows():
         fig.add_annotation(
             x=row['start_year'],
             y=row['max_gas_rate_etapa'],
@@ -1536,7 +1536,7 @@ with tab3:
         )
     
     # Add annotations for average gas rate
-    for i, row in grouped_gasifero.iterrows():
+    for i, row in grouped_gasifero_etapa.iterrows():
         fig.add_annotation(
             x=row['start_year'],
             y=row['p50_gas_rate_etapa'],
