@@ -1392,10 +1392,10 @@ with tab3:
     # Anotaciones (Max y P50)
     for _, row in grouped_petrolifero_etapa.iterrows():
         if not np.isnan(row['max_oil']):
-            fig_oil_etapa.add_annotation(x=row['start_year'], y=row['max_oil'], text=f"{row['max_oil']:.1f}",
+            fig_oil_etapa.add_annotation(x=row['start_year'], y=row['max_oil'], text=f"{row['max_oil']:.2f}",
                                          showarrow=False, ay=-40, font=dict(color='green'), bgcolor='white')
         if not np.isnan(row['p50_oil']):
-            fig_oil_etapa.add_annotation(x=row['start_year'], y=row['p50_oil'], text=f"{row['p50_oil']:.1f}",
+            fig_oil_etapa.add_annotation(x=row['start_year'], y=row['p50_oil'], text=f"{row['p50_oil']:.2f}",
                                          showarrow=False, ay=40, font=dict(color='green'), bgcolor='white')
     
     fig_oil_etapa.update_layout(
@@ -1449,10 +1449,10 @@ with tab3:
     # Anotaciones (Max y P50)
     for _, row in grouped_gasifero_etapa.iterrows():
         if not np.isnan(row['max_gas']):
-            fig_gas_etapa.add_annotation(x=row['start_year'], y=row['max_gas'], text=f"{row['max_gas']:.1f}",
+            fig_gas_etapa.add_annotation(x=row['start_year'], y=row['max_gas'], text=f"{row['max_gas']:.2f}",
                                          showarrow=False, ay=-40, font=dict(color='red'), bgcolor='white')
         if not np.isnan(row['p50_gas']):
-            fig_gas_etapa.add_annotation(x=row['start_year'], y=row['p50_gas'], text=f"{row['p50_gas']:.1f}",
+            fig_gas_etapa.add_annotation(x=row['start_year'], y=row['p50_gas'], text=f"{row['p50_gas']:.2f}",
                                          showarrow=False, ay=40, font=dict(color='red'), bgcolor='white')
     
     fig_gas_etapa.update_layout(
