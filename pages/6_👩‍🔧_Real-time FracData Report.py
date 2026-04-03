@@ -1354,9 +1354,9 @@ with tab3:
     ).agg({
         'Qo_peak_x_etapa': [
             'max',
-            lambda x: np.percentile(x, 50),
-            lambda x: np.percentile(x, 90),
-            lambda x: np.percentile(x, 10)
+            lambda x: np.nanpercentile(x, 50) if not x.dropna().empty else np.nan,
+            lambda x: np.nanpercentile(x, 90) if not x.dropna().empty else np.nan,
+            lambda x: np.nanpercentile(x, 10) if not x.dropna().empty else np.nan
         ]
     }).reset_index()
     
@@ -1411,9 +1411,9 @@ with tab3:
     ).agg({
         'Qg_peak_x_etapa': [ # <-- AQUÍ ESTABA EL ERROR (usabas Qg_peak)
             'max',
-            lambda x: np.percentile(x, 50),
-            lambda x: np.percentile(x, 90),
-            lambda x: np.percentile(x, 10)
+            lambda x: np.nanpercentile(x, 50) if not x.dropna().empty else np.nan,
+            lambda x: np.nanpercentile(x, 90) if not x.dropna().empty else np.nan,
+            lambda x: np.nanpercentile(x, 10) if not x.dropna().empty else np.nan
         ]
     }).reset_index()
     
