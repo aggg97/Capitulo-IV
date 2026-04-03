@@ -1399,7 +1399,7 @@ with tab3:
                                          showarrow=False, ay=40, font=dict(color='green'), bgcolor='white')
     
     fig_oil_etapa.update_layout(
-        title="Petrolífero: Caudal Pico de Petróleo por Etapa",
+        title="Tipo Petrolífero Evolución del Caudal Pico de Gas por Etapa (Máximo y Percentiles)",
         xaxis_title="Campaña", yaxis_title="m3/d/etapa",
         template="plotly_white", legend=dict(orientation='h', y=1.1, x=0.5, xanchor='center')
     )
@@ -1456,7 +1456,7 @@ with tab3:
                                          showarrow=False, ay=40, font=dict(color='red'), bgcolor='white')
     
     fig_gas_etapa.update_layout(
-        title="Gasífero: Caudal Pico de Gas por Etapa",
+        title="Tipo Gasífero: Evolución del Caudal Pico de Gas por Etapa (Máximo y Percentiles)",
         xaxis_title="Campaña", yaxis_title="km3/d/etapa",
         template="plotly_white", legend=dict(orientation='h', y=1.1, x=0.5, xanchor='center')
     )
