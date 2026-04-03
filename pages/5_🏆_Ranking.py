@@ -1491,7 +1491,7 @@ for _, row in top3_petro_emp.iterrows():
     })
     last_year = current_year
 
-st.write("**Top 3 Empresas con Mayores Caudales Pico de Petróleo por Etapa**")
+st.write("**Top 3 Empresas con Mayores Caudales Pico de Petróleo por Etapa por Pozo**")
 st.dataframe(pd.DataFrame(data_petro_final), use_container_width=True, hide_index=True)
 
 
@@ -1524,6 +1524,6 @@ for _, row in top3_gas_emp.iterrows():
     })
     last_year = current_year
 
-st.write("**Top 3 Empresas con Mayores Caudales Pico de Gas por Etapa**")
+st.write("**Top 3 Empresas con Mayores Caudales Pico de Gas por Etapa por Pozo**")
 st.dataframe(pd.DataFrame(data_gas_final), use_container_width=True, hide_index=True)
 
