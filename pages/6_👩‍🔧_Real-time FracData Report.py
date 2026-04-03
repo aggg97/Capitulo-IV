@@ -1409,7 +1409,7 @@ with tab3:
     # =================================================================
     # GRÁFICO 4: Gasífero por Etapa (CORREGIDO)
     # =================================================================
-    grouped_petrolifero_etapa = df_merged_VMUT[
+    grouped_gasifero_etapa = df_merged_VMUT[
     (df_merged_VMUT['tipopozoNEW'] == 'Gasífero') & 
     (df_merged_VMUT['start_year'] > 2012)
     ].groupby(['start_year']).agg({
