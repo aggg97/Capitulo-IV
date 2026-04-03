@@ -1403,7 +1403,7 @@ st.dataframe(df_petrolifero_final, use_container_width=True,hide_index=True)
 grouped_gasifero = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
     ['start_year', 'sigla', 'empresaNEW']
 ).agg({
-    'Qg_peak_etapa': 'max',
+    'Qg_peak_x_etapa': 'max',
     'longitud_rama_horizontal_m': 'median',
     'cantidad_fracturas': 'median',
     'arena_bombeada_nacional_tn': 'sum',
@@ -1415,7 +1415,7 @@ grouped_gasifero['agente_etapa'] = (
     grouped_gasifero['arena_bombeada_nacional_tn'] + grouped_gasifero['arena_bombeada_importada_tn']
 ) / grouped_gasifero['cantidad_fracturas']
 
-grouped_gasifero_sorted = grouped_gasifero.sort_values(['start_year', 'Qg_peak_etapa'], ascending=[True, False])
+grouped_gasifero_sorted = grouped_gasifero.sort_values(['start_year', 'Qg_peak_x_etapa'], ascending=[True, False])
 top_gasifero = grouped_gasifero_sorted.groupby('start_year').head(3)
 
 # Format Table
@@ -1427,7 +1427,7 @@ for _, row in top_gasifero.iterrows():
         'Campaña': year_value,
         'Sigla': row['sigla'],
         'Empresa': row['empresaNEW'],
-        'Caudal Pico de Gas por Etapa (km3/d/etapa)': int(row['Qg_peak_etapa']),
+        'Caudal Pico de Gas por Etapa (km3/d/etapa)': int(row['Qg_peak_x_etapa']),
         'Cantidad de Fracturas': (
             int(row['cantidad_fracturas']) 
             if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
@@ -1456,12 +1456,12 @@ st.dataframe(df_gasifero_final, use_container_width=True,hide_index=True)
 grouped_petro_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'].groupby(
     ['start_year', 'empresaNEW']
 ).agg({
-    'Qo_peak_etapa': 'median',
+    'Qo_peak_x_etapa': 'median',
     'cantidad_fracturas': 'median'
 }).reset_index()
 
 # Ordenar y sacar Top 3 por año
-top3_petro_emp = grouped_petro_emp.sort_values(['start_year', 'Qo_peak_etapa'], ascending=[True, False]).groupby('start_year').head(3)
+top3_petro_emp = grouped_petro_emp.sort_values(['start_year', 'Qo_peak_x_etapa'], ascending=[True, False]).groupby('start_year').head(3)
 
 # Lógica para no repetir el año en la visualización
 data_petro_final = []
@@ -1475,7 +1475,7 @@ for _, row in top3_petro_emp.iterrows():
     data_petro_final.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'P50 Caudal Pico por Etapa (m3/d/etapa)': round(row['Qo_peak_etapa'], 0)
+        'P50 Caudal Pico por Etapa (m3/d/etapa)': round(row['Qo_peak_x_etapa'], 0)
     })
     last_year = current_year
 
@@ -1487,12 +1487,12 @@ st.dataframe(pd.DataFrame(data_petro_final), use_container_width=True, hide_inde
 grouped_gas_emp = df_merged_VMUT[df_merged_VMUT['tipopozoNEW'] == 'Gasífero'].groupby(
     ['start_year', 'empresaNEW']
 ).agg({
-    'Qg_peak_etapa': 'median',
+    'Qg_peak_x_etapa': 'median',
     'cantidad_fracturas': 'median'
 }).reset_index()
 
 # Ordenar y sacar Top 3 por año
-top3_gas_emp = grouped_gas_emp.sort_values(['start_year', 'Qg_peak_etapa'], ascending=[True, False]).groupby('start_year').head(3)
+top3_gas_emp = grouped_gas_emp.sort_values(['start_year', 'Qg_peak_x_etapa'], ascending=[True, False]).groupby('start_year').head(3)
 
 # Lógica para no repetir el año en la visualización
 data_gas_final = []
@@ -1506,7 +1506,7 @@ for _, row in top3_gas_emp.iterrows():
     data_gas_final.append({
         'Campaña': display_year,
         'Empresa': row['empresaNEW'],
-        'P50 Caudal Pico por Etapa (km3/d/etapa)': round(row['Qg_peak_etapa'], 0)
+        'P50 Caudal Pico por Etapa (km3/d/etapa)': round(row['Qg_peak_x_etapa'], 0)
     
     })
     last_year = current_year
