@@ -1378,7 +1378,7 @@ for _, row in top_petrolifero.iterrows():
         'Empresa': row['empresaNEW'],
         'Caudal Pico de Petróleo por Etapa (m3/d/etapa)': (
             int(row['Qo_peak_x_etapa'])
-            if pd.notna(row['Qp_peak_x_etapa'])
+            if pd.notna(row['Qo_peak_x_etapa'])
             else None
             ),
         'Cantidad de Fracturas': (
