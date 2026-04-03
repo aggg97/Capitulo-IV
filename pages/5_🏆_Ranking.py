@@ -1376,7 +1376,11 @@ for _, row in top_petrolifero.iterrows():
         'Campaña': year_value,
         'Sigla': row['sigla'],
         'Empresa': row['empresaNEW'],
-        'Caudal Pico de Petróleo por Etapa (m3/d/etapa)': int(row['Qo_peak_x_etapa']),
+        'Caudal Pico de Petróleo por Etapa (m3/d/etapa)': (
+            int(row['Qo_peak_x_etapa'])
+            if pd.notna(row['Qp_peak_x_etapa'])
+            else None
+            ),
         'Cantidad de Fracturas': (
             int(row['cantidad_fracturas']) 
             if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
@@ -1427,7 +1431,11 @@ for _, row in top_gasifero.iterrows():
         'Campaña': year_value,
         'Sigla': row['sigla'],
         'Empresa': row['empresaNEW'],
-        'Caudal Pico de Gas por Etapa (km3/d/etapa)': int(row['Qg_peak_x_etapa']),
+        'Caudal Pico de Gas por Etapa (km3/d/etapa)': (
+            int(row['Qg_peak_x_etapa'])
+            if pd.notna(row['Qg_peak_x_etapa'])
+            else None
+            ),
         'Cantidad de Fracturas': (
             int(row['cantidad_fracturas']) 
             if pd.notna(row['cantidad_fracturas']) and row['cantidad_fracturas'] > 0 
