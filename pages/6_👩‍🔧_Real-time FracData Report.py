@@ -1337,3 +1337,136 @@ with tab3:
 
 # --------------------
 
+    df_merged_VMUT['Qo_peak_x_etapa'] = (
+        df_merged_VMUT['Qo_peak'] / df_merged_VMUT['cantidad_fracturas']
+    ).replace([np.inf, -np.inf], np.nan)
+    
+    df_merged_VMUT['Qg_peak_x_etapa'] = (
+        df_merged_VMUT['Qg_peak'] / df_merged_VMUT['cantidad_fracturas']
+    ).replace([np.inf, -np.inf], np.nan)
+
+    grouped_petrolifero_etapa = df_merged_VMUT[
+        df_merged_VMUT['tipopozoNEW'] == 'Petrolífero'
+    ].groupby(['start_year']).agg({
+        'Qo_peak_x_etapa': [
+            'max',
+            lambda x: np.percentile(x, 50),
+            lambda x: np.percentile(x, 90),
+            lambda x: np.percentile(x, 10)
+        ]
+    }).reset_index()
+    
+    grouped_petrolifero_etapa.columns = [
+        'start_year',
+        'max_oil_rate_etapa',
+        'avg_oil_rate_etapa',
+        'p10_oil_rate_etapa',
+        'p90_oil_rate_etapa'
+    ]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=grouped_petrolifero_etapa['start_year'],
+        y=grouped_petrolifero_etapa['max_oil_rate_etapa'],
+        mode='lines+markers',
+        name='Qo/etapa Max',
+        line=dict(dash='dot', color='#C9184A')
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=grouped_petrolifero_etapa['start_year'],
+        y=grouped_petrolifero_etapa['avg_oil_rate_etapa'],
+        mode='lines+markers',
+        name='Qo/etapa P50',
+        line=dict(color='#FF4D8D')
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=grouped_petrolifero_etapa['start_year'],
+        y=grouped_petrolifero_etapa['p10_oil_rate_etapa'],
+        mode='lines',
+        name='Qo/etapa P10',
+        line=dict(color='black')
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=grouped_petrolifero_etapa['start_year'],
+        y=grouped_petrolifero_etapa['p90_oil_rate_etapa'],
+        mode='lines',
+        name='Qo/etapa P90',
+        line=dict(color='black', dash='dash')
+    ))
+    
+    fig.update_layout(
+        title="Petrolífero: Qo_peak por Etapa",
+        xaxis_title="Campaña",
+        yaxis_title="Qo_peak / etapa (m3/d/etapa)",
+        template="plotly_white",
+        legend=dict(orientation='h', y=1, x=0.5, xanchor='center')
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+
+    grouped_gasifero_etapa = df_merged_VMUT[
+    df_merged_VMUT['tipopozoNEW'] == 'Gasífero'
+    ].groupby(['start_year']).agg({
+        'Qg_peak_x_etapa': [
+            'max',
+            lambda x: np.percentile(x, 50),
+            lambda x: np.percentile(x, 90),
+            lambda x: np.percentile(x, 10)
+        ]
+    }).reset_index()
+    
+    grouped_gasifero_etapa.columns = [
+        'start_year',
+        'max_gas_rate_etapa',
+        'avg_gas_rate_etapa',
+        'p10_gas_rate_etapa',
+        'p90_gas_rate_etapa'
+    ]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=grouped_gasifero_etapa['start_year'],
+        y=grouped_gasifero_etapa['max_gas_rate_etapa'],
+        mode='lines+markers',
+        name='Qg/etapa Max',
+        line=dict(dash='dot', color='#3C096C')
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=grouped_gasifero_etapa['start_year'],
+        y=grouped_gasifero_etapa['avg_gas_rate_etapa'],
+        mode='lines+markers',
+        name='Qg/etapa P50',
+        line=dict(color='#7B2CBF')
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=grouped_gasifero_etapa['start_year'],
+        y=grouped_gasifero_etapa['p10_gas_rate_etapa'],
+        mode='lines',
+        name='Qg/etapa P10',
+        line=dict(color='black')
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=grouped_gasifero_etapa['start_year'],
+        y=grouped_gasifero_etapa['p90_gas_rate_etapa'],
+        mode='lines',
+        name='Qg/etapa P90',
+        line=dict(color='black', dash='dash')
+    ))
+    
+    fig.update_layout(
+        title="Gasífero: Qg_peak por Etapa",
+        xaxis_title="Campaña",
+        yaxis_title="Qg_peak / etapa (km3/d/etapa)",
+        template="plotly_white",
+        legend=dict(orientation='h', y=1, x=0.5, xanchor='center')
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
