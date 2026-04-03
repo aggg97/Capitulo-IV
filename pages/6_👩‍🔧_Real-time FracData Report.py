@@ -1400,7 +1400,7 @@ with tab3:
     
     fig_oil_etapa.update_layout(
         title="Tipo Petrolífero Evolución del Caudal Pico de Gas por Etapa (Máximo y Percentiles)",
-        xaxis_title="Campaña", yaxis_title="m3/d/etapa",
+        xaxis_title="Campaña", yaxis_title="Caudal de Petróleo (m3/d/etapa)",
         template="plotly_white", legend=dict(orientation='h', y=1.1, x=0.5, xanchor='center')
     )
     st.plotly_chart(fig_oil_etapa, use_container_width=True)
@@ -1457,7 +1457,7 @@ with tab3:
     
     fig_gas_etapa.update_layout(
         title="Tipo Gasífero: Evolución del Caudal Pico de Gas por Etapa (Máximo y Percentiles)",
-        xaxis_title="Campaña", yaxis_title="km3/d/etapa",
+        xaxis_title="Campaña", yaxis_title="Caudal de gas (km3/d/etapa)",
         template="plotly_white", legend=dict(orientation='h', y=1.1, x=0.5, xanchor='center')
     )
     st.plotly_chart(fig_gas_etapa, use_container_width=True)
